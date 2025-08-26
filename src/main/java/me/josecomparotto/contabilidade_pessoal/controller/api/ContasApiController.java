@@ -14,7 +14,7 @@ import me.josecomparotto.contabilidade_pessoal.service.ContasService;
 
 @RestController
 @RequestMapping("/api/contas")
-public class ContasController {
+public class ContasApiController {
 
     @Autowired
     private ContasService contasService;
