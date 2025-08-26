@@ -35,3 +35,17 @@ spring:
     placeholders:
       app_user: "${APP_DB_USER:app}"
       app_user_password: "${APP_DB_PASSWORD:app}"
+
+springdoc:
+  swagger-ui:
+    # Path where Swagger UI will be served
+    path: /api/docs
+    # Serve a custom OpenAPI definition from static resources
+    urls:
+      - name: API de Simulação de Crédito
+        url: /api/openapi.yaml
+    display-request-duration: true
+    doc-expansion: list
+  api-docs:
+    enabled: true
+    path: /v3/api-docs

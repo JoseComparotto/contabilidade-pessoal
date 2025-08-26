@@ -10,7 +10,7 @@ info:
     - Em `flat`, os itens seguem a estrutura de `ContaFlatDto`.
     - Em `tree`, os itens seguem a estrutura de `ContaTreeDto` (recursiva via `inferiores`).
 servers:
-  - url: http://localhost:8080/api
+  - url: /api
     description: Servidor local
 tags:
   - name: Contas
