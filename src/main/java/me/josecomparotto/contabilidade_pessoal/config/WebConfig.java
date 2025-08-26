@@ -22,8 +22,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addViewControllers(@NonNull ViewControllerRegistry registry) {
         String docsPath = "/api/docs";
-        registry.addRedirectViewController("/docs", docsPath);
-        registry.addRedirectViewController("/", docsPath);
-        registry.addRedirectViewController("", docsPath);
+        registry.addRedirectViewController("/api", docsPath);
     }
 }

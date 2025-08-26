@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contas</title>
+    <link rel="stylesheet" href="/css/contas.css" />
+</head>
+<body>
+    <main class="container">
+        <h1>Contas</h1>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descrição</th>
+                        <th>Saldo Atual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Flattened view renders a list of ContaFlatDto which has id, codigo, descricao, natureza, tipo -->
+                    <tr th:each="c : ${contas}" th:object="${c}" th:classappend="${c.tipo.name() == 'SINTETICA'} ? 'sintetica'">
+                        <td th:text="*{codigo != null ? codigo : (id != null ? id : '')}">1</td>
+                        <td th:text="*{descricao}">Descrição</td>
+                        <td th:text="*{saldoAtualFormatado}">R$ 0,00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+</body>
+</html>
