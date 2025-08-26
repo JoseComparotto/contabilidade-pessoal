@@ -27,10 +27,13 @@ public class ContasService {
     }
 
     public List<?> listarContasPorView(String view) {
-        if ("tree".equalsIgnoreCase(view)) {
+        if (view == null || "flat".equalsIgnoreCase(view)) {
+            return listarContasFlat();
+        } else if ("tree".equalsIgnoreCase(view)) {
             return listarContasTree();
+        } else {
+            throw new IllegalArgumentException("Visualização não suportada: " + view);
         }
-        return listarContasFlat();
     }
 
     public List<ContaTreeDto> listarContasTree() {
@@ -57,8 +60,8 @@ public class ContasService {
                 roots.add(dto);
             }
         }
-    // Ordenar raízes e filhos por sequencia
-    ordenarArvore(roots, seqMap);
+        // Ordenar raízes e filhos por sequencia
+        ordenarArvore(roots, seqMap);
         return roots;
     }
 
@@ -72,11 +75,11 @@ public class ContasService {
             byId.put(c.getId(), c);
         }
 
-        // Ordenar lexicograficamente por caminho de sequencias (ex.: [1], [1,1], [1,2], [2])
+        // Ordenar lexicograficamente por caminho de sequencias (ex.: [1], [1,1], [1,2],
+        // [2])
         list.sort((a, b) -> comparePaths(
-            a.getPath(),
-            b.getPath()
-        ));
+                a.getPath(),
+                b.getPath()));
         return list;
     }
 
@@ -113,21 +116,25 @@ public class ContasService {
 
     // Compara dois caminhos lexicograficamente
     private int comparePaths(List<Integer> a, List<Integer> b) {
-        if (a == b) return 0;
-        if (a == null) return -1;
-        if (b == null) return 1;
+        if (a == b)
+            return 0;
+        if (a == null)
+            return -1;
+        if (b == null)
+            return 1;
         int size = Math.min(a.size(), b.size());
         for (int i = 0; i < size; i++) {
             int cmp = Integer.compare(a.get(i), b.get(i));
-            if (cmp != 0) return cmp;
+            if (cmp != 0)
+                return cmp;
         }
         return Integer.compare(a.size(), b.size());
     }
 
     private void ordenarArvore(List<ContaTreeDto> nodes, Map<Integer, Integer> seqMap) {
         nodes.sort(Comparator
-            .comparing((ContaTreeDto n) -> seqMap.getOrDefault(n.getId(), Integer.MAX_VALUE))
-            .thenComparing(ContaTreeDto::getId));
+                .comparing((ContaTreeDto n) -> seqMap.getOrDefault(n.getId(), Integer.MAX_VALUE))
+                .thenComparing(ContaTreeDto::getId));
         for (ContaTreeDto n : nodes) {
             ordenarArvore(n.getInferiores(), seqMap);
         }

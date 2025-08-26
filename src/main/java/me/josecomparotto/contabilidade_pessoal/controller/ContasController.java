@@ -21,14 +21,14 @@ public class ContasController {
 
     // GET /contas?view=tree|flat (default=flat)
     @GetMapping
-    public List<?> listarContas(@RequestParam(name = "view", defaultValue = "flat") String view) {
+    public List<?> listarContas(@RequestParam(defaultValue = "flat") String view) {
         return contasService.listarContasPorView(view);
     }
 
     // GET /contas/{id}?view=tree|flat (default=flat)
     @GetMapping("/{id}")
     public ResponseEntity<?> obterConta(@PathVariable Integer id,
-            @RequestParam(name = "view", defaultValue = "flat") String view) {
+            @RequestParam(defaultValue = "flat") String view) {
         Object body = contasService.obterContaPorIdPorView(id, view);
         if (body == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(body);
