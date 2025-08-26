@@ -15,16 +15,5 @@ services:
       timeout: 3s
       retries: 20
 
-  adminer:
-    image: adminer:4
-    container_name: contabilidade_adminer
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      ADMINER_DEFAULT_SERVER: db
-    ports:
-      - "8081:8080"
-
 volumes:
   db-data:
