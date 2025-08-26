@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: contabilidade-pessoal
+
+  # --- Environment File Import ---
+  config:
+    import: "optional:file:.env[.properties]"
+
+  # --- Datasource (PostgreSQL) ---
+  datasource:
+    url: "${DB_URL:jdbc:postgresql://localhost:${DB_PORT:5432}/${POSTGRES_DB:contabilidade}}"
+    username: "${APP_DB_USER}"
+    password: "${APP_DB_PASSWORD}"
+    driver-class-name: "org.postgresql.Driver"
+
+  # --- JPA / Hibernate ---
+  jpa:
+    hibernate:
+      ddl-auto: "validate"
+    database-platform: "org.hibernate.dialect.PostgreSQLDialect"
+    show-sql: false
+
+  # --- Flyway ---
+  flyway:
+    enabled: true
+    locations: "classpath:db/migration"
+    baseline-on-migrate: true
+
+    # Flyway runs with admin user (superuser) distinct from app user
+    url: "${DB_URL:jdbc:postgresql://localhost:${DB_PORT:5432}/${POSTGRES_DB:contabilidade}}"
+    user: "${POSTGRES_USER}"
+    password: "${POSTGRES_PASSWORD}"
+
+    # Placeholders to use inside migrations (e.g., ${app_user})
+    placeholders:
+      app_user: "${APP_DB_USER:app}"
+      app_user_password: "${APP_DB_PASSWORD:app}"
