@@ -1,0 +1,130 @@
+openapi: 3.0.3
+info:
+  title: Contabilidade Pessoal API
+  version: 0.0.1
+  description: |
+    API para gerenciamento e consulta de contas contábeis.
+    
+    Observações:
+    - O parâmetro de consulta `view` controla a forma de retorno: `flat` (padrão) ou `tree`.
+    - Em `flat`, os itens seguem a estrutura de `ContaFlatDto`.
+    - Em `tree`, os itens seguem a estrutura de `ContaTreeDto` (recursiva via `inferiores`).
+servers:
+  - url: http://localhost:8080
+    description: Servidor local (Spring Boot padrão)
+tags:
+  - name: Contas
+    description: Endpoints de consulta de contas
+paths:
+  /contas:
+    get:
+      tags: [Contas]
+      summary: Listar contas
+      operationId: listarContas
+      parameters:
+        - in: query
+          name: view
+          description: Define a forma de visualização dos dados
+          required: false
+          schema:
+            type: string
+            enum: [flat, tree]
+            default: flat
+      responses:
+        '200':
+          description: Lista de contas
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/ContaFlatDto'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/ContaTreeDto'
+  /contas/{id}:
+    get:
+      tags: [Contas]
+      summary: Obter conta por ID
+      operationId: obterContaPorId
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Identificador da conta
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: view
+          description: Define a forma de visualização do retorno
+          required: false
+          schema:
+            type: string
+            enum: [flat, tree]
+            default: flat
+      responses:
+        '200':
+          description: Conta encontrada
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ContaFlatDto'
+                  - $ref: '#/components/schemas/ContaTreeDto'
+        '404':
+          description: Conta não encontrada
+components:
+  schemas:
+    Natureza:
+      type: string
+      description: Natureza da conta
+      enum: [CREDORA, DEVEDORA]
+    TipoConta:
+      type: string
+      description: Tipo da conta
+      enum: [ANALITICA, SINTETICA]
+    ContaFlatDto:
+      type: object
+      description: Representação plana de uma conta
+      properties:
+        id:
+          type: integer
+          format: int32
+        codigo:
+          type: string
+          description: Código calculado a partir do caminho (ex. "1.2.3")
+        descricao:
+          type: string
+        superiorId:
+          type: integer
+          format: int32
+          nullable: true
+        natureza:
+          $ref: '#/components/schemas/Natureza'
+        tipo:
+          $ref: '#/components/schemas/TipoConta'
+      required: [id, codigo, descricao, natureza, tipo]
+    ContaTreeDto:
+      type: object
+      description: Representação hierárquica de uma conta com seus filhos
+      properties:
+        id:
+          type: integer
+          format: int32
+        codigo:
+          type: string
+          description: Código calculado a partir do caminho (ex. "1.2.3")
+        descricao:
+          type: string
+        natureza:
+          $ref: '#/components/schemas/Natureza'
+        tipo:
+          $ref: '#/components/schemas/TipoConta'
+        inferiores:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContaTreeDto'
+          description: Contas filhas
+      required: [id, codigo, descricao, natureza, tipo]
