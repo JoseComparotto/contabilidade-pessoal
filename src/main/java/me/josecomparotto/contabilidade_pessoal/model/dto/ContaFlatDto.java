@@ -1,11 +1,11 @@
-package me.josecomparotto.contabilidade_pessoal.dto;
+package me.josecomparotto.contabilidade_pessoal.model.dto;
 
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import me.josecomparotto.contabilidade_pessoal.model.Natureza;
-import me.josecomparotto.contabilidade_pessoal.model.TipoConta;
+import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
+import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 
 public class ContaFlatDto {
     private Integer id;

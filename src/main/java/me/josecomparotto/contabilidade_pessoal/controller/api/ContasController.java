@@ -1,4 +1,4 @@
-package me.josecomparotto.contabilidade_pessoal.controller;
+package me.josecomparotto.contabilidade_pessoal.controller.api;
 
 import java.util.List;
 
@@ -13,19 +13,19 @@ import org.springframework.web.bind.annotation.RestController;
 import me.josecomparotto.contabilidade_pessoal.service.ContasService;
 
 @RestController
-@RequestMapping("/contas")
+@RequestMapping("/api/contas")
 public class ContasController {
 
     @Autowired
     private ContasService contasService;
 
-    // GET /contas?view=tree|flat (default=flat)
+    // GET /api/contas?view=tree|flat (default=flat)
     @GetMapping
     public List<?> listarContas(@RequestParam(defaultValue = "flat") String view) {
         return contasService.listarContasPorView(view);
     }
 
-    // GET /contas/{id}?view=tree|flat (default=flat)
+    // GET /api/contas/{id}?view=tree|flat (default=flat)
     @GetMapping("/{id}")
     public ResponseEntity<?> obterConta(@PathVariable Integer id,
             @RequestParam(defaultValue = "flat") String view) {

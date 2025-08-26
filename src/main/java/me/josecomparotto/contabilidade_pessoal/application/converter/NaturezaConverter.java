@@ -1,7 +1,8 @@
-package me.josecomparotto.contabilidade_pessoal.model;
+package me.josecomparotto.contabilidade_pessoal.application.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 
 @Converter(autoApply = false)
 public class NaturezaConverter implements AttributeConverter<Natureza, Boolean> {

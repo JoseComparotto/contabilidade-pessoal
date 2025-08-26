@@ -1,9 +1,11 @@
-package me.josecomparotto.contabilidade_pessoal.dto;
+package me.josecomparotto.contabilidade_pessoal.application.mapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import me.josecomparotto.contabilidade_pessoal.model.Conta;
+import me.josecomparotto.contabilidade_pessoal.model.dto.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.ContaTreeDto;
+import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 
 public final class ContaMapper {
 

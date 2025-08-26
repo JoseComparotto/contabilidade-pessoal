@@ -1,4 +1,4 @@
-package me.josecomparotto.contabilidade_pessoal.model;
+package me.josecomparotto.contabilidade_pessoal.model.entity;
 
 import java.beans.Transient;
 import java.util.ArrayList;
@@ -16,6 +16,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import me.josecomparotto.contabilidade_pessoal.application.converter.NaturezaConverter;
+import me.josecomparotto.contabilidade_pessoal.application.converter.TipoContaConverter;
+import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
+import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 
 @Entity
 @Table(name = "tb_contas", schema = "public")

@@ -1,10 +1,10 @@
-package me.josecomparotto.contabilidade_pessoal.dto;
+package me.josecomparotto.contabilidade_pessoal.model.dto;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import me.josecomparotto.contabilidade_pessoal.model.Natureza;
-import me.josecomparotto.contabilidade_pessoal.model.TipoConta;
+import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
+import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 
 public class ContaTreeDto {
     private Integer id;

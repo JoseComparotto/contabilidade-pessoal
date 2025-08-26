@@ -6,9 +6,10 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.data.repository.query.Param;
 
-import me.josecomparotto.contabilidade_pessoal.model.Conta;
+import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
+
+import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface ContaRepository extends JpaRepository<Conta, Integer> {

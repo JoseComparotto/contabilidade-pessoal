@@ -10,10 +10,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import me.josecomparotto.contabilidade_pessoal.dto.ContaTreeDto;
-import me.josecomparotto.contabilidade_pessoal.dto.ContaFlatDto;
-import me.josecomparotto.contabilidade_pessoal.dto.ContaMapper;
-import me.josecomparotto.contabilidade_pessoal.model.Conta;
+import me.josecomparotto.contabilidade_pessoal.application.mapper.ContaMapper;
+import me.josecomparotto.contabilidade_pessoal.model.dto.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.ContaTreeDto;
+import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.repository.ContaRepository;
 
 @Service
