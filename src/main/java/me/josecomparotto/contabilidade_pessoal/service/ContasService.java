@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import me.josecomparotto.contabilidade_pessoal.dto.ContaTreeDto;
 import me.josecomparotto.contabilidade_pessoal.dto.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.dto.ContaMapper;
 import me.josecomparotto.contabilidade_pessoal.model.Conta;
 import me.josecomparotto.contabilidade_pessoal.repository.ContaRepository;
 
@@ -38,10 +39,7 @@ public class ContasService {
         Map<Integer, ContaTreeDto> dtoMap = new HashMap<>();
         Map<Integer, Integer> seqMap = new HashMap<>();
         for (Conta c : all) {
-            dtoMap.put(c.getId(), new ContaTreeDto(
-                    c.getId(),
-                    c.getCodigo(),
-                    c.getDescricao()));
+            dtoMap.put(c.getId(), ContaMapper.toTreeDto(c));
             seqMap.put(c.getId(), c.getSequencia());
         }
 
@@ -66,20 +64,12 @@ public class ContasService {
 
     public List<ContaFlatDto> listarContasFlat() {
         List<Conta> all = contaRepository.findAllWithSuperior();
-        List<ContaFlatDto> list = new ArrayList<>();
+        List<ContaFlatDto> list = ContaMapper.toFlatList(all);
+
         // Map para navegar a cadeia de superiores sem novas consultas
         Map<Integer, Conta> byId = new HashMap<>();
         for (Conta c : all) {
             byId.put(c.getId(), c);
-        }
-
-        for (Conta c : all) {
-            Integer superiorId = c.getSuperior() != null ? c.getSuperior().getId() : null;
-            list.add(new ContaFlatDto(
-                    c.getId(),
-                    c.getCodigo(),
-                    c.getDescricao(),
-                    superiorId,c.getPath()));
         }
 
         // Ordenar lexicograficamente por caminho de sequencias (ex.: [1], [1,1], [1,2], [2])
@@ -102,13 +92,7 @@ public class ContasService {
         if (opt.isEmpty())
             return null;
         Conta c = opt.get();
-        Integer superiorId = c.getSuperior() != null ? c.getSuperior().getId() : null;
-        ContaFlatDto dto = new ContaFlatDto(
-            c.getId(),
-            c.getCodigo(),
-            c.getDescricao(),
-            superiorId,
-            c.getPath());
+        ContaFlatDto dto = ContaMapper.toFlatDto(c);
         return dto;
     }
 

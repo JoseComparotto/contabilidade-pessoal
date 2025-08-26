@@ -12,6 +12,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -31,6 +33,14 @@ public class Conta {
     private Integer sequencia;
 
     private String descricao;
+
+    @Column(name = "credora")
+    @Convert(converter = NaturezaConverter.class)
+    private Natureza natureza;
+
+    @Column(name = "analitica")
+    @Convert(converter = TipoContaConverter.class)
+    private TipoConta tipo;
 
     @OneToMany(mappedBy = "superior")
     @JsonIgnoreProperties("superior")
@@ -86,6 +96,22 @@ public class Conta {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public Natureza getNatureza() {
+        return natureza;
+    }
+
+    public void setNatureza(Natureza natureza) {
+        this.natureza = natureza;
+    }
+
+    public TipoConta getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(TipoConta tipo) {
+        this.tipo = tipo;
     }
 
     public List<Conta> getInferiores() {

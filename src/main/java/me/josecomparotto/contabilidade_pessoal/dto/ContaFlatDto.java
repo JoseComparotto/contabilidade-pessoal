@@ -4,24 +4,21 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import me.josecomparotto.contabilidade_pessoal.model.Natureza;
+import me.josecomparotto.contabilidade_pessoal.model.TipoConta;
+
 public class ContaFlatDto {
     private Integer id;
     private String codigo;
     private String descricao;
     private Integer superiorId;
+    private Natureza natureza;
+    private TipoConta tipo;
 
     @JsonIgnore
     private List<Integer> path;
 
     public ContaFlatDto() {}
-
-    public ContaFlatDto(Integer id, String codigo, String descricao, Integer superiorId, List<Integer> path) {
-        this.id = id;
-        this.codigo = codigo;
-        this.descricao = descricao;
-        this.superiorId = superiorId;
-        this.path = path;
-    }
 
     public Integer getId() {
         return id;
@@ -61,6 +58,22 @@ public class ContaFlatDto {
 
     public void setPath(List<Integer> path) {
         this.path = path;
+    }
+
+    public Natureza getNatureza() {
+        return natureza;
+    }
+
+    public void setNatureza(Natureza natureza) {
+        this.natureza = natureza;
+    }
+
+    public TipoConta getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(TipoConta tipo) {
+        this.tipo = tipo;
     }
 
 }

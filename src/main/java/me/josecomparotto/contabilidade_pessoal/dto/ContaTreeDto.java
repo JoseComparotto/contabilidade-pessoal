@@ -3,19 +3,18 @@ package me.josecomparotto.contabilidade_pessoal.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.josecomparotto.contabilidade_pessoal.model.Natureza;
+import me.josecomparotto.contabilidade_pessoal.model.TipoConta;
+
 public class ContaTreeDto {
     private Integer id;
     private String codigo;
     private String descricao;
+    private Natureza natureza;
+    private TipoConta tipo;
     private List<ContaTreeDto> inferiores = new ArrayList<>();
 
     public ContaTreeDto() {
-    }
-
-    public ContaTreeDto(Integer id, String codigo, String descricao) {
-        this.id = id;
-        this.codigo = codigo;
-        this.descricao = descricao;
     }
 
     public Integer getId() {
@@ -49,4 +48,21 @@ public class ContaTreeDto {
     public void setInferiores(List<ContaTreeDto> inferiores) {
         this.inferiores = inferiores;
     }
+
+    public Natureza getNatureza() {
+        return natureza;
+    }
+
+    public void setNatureza(Natureza natureza) {
+        this.natureza = natureza;
+    }
+
+    public TipoConta getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(TipoConta tipo) {
+        this.tipo = tipo;
+    }
+
 }
