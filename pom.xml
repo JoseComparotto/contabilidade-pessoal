@@ -12,13 +12,16 @@
 	<artifactId>contabilidade-pessoal</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>contabilidade-pessoal</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Sistema de Contabilidade Pessoal</description>
 	<url/>
 	<licenses>
 		<license/>
 	</licenses>
 	<developers>
-		<developer/>
+		<developer>
+			<name>José Comparotto</name>
+			<email>jose.comparotto@gmail.com</email>
+		</developer>
 	</developers>
 	<scm>
 		<connection/>
@@ -50,8 +53,17 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
