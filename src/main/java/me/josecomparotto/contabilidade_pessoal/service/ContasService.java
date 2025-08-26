@@ -39,27 +39,18 @@ public class ContasService {
     public List<ContaTreeDto> listarContasTree() {
         List<Conta> all = contaRepository.findAllWithSuperior();
 
-        Map<Integer, ContaTreeDto> dtoMap = new HashMap<>();
         Map<Integer, Integer> seqMap = new HashMap<>();
         for (Conta c : all) {
-            dtoMap.put(c.getId(), ContaMapper.toTreeDto(c));
             seqMap.put(c.getId(), c.getSequencia());
         }
 
         List<ContaTreeDto> roots = new ArrayList<>();
         for (Conta c : all) {
-            ContaTreeDto dto = dtoMap.get(c.getId());
-            if (c.getSuperior() != null) {
-                ContaTreeDto parentDto = dtoMap.get(c.getSuperior().getId());
-                if (parentDto != null) {
-                    parentDto.getInferiores().add(dto);
-                } else {
-                    roots.add(dto);
-                }
-            } else {
-                roots.add(dto);
+            if (c.getSuperior() == null) {
+                roots.add(ContaMapper.toTreeDto(c));
             }
         }
+
         // Ordenar raízes e filhos por sequencia
         ordenarArvore(roots, seqMap);
         return roots;

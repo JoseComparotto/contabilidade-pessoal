@@ -44,7 +44,7 @@ public final class ContaMapper {
         dto.setNatureza(conta.getNatureza());
         dto.setTipo(conta.getTipo());
         if (conta.getInferiores() != null && !conta.getInferiores().isEmpty()) {
-            dto.setInferiores(
+            dto.getInferiores().addAll(
                     conta.getInferiores().stream()
                             .map(ContaMapper::toTreeDto)
                             .collect(Collectors.toList()));

@@ -12,7 +12,7 @@ public class ContaTreeDto {
     private String descricao;
     private Natureza natureza;
     private TipoConta tipo;
-    private List<ContaTreeDto> inferiores = new ArrayList<>();
+    private final List<ContaTreeDto> inferiores = new ArrayList<>();
 
     public ContaTreeDto() {
     }
@@ -43,10 +43,6 @@ public class ContaTreeDto {
 
     public List<ContaTreeDto> getInferiores() {
         return inferiores;
-    }
-
-    public void setInferiores(List<ContaTreeDto> inferiores) {
-        this.inferiores = inferiores;
     }
 
     public Natureza getNatureza() {
