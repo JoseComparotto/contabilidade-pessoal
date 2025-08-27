@@ -1,0 +1,71 @@
+<div xmlns:th="http://www.thymeleaf.org">
+    <!-- Text input field -->
+    <div class="field"
+        th:fragment="textField(id, name, label, value, required, isDisabled, hint, preserveWhenDisabled)">
+        <label th:attr="for=${id}" th:text="${label}">Label</label>
+        <input type="text" th:id="${id}" th:name="${name}" th:value="${value}"
+            th:attr="required=${required?:false} ? 'required' : null, disabled=${isDisabled?:false} ? 'disabled' : null" />
+        <!-- Preserve value when disabled (for edit forms where field is not editable) -->
+        <input type="hidden" th:if="${(isDisabled?:false) and (preserveWhenDisabled?:false)}" th:name="${name}"
+            th:value="${value}" />
+        <div class="hint" th:if="${hint}" th:text="${hint}"></div>
+    </div>
+
+    <!-- Select field with common id/displayText shape -->
+    <div class="field"
+        th:fragment="selectField(id, name, label, items, selectedValue, required, isDisabled, placeholder, hint, preserveWhenDisabled)">
+        <label th:attr="for=${id}" th:text="${label}">Label</label>
+        <select th:id="${id}" th:name="${name}"
+            th:attr="required=${required?:false} ? 'required' : null, disabled=${isDisabled?:false} ? 'disabled' : null">
+            <option th:if="${placeholder}" value="" disabled th:selected="${selectedValue == null}"
+                th:text="${placeholder}">Selecione…</option>
+            <option th:each="item : ${items}" th:value="${item.id}" th:text="${item.displayText}"
+                th:selected="${selectedValue != null and item.id == selectedValue}"></option>
+        </select>
+        <!-- Preserve selected value when disabled -->
+        <input type="hidden" th:if="${(isDisabled?:false) and (preserveWhenDisabled?:false)}" th:name="${name}"
+            th:value="${selectedValue}" />
+        <div class="hint" th:if="${hint}" th:text="${hint}"></div>
+    </div>
+
+    <!-- Segmented radios for Enum options (expects a list of enums in 'options') -->
+    <div class="field"
+        th:fragment="segmentedEnum(name, label, options, selectedValue, labelPrefix, required, isDisabled, hint, preserveWhenDisabled)">
+        <label th:text="${label}">Label</label>
+        <div class="radio-segmented">
+            <div class="segmented-group" th:classappend="${isDisabled?:false} ? ' disabled' : ''">
+                <th:block th:each="t : ${options}">
+                    <input class="sr-only" type="radio" th:id="${name + '_' + t.name()}" th:name="${name}"
+                        th:value="${t.name()}" th:checked="${selectedValue != null and t.name() == selectedValue}"
+                        th:attr="disabled=${isDisabled} ? 'disabled' : null, required=${required?:false} ? 'required' : null" />
+                    <label class="btn segmented" th:for="${name + '_' + t.name()}"
+                        th:text="#{${labelPrefix + t.name()}}"></label>
+                </th:block>
+            </div>
+            <!-- Preserve value when disabled -->
+            <input type="hidden" th:if="${(isDisabled?:false) and (preserveWhenDisabled?:false)}" th:name="${name}"
+                th:value="${selectedValue != null ? selectedValue : ''}" />
+        </div>
+        <div class="hint" th:if="${hint}" th:text="${hint}"></div>
+    </div>
+
+    <!-- Checkbox field -->
+    <div class="field"
+        th:fragment="checkboxField(name, label, checked, isDisabled=false, hint, preserveWhenDisabled)">
+        <label>
+            <input type="checkbox" th:name="${name}" th:checked="${checked?:false}"
+                th:attr="disabled=${isDisabled} ? 'disabled' : null" />
+            <span th:text="${label}">Label</span>
+        </label>
+        <!-- Preserve boolean value when disabled -->
+        <input type="hidden" th:if="${(isDisabled?:false) and (preserveWhenDisabled?:false)}" th:name="${name}"
+            th:value="${checked} ? 'true' : 'false'" />
+        <div class="hint" th:if="${hint}" th:text="${hint}"></div>
+    </div>
+
+    <!-- Form actions -->
+    <div class="actions" th:fragment="formActions(submitText, cancelHref)">
+        <button class="btn primary" type="submit" th:text="${submitText}">Salvar</button>
+        <a class="btn cancel" th:href="${cancelHref}">Cancelar</a>
+    </div>
+</div>
