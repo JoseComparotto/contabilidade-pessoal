@@ -1,8 +1,9 @@
 package me.josecomparotto.contabilidade_pessoal.model.dto;
 
+import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 
-public class ContaNewDto {
+public class ContaNewDto implements IDto<Conta> {
     private Integer superiorId;
     private String descricao;
     private TipoConta tipo;

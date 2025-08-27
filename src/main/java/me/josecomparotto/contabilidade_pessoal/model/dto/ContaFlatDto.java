@@ -8,10 +8,11 @@ import java.util.Locale;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 
-public class ContaFlatDto {
+public class ContaFlatDto implements IDto<Conta> {
     private Integer id;
     private String codigo;
     private String descricao;

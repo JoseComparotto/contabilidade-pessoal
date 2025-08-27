@@ -4,10 +4,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 
-public class ContaTreeDto {
+public class ContaTreeDto implements IDto<Conta> {
     private Integer id;
     private String codigo;
     private String descricao;

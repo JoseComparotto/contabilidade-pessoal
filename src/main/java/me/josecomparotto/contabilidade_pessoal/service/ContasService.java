@@ -14,6 +14,7 @@ import me.josecomparotto.contabilidade_pessoal.application.mapper.ContaMapper;
 import me.josecomparotto.contabilidade_pessoal.model.dto.ContaFlatDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.ContaTreeDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
@@ -29,7 +30,7 @@ public class ContasService {
         return contaRepository.findAll();
     }
 
-    public List<?> listarContasPorView(String view) {
+    public List<? extends IDto<Conta>> listarContasPorView(String view) {
         if (view == null || "flat".equalsIgnoreCase(view)) {
             return listarContasFlat();
         } else if ("tree".equalsIgnoreCase(view)) {
@@ -83,7 +84,7 @@ public class ContasService {
                 .toList();
     }
 
-    public Object obterContaPorIdPorView(Integer id, String view) {
+    public IDto<Conta> obterContaPorIdPorView(Integer id, String view) {
         if ("tree".equalsIgnoreCase(view)) {
             return obterContaTree(id);
         }
