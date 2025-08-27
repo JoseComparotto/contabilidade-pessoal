@@ -51,18 +51,27 @@
 
                     <div class="field">
                         <label for="tipo">Tipo de Conta</label>
-                        <select id="tipo" name="tipo" required
-                            th:attr="disabled=(${mode} == 'edit' and not ${conta.editableProperties.contains('tipo')}) ? 'disabled' : null">
-                            <option value="" disabled th:selected="${conta.tipo} == null">Selecione…</option>
-                            <option th:each="t : ${tipos}" th:value="${t.name()}"
-                                th:text="#{'TipoConta.' + ${t.name()}}"
-                                th:selected="${conta.tipo} != null ? ${t.name()} == ${conta.tipo.name()} : false">
-                            </option>
-                        </select>
-                        <!-- Preserve value submission when disabled in edit mode -->
-                        <input type="hidden" name="tipo"
-                            th:if="(${mode} == 'edit' and not ${conta.editableProperties.contains('tipo')})"
-                            th:value="${conta.tipo} != null ? ${conta.tipo.name()} : ''" />
+                    <div class="radio-segmented"
+                        th:with="isDisabled=${mode == 'edit' and not conta.editableProperties.contains('tipo')}">
+                            <div class="segmented-group" th:classappend="${isDisabled} ? ' disabled' : ''">
+                                <th:block th:each="t : ${tipos}">
+                                    <input class="sr-only" type="radio"
+                                   th:id="${'tipo_' + t.name()}"
+                                           name="tipo"
+                                   th:value="${t.name()}"
+                                   th:checked="${conta.tipo != null and t.name() == conta.tipo.name()}"
+                                           th:attr="disabled=${isDisabled} ? 'disabled' : null"
+                                           required />
+                                    <label class="btn segmented"
+                                   th:for="${'tipo_' + t.name()}"
+                                   th:text="#{${'TipoConta.' + t.name()}}"></label>
+                                </th:block>
+                            </div>
+                            <!-- Preserve value submission when disabled in edit mode -->
+                            <input type="hidden" name="tipo"
+                                th:if="${isDisabled}"
+                          th:value="${conta.tipo != null ? conta.tipo.name() : ''}" />
+                        </div>
                         <div class="hint">Dica: contas sintéticas podem ter contas filhas; contas
                             analíticas podem receber lançamentos diretos.</div>
                     </div>

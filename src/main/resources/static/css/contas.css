@@ -66,3 +66,12 @@ input[type="text"], select, input[type="number"], input[type="checkbox"] { paddi
 .btn.primary { background: #0a66c2; color: #fff; border-color: #0a66c2 }
 .btn.primary:hover { filter: brightness(0.95) }
 .hint { color: #666; font-size: .85rem }
+
+/* Segmented radio buttons (button-like radios) */
+.segmented-group { display: inline-flex; gap: .35rem; flex-wrap: wrap }
+.segmented-group.disabled { opacity: 0.6; pointer-events: none }
+.segmented-group .btn.segmented { background: #fff; border: 1px solid #d9dce4; color: #222; padding: .4rem .7rem; border-radius: 6px; cursor: pointer; user-select: none }
+.segmented-group .btn.segmented:hover { background: #f6faff }
+.segmented-group input[type="radio"]:focus-visible + .btn.segmented { outline: 2px solid #0a66c2; outline-offset: 2px }
+.segmented-group input[type="radio"]:checked + .btn.segmented { background: #0a66c2; color: #fff; border-color: #0a66c2 }
+.segmented-group input[type="radio"]:disabled + .btn.segmented { cursor: default }
