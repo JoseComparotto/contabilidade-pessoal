@@ -52,7 +52,7 @@
             <select id="tipo" name="tipo" required
                 th:attr="disabled=(${mode} == 'edit' and not ${conta.editableProperties.contains('tipo')}) ? 'disabled' : null">
                             <option value="" disabled th:selected="${conta.tipo} == null">Selecione…</option>
-                            <option th:each="t : ${tipos}" th:value="${t.name()}" th:text="${t.name()}"
+                            <option th:each="t : ${tipos}" th:value="${t.name()}" th:text="#{'TipoConta.' + ${t.name()}}"
                                 th:selected="${conta.tipo} != null ? ${t.name()} == ${conta.tipo.name()} : false">
                             </option>
                         </select>
@@ -81,7 +81,7 @@
                 <div class="actions">
                     <button class="btn primary" type="submit"
                         th:text="${mode} == 'edit' ? 'Salvar' : 'Criar'">Salvar</button>
-                    <a class="btn" href="/contas">Cancelar</a>
+                    <a class="btn cancel" href="/contas">Cancelar</a>
                 </div>
             </form>
         </div>

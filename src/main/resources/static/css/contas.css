@@ -13,9 +13,15 @@ tbody td { padding: .6rem .8rem; border-bottom: 1px solid #f1f3f7 }
 .sintetica td { font-weight: 700 }
 
 /* Botões simples */
-.btn { padding: .3rem .6rem; border-radius: 4px; border: 1px solid transparent; cursor: pointer; font-size: .9rem }
+.btn { padding: .3rem .6rem; border-radius: 4px; border: 1px solid transparent; cursor: pointer; font-size: .9rem; text-decoration: none; color: inherit }
+.btn:link, .btn:visited { text-decoration: none; color: inherit }
+.btn:hover { text-decoration: none }
+.btn:focus-visible { outline: 2px solid #0a66c2; outline-offset: 2px }
 .btn.delete { background: #fff; color: #c7383a; border-color: #e6bfc0 }
 .btn.delete:hover { background: #feecec }
+/* Cancel button: same visual as delete but text-only usage */
+.btn.cancel { background: #fff; color: #c7383a; border-color: #e6bfc0 }
+.btn.cancel:hover { background: #feecec }
 
 /* Botão de editar: similar ao delete, mas com cor azul/teal para ação positiva */
 .btn.edit { background: #fff; color: #0a66c2; border-color: #cfe4fb }
@@ -23,7 +29,7 @@ tbody td { padding: .6rem .8rem; border-bottom: 1px solid #f1f3f7 }
 
 /* Icon buttons: compact square buttons showing only an SVG */
 .btn.icon { padding: .35rem; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; box-sizing: border-box }
-.btn.icon svg { width: 18px; height: 18px; display: block }
+.btn.icon svg, .btn.icon i { width: 18px; height: 18px; display: block; font-size: 18px; line-height: 18px }
 .btn.icon .sr-only { display: none }
 
 /* Slight visual variants for edit/delete */
