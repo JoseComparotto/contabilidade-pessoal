@@ -43,7 +43,7 @@ springdoc:
     # Serve a custom OpenAPI definition from static resources
     urls:
       - name: API de Simulação de Crédito
-        url: /api/openapi.yaml
+        url: /api/openapi.json
     display-request-duration: true
     doc-expansion: list
   api-docs:

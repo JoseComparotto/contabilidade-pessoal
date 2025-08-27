@@ -107,7 +107,7 @@
 								<resource>
 									<directory>${project.basedir}/docs</directory>
 									<includes>
-										<include>openapi.yaml</include>
+										<include>openapi.json</include>
 									</includes>
 									<filtering>false</filtering>
 								</resource>
