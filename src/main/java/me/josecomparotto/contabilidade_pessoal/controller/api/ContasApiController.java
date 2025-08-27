@@ -3,14 +3,19 @@ package me.josecomparotto.contabilidade_pessoal.controller.api;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import me.josecomparotto.contabilidade_pessoal.model.dto.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.service.ContasService;
 
 @RestController
@@ -34,6 +39,13 @@ public class ContasApiController {
         if (body == null)
             return ResponseEntity.notFound().build();
         return ResponseEntity.ok(body);
+    }
+
+    // POST /api/contas
+    @PostMapping
+    public ResponseEntity<?> criarConta(@RequestBody ContaNewDto contaDto) {
+        ContaFlatDto novaConta = contasService.criarConta(contaDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(novaConta);
     }
 
     // DELETE /api/contas/{id}

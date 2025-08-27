@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.ContaTreeDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 
@@ -65,5 +66,15 @@ public final class ContaMapper {
         return contas.stream()
                 .map(ContaMapper::toTreeDto)
                 .collect(Collectors.toList());
+    }
+
+    public static Conta fromNewDto(ContaNewDto dto) {
+        if (dto == null)
+            return null;
+        Conta conta = new Conta();
+        conta.setDescricao(dto.getDescricao());
+        conta.setTipo(dto.getTipo());
+        conta.setCreatedBySystem(false);
+        return conta;
     }
 }

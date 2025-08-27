@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 
 import me.josecomparotto.contabilidade_pessoal.application.mapper.ContaMapper;
 import me.josecomparotto.contabilidade_pessoal.model.dto.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.ContaTreeDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
+import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.repository.ContaRepository;
 
 @Service
@@ -142,5 +144,61 @@ public class ContasService {
 
         contaRepository.delete(c);
         return true;
+    }
+
+    public ContaFlatDto criarConta(ContaNewDto contaDto) {
+
+        // Validar dados da conta
+        if(contaDto.getDescricao() == null || contaDto.getDescricao().trim().isEmpty()) {
+            throw new IllegalArgumentException("Descrição da conta é obrigatória");
+        }
+        if(contaDto.getTipo() == null) {
+            throw new IllegalArgumentException("Tipo da conta é obrigatório");
+        }
+
+        // Mapear DTO para entidade
+        Conta conta = ContaMapper.fromNewDto(contaDto);
+        if (conta == null) {
+            throw new IllegalArgumentException("Dados da conta inválidos");
+        }
+
+        // Se houver superiorId, buscar a conta superior
+        if (contaDto.getSuperiorId() != null) {
+            Optional<Conta> optSup = contaRepository.findById(contaDto.getSuperiorId());
+            if (optSup.isEmpty()) {
+                throw new IllegalArgumentException("Conta superior não encontrada: " + contaDto.getSuperiorId());
+            }
+            Conta sup = optSup.get();
+            Conta raiz = sup.getRaiz();
+            conta.setSuperior(sup);
+
+            // Definir natureza da conta
+            if(Boolean.TRUE.equals(contaDto.isRedutora())) {
+                if(Natureza.CREDORA.equals(raiz.getNatureza())) {
+                    conta.setNatureza(Natureza.DEVEDORA);
+                }else{
+                    conta.setNatureza(Natureza.CREDORA);
+                }
+            }else {
+                conta.setNatureza(sup.getNatureza());
+            }
+
+            // Definir sequencia como o próximo número disponível entre os inferiores
+            int nextSeq = 1;
+            for (Conta inf : sup.getInferiores()) {
+                if (inf.getSequencia() >= nextSeq) {
+                    nextSeq = inf.getSequencia() + 1;
+                }
+            }
+            conta.setSequencia(nextSeq);
+        } else {
+            // Lança exceção se não houver conta superior
+            throw new IllegalArgumentException("Conta superior não informada");
+        }
+
+        // Salvar para gerar ID e código
+        conta = contaRepository.save(conta);
+
+        return ContaMapper.toFlatDto(conta);
     }
 }

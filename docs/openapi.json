@@ -66,6 +66,38 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Contas"
+        ],
+        "summary": "Criar nova conta",
+        "operationId": "criarConta",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContaNewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Conta criada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContaFlatDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos"
+          }
+        }
       }
     },
     "/contas/{id}": {
@@ -172,6 +204,33 @@
         "enum": [
           "ANALITICA",
           "SINTETICA"
+        ]
+      },
+      "ContaNewDto": {
+        "type": "object",
+        "description": "DTO para criação de nova conta",
+        "properties": {
+          "superiorId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "description": "ID da conta superior (obrigatório)"
+          },
+          "descricao": {
+            "type": "string"
+          },
+          "tipo": {
+            "$ref": "#/components/schemas/TipoConta"
+          },
+          "redutora": {
+            "type": "boolean",
+            "description": "Indica se a conta é redutora (opcional, default false)"
+          }
+        },
+        "required": [
+          "superiorId",
+          "descricao",
+          "tipo"
         ]
       },
       "ContaFlatDto": {
