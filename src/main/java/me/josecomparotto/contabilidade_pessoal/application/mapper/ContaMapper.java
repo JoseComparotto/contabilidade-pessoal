@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import me.josecomparotto.contabilidade_pessoal.model.dto.ContaFlatDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.ContaNewDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.ContaTreeDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaTreeDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 
 public final class ContaMapper {

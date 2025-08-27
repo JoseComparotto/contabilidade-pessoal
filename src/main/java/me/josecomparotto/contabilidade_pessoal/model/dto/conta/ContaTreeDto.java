@@ -1,35 +1,30 @@
-package me.josecomparotto.contabilidade_pessoal.model.dto;
+package me.josecomparotto.contabilidade_pessoal.model.dto.conta;
 
-import java.util.List;
-import java.beans.Transient;
 import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 
-public class ContaFlatDto implements IDto<Conta> {
+public class ContaTreeDto implements IDto<Conta> {
     private Integer id;
     private String codigo;
     private String descricao;
-    private Integer superiorId;
     private Natureza natureza;
     private TipoConta tipo;
-    private boolean redutora;
-    private boolean editable;
-    private boolean deletable;
+    private Boolean redutora;
+    private final List<ContaTreeDto> inferiores = new ArrayList<>();
+    private Boolean editable;
+    private Boolean deletable;
 
     // saldo atual (pode ser nulo se não calculado/populado)
     private BigDecimal saldoAtual;
 
-    @JsonIgnore
-    private List<Integer> path;
-
-    public ContaFlatDto() {}
+    public ContaTreeDto() {
+    }
 
     public Integer getId() {
         return id;
@@ -55,20 +50,8 @@ public class ContaFlatDto implements IDto<Conta> {
         this.descricao = descricao;
     }
 
-    public Integer getSuperiorId() {
-        return superiorId;
-    }
-
-    public void setSuperiorId(Integer superiorId) {
-        this.superiorId = superiorId;
-    }
-
-    public List<Integer> getPath() {
-        return path;
-    }
-
-    public void setPath(List<Integer> path) {
-        this.path = path;
+    public List<ContaTreeDto> getInferiores() {
+        return inferiores;
     }
 
     public Natureza getNatureza() {
@@ -87,29 +70,20 @@ public class ContaFlatDto implements IDto<Conta> {
         this.tipo = tipo;
     }
 
+    public boolean isRedutora() {
+        return redutora;
+    }
+
+    public void setRedutora(boolean redutora) {
+        this.redutora = redutora;
+    }
+
     public BigDecimal getSaldoAtual() {
         return saldoAtual;
     }
 
     public void setSaldoAtual(BigDecimal saldoAtual) {
         this.saldoAtual = saldoAtual;
-    }
-
-    @Transient
-    @JsonIgnore
-    public String getSaldoAtualFormatado() {
-        if (saldoAtual == null) {
-            return "R$ 0,00";
-        }
-    NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
-        return nf.format(saldoAtual);
-    }
-
-    public boolean isRedutora() {
-        return redutora;
-    }
-    public void setRedutora(boolean redutora) {
-        this.redutora = redutora;
     }
 
     public Boolean isEditable() {
@@ -127,4 +101,9 @@ public class ContaFlatDto implements IDto<Conta> {
     public void setDeletable(Boolean deletable) {
         this.deletable = deletable;
     }
+
+    public Boolean getDeletable() {
+        return deletable;
+    }
+
 }

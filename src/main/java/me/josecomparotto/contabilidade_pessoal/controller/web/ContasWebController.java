@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import me.josecomparotto.contabilidade_pessoal.model.dto.ContaEditDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.ContaFlatDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.ContaNewDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 import me.josecomparotto.contabilidade_pessoal.service.ContasService;
 

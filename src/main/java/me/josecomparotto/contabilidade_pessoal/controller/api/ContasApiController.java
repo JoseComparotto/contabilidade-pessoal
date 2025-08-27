@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import me.josecomparotto.contabilidade_pessoal.model.dto.ContaEditDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.ContaFlatDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.ContaNewDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.service.ContasService;
 
 @RestController

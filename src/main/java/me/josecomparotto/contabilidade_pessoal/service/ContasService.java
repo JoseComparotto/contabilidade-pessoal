@@ -16,11 +16,11 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.stereotype.Service;
 
 import me.josecomparotto.contabilidade_pessoal.application.mapper.ContaMapper;
-import me.josecomparotto.contabilidade_pessoal.model.dto.ContaEditDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.ContaFlatDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.ContaNewDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.ContaTreeDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaTreeDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 import me.josecomparotto.contabilidade_pessoal.repository.ContaRepository;
