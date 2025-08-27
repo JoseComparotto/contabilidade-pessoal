@@ -62,8 +62,8 @@ CREATE TRIGGER tg_before_update_audit
 -- 1) Criar usuário da aplicação, se não existir (executa como superuser via Flyway)
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '${app_user}') THEN
-        EXECUTE format('CREATE ROLE %I LOGIN PASSWORD %L', '${app_user}', '${app_user_password}');
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '${app-user}') THEN
+        EXECUTE format('CREATE ROLE %I LOGIN PASSWORD %L', '${app-user}', '${app-user-password}');
     END IF;
 END $$;
 
@@ -76,9 +76,9 @@ BEGIN
 END $$;
 
 -- 3) Conceder privilégios mínimos
-GRANT USAGE ON SCHEMA public TO ${app_user};
+GRANT USAGE ON SCHEMA public TO ${app-user};
 GRANT SELECT ON public.tb_contas TO core_contas_manage;
-GRANT core_contas_manage TO ${app_user};
+GRANT core_contas_manage TO ${app-user};
 
 -- 4) RLS: Habilitar e criar políticas (sem DML pendente nesta transação)
 ALTER TABLE public.tb_contas ENABLE ROW LEVEL SECURITY;
