@@ -22,6 +22,7 @@ public final class ContaMapper {
         dto.setId(conta.getId());
         dto.setCodigo(conta.getCodigo());
         dto.setDescricao(conta.getDescricao());
+        dto.setDisplayText(conta.getDisplayText());
         dto.setNatureza(conta.getNatureza());
         dto.setTipo(conta.getTipo());
         dto.setSuperiorId(conta.getSuperior() != null ? conta.getSuperior().getId() : null);
@@ -49,6 +50,7 @@ public final class ContaMapper {
         dto.setId(conta.getId());
         dto.setCodigo(conta.getCodigo());
         dto.setDescricao(conta.getDescricao());
+        dto.setDisplayText(conta.getDisplayText());
         dto.setNatureza(conta.getNatureza());
         dto.setTipo(conta.getTipo());
         dto.setSaldoAtual(BigDecimal.ZERO); // Saldo não é populado aqui

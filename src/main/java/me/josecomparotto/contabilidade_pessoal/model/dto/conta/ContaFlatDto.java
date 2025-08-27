@@ -18,6 +18,7 @@ public class ContaFlatDto implements IDto<Conta> {
     private Integer id;
     private String codigo;
     private String descricao;
+    private String displayText;
     private Integer superiorId;
     private Natureza natureza;
     private TipoConta tipo;
@@ -56,6 +57,14 @@ public class ContaFlatDto implements IDto<Conta> {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public String getDisplayText() {
+        return displayText;
+    }
+
+    public void setDisplayText(String displayText) {
+        this.displayText = displayText;
     }
 
     public Integer getSuperiorId() {

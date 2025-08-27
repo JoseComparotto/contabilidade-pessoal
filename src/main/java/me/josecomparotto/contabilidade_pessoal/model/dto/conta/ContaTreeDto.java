@@ -14,6 +14,7 @@ public class ContaTreeDto implements IDto<Conta> {
     private Integer id;
     private String codigo;
     private String descricao;
+    private String displayText;
     private Natureza natureza;
     private TipoConta tipo;
     private Boolean redutora;
@@ -50,6 +51,14 @@ public class ContaTreeDto implements IDto<Conta> {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public String getDisplayText() {
+        return displayText;
+    }
+
+    public void setDisplayText(String displayText) {
+        this.displayText = displayText;
     }
 
     public List<ContaTreeDto> getInferiores() {

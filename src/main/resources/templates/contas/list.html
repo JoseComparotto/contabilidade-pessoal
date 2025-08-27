@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{fragments/head :: commonHead('Contas')}"></head>
+
 <body>
     <div th:replace="~{fragments/toast :: toasts}"></div>
     <main class="container">
@@ -21,19 +23,26 @@
                 </thead>
                 <tbody>
                     <!-- Flattened view renders a list of ContaFlatDto which has id, codigo, descricao, natureza, tipo -->
-                    <tr th:each="c : ${contas}" th:object="${c}" th:classappend="${c.tipo.name() == 'SINTETICA'} ? 'sintetica'">
+                    <tr th:each="c : ${contas}" th:object="${c}" th:classappend="(${c.tipo.name() == 'SINTETICA'} ? 'sintetica ' : '') 
+                   + (${c.redutora} ? 'redutora' : '')">
                         <td th:text="*{codigo != null ? codigo : (id != null ? id : '')}">1</td>
-                        <td th:text="*{descricao}">Descrição</td>
+                        <td th:text="*{ (redutora ? '(-) ' : '') + descricao}">Descrição</td>
                         <td th:text="*{saldoAtualFormatado}">R$ 0,00</td>
                         <td style="white-space:nowrap; display:flex; gap:.4rem">
-                            <a class="btn edit icon" th:href="*{editable} ? @{/contas/{id}/edit(id=*{id})} : ''" th:classappend="*{editable} ? '' : ' disabled'" th:attr="aria-disabled=*{not editable}, tabindex=*{editable} ? 0 : -1" aria-label="Editar">
+                            <a class="btn edit icon" th:href="*{editable} ? @{/contas/{id}/edit(id=*{id})} : ''"
+                                th:classappend="*{editable} ? '' : ' disabled'"
+                                th:attr="aria-disabled=*{not editable}, tabindex=*{editable} ? 0 : -1"
+                                aria-label="Editar">
                                 <i class="fa-solid fa-pen"></i>
                                 <span class="sr-only">Editar</span>
                             </a>
-                            <form th:action="@{/contas/{id}/delete(id=*{id})}" method="post" th:onsubmit="*{deletable} ? 'return confirm(\'Deseja excluir essa conta?\')' : 'return false;'" style="display:inline">
+                            <form th:action="@{/contas/{id}/delete(id=*{id})}" method="post"
+                                th:onsubmit="*{deletable} ? 'return confirm(\'Deseja excluir essa conta?\')' : 'return false;'"
+                                style="display:inline">
                                 <!-- Spring MVC common pattern: use hidden _method if your app expects HTTP DELETE via method override -->
                                 <input type="hidden" name="_method" value="delete" />
-                                <button type="submit" class="btn delete icon" aria-label="Excluir" th:classappend="*{deletable} ? '' : ' disabled'" th:disabled="*{not deletable}">
+                                <button type="submit" class="btn delete icon" aria-label="Excluir"
+                                    th:classappend="*{deletable} ? '' : ' disabled'" th:disabled="*{not deletable}">
                                     <i class="fa-solid fa-trash"></i>
                                     <span class="sr-only">Excluir</span>
                                 </button>
@@ -47,4 +56,5 @@
     </main>
     <script src="/js/toast.js"></script>
 </body>
+
 </html>

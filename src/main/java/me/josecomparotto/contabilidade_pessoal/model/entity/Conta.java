@@ -133,6 +133,18 @@ public class Conta {
         this.natureza = naturezaOposta(raizNatureza);
     }
 
+    @Transient
+    public String getDisplayText() {
+        Conta raiz = getRaiz();
+
+        return String.format("%s. %s%s%s",
+            getCodigo(),
+            isRedutora() ? "(-) " : "",
+            getDescricao(),
+            !this.equals(raiz) ? String.format(" (%s)", raiz.getDescricao()) : ""
+        );
+    }
+
     private static Natureza naturezaOposta(Natureza natureza) {
         return natureza.equals(Natureza.DEVEDORA) ? Natureza.CREDORA : Natureza.DEVEDORA;
     }
