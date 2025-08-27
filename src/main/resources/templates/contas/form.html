@@ -81,17 +81,12 @@
             <!-- Create mode uses ContaNewDto; Edit mode uses ContaFlatDto -->
             <form th:action="${mode} == 'edit' ? @{'/contas/' + ${conta.id} + '/edit'} : @{/contas}" method="post">
                 <div class="form-grid">
-                    <div class="field" th:if="${mode} == 'edit'">
-                        <label>Código</label>
-                        <input type="text" th:value="${conta.codigo}" readonly />
-                    </div>
-
                     <div class="field">
                         <label for="descricao">Descrição</label>
                         <input id="descricao" name="descricao" type="text" th:value="${conta.descricao}" required />
                         <div class="hint">Priorize o padrão "Title Case": iniciais de capa palavra em maísculo.</div>                    </div>
 
-                    <div class="field">
+                    <div class="field" th:if="${mode} == 'create'">
                         <label for="superiorId">Conta superior</label>
                         <select id="superiorId" name="superiorId" required>
                             <option value="" disabled th:selected="${conta.superiorId} == null">Selecione…</option>

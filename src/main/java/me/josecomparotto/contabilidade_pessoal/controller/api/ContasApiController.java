@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import me.josecomparotto.contabilidade_pessoal.model.dto.ContaEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.ContaFlatDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.service.ContasService;
@@ -51,7 +52,7 @@ public class ContasApiController {
 
     // PUT /api/contas/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizarConta(@PathVariable Integer id, @RequestBody ContaFlatDto contaDto) {
+    public ResponseEntity<?> atualizarConta(@PathVariable Integer id, @RequestBody ContaEditDto contaDto) {
         try {
             ContaFlatDto contaAtualizada = contasService.atualizarConta(id, contaDto);
             if (contaAtualizada == null)

@@ -11,12 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import me.josecomparotto.contabilidade_pessoal.application.mapper.ContaMapper;
+import me.josecomparotto.contabilidade_pessoal.model.dto.ContaEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.ContaFlatDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.ContaTreeDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
-import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 import me.josecomparotto.contabilidade_pessoal.repository.ContaRepository;
 
@@ -201,14 +201,13 @@ public class ContasService {
         return ContaMapper.toFlatDto(conta);
     }
 
-    public ContaFlatDto atualizarConta(Integer id, ContaFlatDto contaDto) {
+    public ContaFlatDto atualizarConta(Integer id, ContaEditDto contaDto) {
         Optional<Conta> opt = contaRepository.findById(id);
         if (opt.isEmpty()) {
             throw new IllegalArgumentException("Conta não encontrada: " + id);
         }
         Conta conta = opt.get();
 
-        
         if (!conta.isEditable()) {
             throw new IllegalStateException("Conta não pode ser editada");
         }
@@ -224,54 +223,9 @@ public class ContasService {
         // Atualizar descrição e tipo
         conta.setDescricao(contaDto.getDescricao());
         conta.setTipo(contaDto.getTipo());
+        conta.setRedutora(contaDto.isRedutora());
 
-        // Possível mudança de superior
-        Integer novoSuperiorId = contaDto.getSuperiorId();
-        Conta superiorAtual = conta.getSuperior();
-        Integer superiorAtualId = superiorAtual != null ? superiorAtual.getId() : null;
-
-        if (novoSuperiorId != null && !novoSuperiorId.equals(superiorAtualId)) {
-            Optional<Conta> optSup = contaRepository.findById(novoSuperiorId);
-            if (optSup.isEmpty()) {
-                throw new IllegalArgumentException("Conta superior não encontrada: " + novoSuperiorId);
-            }
-            Conta novoSuperior = optSup.get();
-
-            // Evitar ciclos: não permitir mover para um descendente
-            Conta cursor = novoSuperior;
-            while (cursor != null) {
-                if (cursor.getId().equals(conta.getId())) {
-                    throw new IllegalArgumentException("Não é permitido tornar a conta filha de si mesma ou de um de seus descendentes.");
-                }
-                cursor = cursor.getSuperior();
-            }
-
-            // Atribuir novo superior e definir nova sequência
-            conta.setSuperior(novoSuperior);
-            int nextSeq = 1;
-            for (Conta inf : novoSuperior.getInferiores()) {
-                if (inf.getSequencia() != null && inf.getSequencia() >= nextSeq) {
-                    nextSeq = inf.getSequencia() + 1;
-                }
-            }
-            conta.setSequencia(nextSeq);
-        }
-
-        // Ajustar natureza conforme redutora vs raiz
-        boolean redutora = Boolean.TRUE.equals(contaDto.isRedutora());
-        Conta raiz = (conta.getSuperior() != null) ? conta.getSuperior().getRaiz() : conta.getRaiz();
-        if (raiz == null) raiz = conta; // fallback
-        if (redutora) {
-            if (raiz.getNatureza() == Natureza.CREDORA) {
-                conta.setNatureza(Natureza.DEVEDORA);
-            } else {
-                conta.setNatureza(Natureza.CREDORA);
-            }
-        } else {
-            // mesma natureza da raiz do grupo
-            conta.setNatureza(raiz.getNatureza());
-        }
-
+        // Salvar alterações
         conta = contaRepository.save(conta);
         return ContaMapper.toFlatDto(conta);
     }
