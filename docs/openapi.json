@@ -93,9 +93,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Dados inválidos"
           }
         }
       }
@@ -179,7 +176,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ContaFlatDto"
+                "$ref": "#/components/schemas/ContaEditDto"
               }
             }
           }
@@ -197,6 +194,9 @@
           },
           "404": {
             "description": "Conta não encontrada"
+          },
+          "400": {
+            "description": "Requisição inválida (dados inválidos ou campo não editável)"
           }
         }
       },
@@ -257,7 +257,7 @@
           "superiorId": {
             "type": "integer",
             "format": "int32",
-            "nullable": true,
+            "nullable": false,
             "description": "ID da conta superior (obrigatório)"
           },
           "descricao": {
@@ -273,6 +273,26 @@
         },
         "required": [
           "superiorId",
+          "descricao",
+          "tipo"
+        ]
+      },
+      "ContaEditDto": {
+        "type": "object",
+        "description": "DTO para edição de conta",
+        "properties": {
+          "descricao": {
+            "type": "string"
+          },
+          "tipo": {
+            "$ref": "#/components/schemas/TipoConta"
+          },
+          "redutora": {
+            "type": "boolean",
+            "description": "Indica se a conta é redutora (opcional, default false)"
+          }
+        },
+        "required": [
           "descricao",
           "tipo"
         ]
