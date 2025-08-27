@@ -1,0 +1,5 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="toasts">
+    <div id="toast-container"></div>
+    <div id="flash-success" th:if="${success}" th:text="${success}" style="display:none"></div>
+    <div id="flash-error" th:if="${error}" th:text="${error}" style="display:none"></div>
+</div>
