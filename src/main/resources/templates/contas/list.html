@@ -65,11 +65,23 @@
                         <td th:text="*{descricao}">Descrição</td>
                         <td th:text="*{saldoAtualFormatado}">R$ 0,00</td>
                         <td style="white-space:nowrap; display:flex; gap:.4rem">
-                            <a class="btn edit" th:if="*{editable}" th:href="@{/contas/{id}/edit(id=*{id})}">Editar</a>
-                            <form th:if="*{deletable}" th:action="@{/contas/{id}/delete(id=*{id})}" method="post" onsubmit="return confirm('Deseja excluir essa conta?');" style="display:inline">
+                            <a class="btn edit icon" th:href="*{editable} ? @{/contas/{id}/edit(id=*{id})} : ''" th:classappend="*{editable} ? '' : ' disabled'" th:attr="aria-disabled=*{not editable}, tabindex=*{editable} ? 0 : -1" aria-label="Editar">
+                                <!-- Pencil icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                    <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                                <span class="sr-only">Editar</span>
+                            </a>
+                            <form th:action="@{/contas/{id}/delete(id=*{id})}" method="post" th:onsubmit="*{deletable} ? 'return confirm(\'Deseja excluir essa conta?\')' : 'return false;'" style="display:inline">
                                 <!-- Spring MVC common pattern: use hidden _method if your app expects HTTP DELETE via method override -->
                                 <input type="hidden" name="_method" value="delete" />
-                                <button type="submit" class="btn delete">Excluir</button>
+                                <button type="submit" class="btn delete icon" aria-label="Excluir" th:classappend="*{deletable} ? '' : ' disabled'" th:disabled="*{not deletable}">
+                                    <!-- Trash icon -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                        <path fill="currentColor" d="M9 3v1H4v2h16V4h-5V3H9zm1 6v7h2V9H10zm4 0v7h2V9h-2zM8 9v7h2V9H8z"/>
+                                    </svg>
+                                    <span class="sr-only">Excluir</span>
+                                </button>
                             </form>
                         </td>
                     </tr>

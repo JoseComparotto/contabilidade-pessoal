@@ -20,3 +20,21 @@ tbody td { padding: .6rem .8rem; border-bottom: 1px solid #f1f3f7 }
 /* Botão de editar: similar ao delete, mas com cor azul/teal para ação positiva */
 .btn.edit { background: #fff; color: #0a66c2; border-color: #cfe4fb }
 .btn.edit:hover { background: #eef6ff }
+
+/* Icon buttons: compact square buttons showing only an SVG */
+.btn.icon { padding: .35rem; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; box-sizing: border-box }
+.btn.icon svg { width: 18px; height: 18px; display: block }
+.btn.icon .sr-only { display: none }
+
+/* Slight visual variants for edit/delete */
+.btn.edit.icon { color: #0a66c2; border-color: #d8eefd; background: #fff }
+.btn.edit.icon:hover { background: #eef6ff }
+.btn.delete.icon { color: #c7383a; border-color: #f5d6d7; background: #fff }
+.btn.delete.icon:hover { background: #fff5f5 }
+
+/* Accessible helper to visually hide text but keep it available for screen readers */
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0 }
+
+/* Disabled state: visual dim + remove pointer events */
+.btn.disabled, .btn.disabled.icon, .btn[aria-disabled="true"] { opacity: 0.45; pointer-events: none; cursor: default }
+.btn.disabled svg { opacity: 0.9 }
