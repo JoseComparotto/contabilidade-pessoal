@@ -5,6 +5,7 @@ import java.beans.Transient;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -23,6 +24,7 @@ public class ContaFlatDto implements IDto<Conta> {
     private boolean redutora;
     private boolean editable;
     private boolean deletable;
+    private Set<String> editableProperties;
 
     // saldo atual (pode ser nulo se não calculado/populado)
     private BigDecimal saldoAtual;
@@ -127,5 +129,13 @@ public class ContaFlatDto implements IDto<Conta> {
 
     public void setDeletable(Boolean deletable) {
         this.deletable = deletable;
+    }
+
+    public Set<String> getEditableProperties() {
+        return editableProperties;
+    }
+    
+    public void setEditableProperties(Set<String> editableProperties) {
+        this.editableProperties = editableProperties;
     }
 }

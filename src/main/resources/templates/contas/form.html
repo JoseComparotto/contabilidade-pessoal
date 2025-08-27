@@ -81,40 +81,64 @@
             <!-- Create mode uses ContaNewDto; Edit mode uses ContaFlatDto -->
             <form th:action="${mode} == 'edit' ? @{'/contas/' + ${conta.id} + '/edit'} : @{/contas}" method="post">
                 <div class="form-grid">
+
+                    <div class="field" th:if="${mode} == 'edit'">
+                        <label for="codigo">Código</label>
+                        <input id="codigo" name="codigo" type="text" th:value="${conta.codigo}" disabled/>
+                    </div>
+
                     <div class="field">
                         <label for="descricao">Descrição</label>
-                        <input id="descricao" name="descricao" type="text" th:value="${conta.descricao}" required />
-                        <div class="hint">Priorize o padrão "Title Case": iniciais de capa palavra em maísculo.</div>                    </div>
+               <input id="descricao" name="descricao" type="text" th:value="${conta.descricao}" required
+                   th:attr="disabled=(${mode} == 'edit' and not ${conta.editableProperties.contains('descricao')}) ? 'disabled' : null" />
+               <!-- Preserve value submission when disabled in edit mode -->
+               <input type="hidden" name="descricao"
+                   th:if="(${mode} == 'edit' and not ${conta.editableProperties.contains('descricao')})"
+                   th:value="${conta.descricao}" />
+                        <div class="hint">Priorize o padrão "Title Case": iniciais de capa palavra em maísculo.</div>
+                    </div>
 
-                    <div class="field" th:if="${mode} == 'create'">
+                    <div class="field">
                         <label for="superiorId">Conta superior</label>
-                        <select id="superiorId" name="superiorId" required>
+                        <select id="superiorId" name="superiorId" required th:attr="disabled=${mode} == 'edit' ? 'disabled' : null">
                             <option value="" disabled th:selected="${conta.superiorId} == null">Selecione…</option>
                             <option th:each="c : ${contas}" th:value="${c.id}"
                                 th:text="${c.codigo + ' - ' + c.descricao}"
                                 th:selected="${conta.superiorId} != null ? ${c.id} == ${conta.superiorId} : false">
                             </option>
                         </select>
+                        <!-- Hidden field ensures value is submitted when select is disabled in edit mode -->
+                        <input type="hidden" name="superiorId" th:if="${mode} == 'edit'" th:value="${conta.superiorId}" />
                         <div class="hint">A nova conta será criada como filha da conta selecionada.</div>
                     </div>
 
                     <div class="field">
                         <label for="tipo">Tipo de Conta</label>
-                        <select id="tipo" name="tipo" required>
+            <select id="tipo" name="tipo" required
+                th:attr="disabled=(${mode} == 'edit' and not ${conta.editableProperties.contains('tipo')}) ? 'disabled' : null">
                             <option value="" disabled th:selected="${conta.tipo} == null">Selecione…</option>
                             <option th:each="t : ${tipos}" th:value="${t.name()}" th:text="${t.name()}"
                                 th:selected="${conta.tipo} != null ? ${t.name()} == ${conta.tipo.name()} : false">
                             </option>
                         </select>
+            <!-- Preserve value submission when disabled in edit mode -->
+            <input type="hidden" name="tipo"
+                   th:if="(${mode} == 'edit' and not ${conta.editableProperties.contains('tipo')})"
+                   th:value="${conta.tipo} != null ? ${conta.tipo.name()} : ''" />
                         <div class="hint">Dica: contas sintéticas podem ter contas filhas; contas
                             analíticas podem receber lançamentos diretos.</div>
                     </div>
 
                     <div class="field">
                         <label>
-                            <input type="checkbox" name="redutora" th:checked="${conta.redutora} == true" />
+                <input type="checkbox" name="redutora" th:checked="${conta.redutora} == true"
+                    th:attr="disabled=${mode} == 'edit' and (${mode} == 'edit' and not ${conta.editableProperties.contains('redutora')}) ? 'disabled' : null" />
                             Conta redutora
                         </label>
+               <!-- Preserve value submission when disabled in edit mode -->
+               <input type="hidden" name="redutora"
+                   th:if="(${mode} == 'edit' and not ${conta.editableProperties.contains('redutora')})"
+                   th:value="${conta.redutora} == true ? 'true' : 'false'" />
                         <div class="hint">Altera a natureza em relação à conta raiz do grupo.</div>
                     </div>
                 </div>
@@ -130,31 +154,31 @@
 
     <script>
         // Read any server-side flash messages rendered in hidden divs and show toasts
-        (function(){
-            function createToast(message, type){
+        (function () {
+            function createToast(message, type) {
                 var container = document.getElementById('toast-container');
-                if(!container) return;
+                if (!container) return;
                 var t = document.createElement('div');
-                t.className = 'toast ' + (type||'');
+                t.className = 'toast ' + (type || '');
                 var msg = document.createElement('div');
                 msg.className = 'msg';
                 msg.textContent = message;
                 var close = document.createElement('button');
                 close.className = 'close';
                 close.textContent = '×';
-                close.setAttribute('aria-label','Fechar');
-                close.onclick = function(){ container.removeChild(t); };
+                close.setAttribute('aria-label', 'Fechar');
+                close.onclick = function () { container.removeChild(t); };
                 t.appendChild(msg);
                 t.appendChild(close);
                 container.appendChild(t);
-                setTimeout(function(){ if(container.contains(t)) container.removeChild(t); }, 6000);
+                setTimeout(function () { if (container.contains(t)) container.removeChild(t); }, 6000);
             }
 
-            document.addEventListener('DOMContentLoaded', function(){
+            document.addEventListener('DOMContentLoaded', function () {
                 var s = document.getElementById('flash-success');
                 var e = document.getElementById('flash-error');
-                if(s && s.textContent.trim().length) createToast(s.textContent.trim(), 'success');
-                if(e && e.textContent.trim().length) createToast(e.textContent.trim(), 'error');
+                if (s && s.textContent.trim().length) createToast(s.textContent.trim(), 'success');
+                if (e && e.textContent.trim().length) createToast(e.textContent.trim(), 'error');
             });
         })();
     </script>

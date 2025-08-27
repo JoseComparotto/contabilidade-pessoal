@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import me.josecomparotto.contabilidade_pessoal.application.mapper.ContaMapper;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
@@ -67,9 +68,10 @@ public class ContasWebController {
 
     // POST /contas/{id}/edit
     @PostMapping("/contas/{id}/edit")
-    public String salvarEdicao(@PathVariable Integer id, ContaEditDto contaDto, RedirectAttributes redirectAttrs) {
+    public String salvarEdicao(@PathVariable Integer id, ContaFlatDto contaDto, RedirectAttributes redirectAttrs) {
         try {
-            contasService.atualizarConta(id, contaDto);
+            ContaEditDto editDto = ContaMapper.toEditDto(contaDto);
+            contasService.atualizarConta(id, editDto);
             redirectAttrs.addFlashAttribute("success", "Conta atualizada com sucesso.");
             return "redirect:/contas";
         } catch (Exception e) {

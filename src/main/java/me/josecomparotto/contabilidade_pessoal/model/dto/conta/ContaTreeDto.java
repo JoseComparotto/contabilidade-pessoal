@@ -3,6 +3,7 @@ package me.josecomparotto.contabilidade_pessoal.model.dto.conta;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
@@ -19,6 +20,7 @@ public class ContaTreeDto implements IDto<Conta> {
     private final List<ContaTreeDto> inferiores = new ArrayList<>();
     private Boolean editable;
     private Boolean deletable;
+    private Set<String> editableProperties;
 
     // saldo atual (pode ser nulo se não calculado/populado)
     private BigDecimal saldoAtual;
@@ -104,6 +106,14 @@ public class ContaTreeDto implements IDto<Conta> {
 
     public Boolean getDeletable() {
         return deletable;
+    }
+
+    public Set<String> getEditableProperties() {
+        return editableProperties;
+    }
+    
+    public void setEditableProperties(Set<String> editableProperties) {
+        this.editableProperties = editableProperties;
     }
 
 }

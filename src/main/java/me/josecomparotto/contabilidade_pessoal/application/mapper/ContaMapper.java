@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaTreeDto;
@@ -29,6 +30,7 @@ public final class ContaMapper {
         dto.setRedutora(conta.isRedutora());
         dto.setEditable(conta.isEditable());
         dto.setDeletable(conta.isDeletable());
+        dto.setEditableProperties(conta.getEditableProperties());
         return dto;
     }
 
@@ -53,6 +55,7 @@ public final class ContaMapper {
         dto.setRedutora(conta.isRedutora());
         dto.setEditable(conta.isEditable());
         dto.setDeletable(conta.isDeletable());
+        dto.setEditableProperties(conta.getEditableProperties());
         if (conta.getInferiores() != null && !conta.getInferiores().isEmpty()) {
             dto.getInferiores().addAll(
                     conta.getInferiores().stream()
@@ -78,5 +81,15 @@ public final class ContaMapper {
         conta.setTipo(dto.getTipo());
         conta.setCreatedBySystem(false);
         return conta;
+    }
+
+    public static ContaEditDto toEditDto(ContaFlatDto contaOld) {
+        if (contaOld == null)
+            return null;
+        ContaEditDto dto = new ContaEditDto();
+        dto.setDescricao(contaOld.getDescricao());
+        dto.setTipo(contaOld.getTipo());
+        dto.setRedutora(contaOld.isRedutora());
+        return dto;
     }
 }
