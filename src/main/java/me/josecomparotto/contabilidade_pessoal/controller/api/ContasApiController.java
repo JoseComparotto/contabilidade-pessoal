@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +31,21 @@ public class ContasApiController {
     public ResponseEntity<?> obterConta(@PathVariable Integer id,
             @RequestParam(defaultValue = "flat") String view) {
         Object body = contasService.obterContaPorIdPorView(id, view);
-        if (body == null) return ResponseEntity.notFound().build();
+        if (body == null)
+            return ResponseEntity.notFound().build();
         return ResponseEntity.ok(body);
+    }
+
+    // DELETE /api/contas/{id}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletarConta(@PathVariable Integer id) {
+        try {
+            boolean removido = contasService.deletarContaPorId(id);
+            if (!removido)
+                return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

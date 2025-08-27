@@ -1,5 +1,6 @@
 package me.josecomparotto.contabilidade_pessoal.model.dto;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,10 @@ public class ContaTreeDto {
     private Natureza natureza;
     private TipoConta tipo;
     private final List<ContaTreeDto> inferiores = new ArrayList<>();
+    private Boolean deletable;
+
+    // saldo atual (pode ser nulo se não calculado/populado)
+    private BigDecimal saldoAtual;
 
     public ContaTreeDto() {
     }
@@ -59,6 +64,26 @@ public class ContaTreeDto {
 
     public void setTipo(TipoConta tipo) {
         this.tipo = tipo;
+    }
+
+    public BigDecimal getSaldoAtual() {
+        return saldoAtual;
+    }
+
+    public void setSaldoAtual(BigDecimal saldoAtual) {
+        this.saldoAtual = saldoAtual;
+    }
+
+    public Boolean isDeletable() {
+        return deletable;
+    }
+
+    public void setDeletable(Boolean deletable) {
+        this.deletable = deletable;
+    }
+
+    public Boolean getDeletable() {
+        return deletable;
     }
 
 }

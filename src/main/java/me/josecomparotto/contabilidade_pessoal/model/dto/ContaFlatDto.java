@@ -1,6 +1,7 @@
 package me.josecomparotto.contabilidade_pessoal.model.dto;
 
 import java.util.List;
+import java.beans.Transient;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -17,6 +18,7 @@ public class ContaFlatDto {
     private Integer superiorId;
     private Natureza natureza;
     private TipoConta tipo;
+    private Boolean deletable;
 
     // saldo atual (pode ser nulo se não calculado/populado)
     private BigDecimal saldoAtual;
@@ -90,7 +92,8 @@ public class ContaFlatDto {
         this.saldoAtual = saldoAtual;
     }
 
-    // Getter para uso na view (formatação pt-BR)
+    @Transient
+    @JsonIgnore
     public String getSaldoAtualFormatado() {
         if (saldoAtual == null) {
             return "R$ 0,00";
@@ -99,4 +102,11 @@ public class ContaFlatDto {
         return nf.format(saldoAtual);
     }
 
+    public Boolean isDeletable() {
+        return deletable;
+    }
+
+    public void setDeletable(Boolean deletable) {
+        this.deletable = deletable;
+    }
 }

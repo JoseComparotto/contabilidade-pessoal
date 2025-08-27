@@ -17,6 +17,7 @@
                         <th>Código</th>
                         <th>Descrição</th>
                         <th>Saldo Atual</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -25,6 +26,13 @@
                         <td th:text="*{codigo != null ? codigo : (id != null ? id : '')}">1</td>
                         <td th:text="*{descricao}">Descrição</td>
                         <td th:text="*{saldoAtualFormatado}">R$ 0,00</td>
+                        <td>
+                            <form th:if="*{deletable}" th:action="@{/contas/{id}/delete(id=*{id})}" method="post" onsubmit="return confirm('Deseja excluir essa conta?');">
+                                <!-- Spring MVC common pattern: use hidden _method if your app expects HTTP DELETE via method override -->
+                                <input type="hidden" name="_method" value="delete" />
+                                <button type="submit" class="btn delete">Excluir</button>
+                            </form>
+                        </td>
                     </tr>
                 </tbody>
             </table>

@@ -130,4 +130,17 @@ public class ContasService {
             ordenarArvore(n.getInferiores(), seqMap);
         }
     }
+
+    public boolean deletarContaPorId(Integer id) {
+        Optional<Conta> opt = contaRepository.findById(id);
+        if (opt.isEmpty()) return false;
+        Conta c = opt.get();
+
+        if (!c.isDeletable()) {
+            throw new IllegalStateException("Conta não pode ser deletada");
+        }
+
+        contaRepository.delete(c);
+        return true;
+    }
 }

@@ -11,3 +11,8 @@ tbody td { padding: .6rem .8rem; border-bottom: 1px solid #f1f3f7 }
 
 /* Sintetica: deixa a linha inteira em negrito */
 .sintetica td { font-weight: 700 }
+
+/* Botões simples */
+.btn { padding: .3rem .6rem; border-radius: 4px; border: 1px solid transparent; cursor: pointer; font-size: .9rem }
+.btn.delete { background: #fff; color: #c7383a; border-color: #e6bfc0 }
+.btn.delete:hover { background: #feecec }

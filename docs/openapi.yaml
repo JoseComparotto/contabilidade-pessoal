@@ -51,13 +51,13 @@ paths:
       parameters:
         - in: path
           name: id
-          required: true
           description: Identificador da conta
+          required: true
           schema:
             type: integer
             format: int32
-        - in: query
-          name: view
+        - name: view
+          in: query
           description: Define a forma de visualização do retorno
           required: false
           schema:
@@ -73,6 +73,25 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/ContaFlatDto'
                   - $ref: '#/components/schemas/ContaTreeDto'
+        '404':
+          description: Conta não encontrada
+    delete:
+      tags: [Contas]
+      summary: Deletar conta por ID
+      operationId: deletarConta
+      parameters:
+        - in: path
+          name: id
+          description: Identificador da conta a ser removida
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Conta removida com sucesso (sem conteúdo)
+        '400':
+          description: Requisição inválida (conta não pode ser deletada)
         '404':
           description: Conta não encontrada
 components:
@@ -101,6 +120,14 @@ components:
           type: integer
           format: int32
           nullable: true
+        saldoAtual:
+          type: number
+          format: double
+          description: Saldo atual da conta (pode ser nulo se não calculado)
+          nullable: true
+        deletable:
+          type: boolean
+          description: Indica se a conta pode ser deletada
         natureza:
           $ref: '#/components/schemas/Natureza'
         tipo:
@@ -127,4 +154,12 @@ components:
           items:
             $ref: '#/components/schemas/ContaTreeDto'
           description: Contas filhas
+        saldoAtual:
+          type: number
+          format: double
+          description: Saldo atual da conta (pode ser nulo se não calculado)
+          nullable: true
+        deletable:
+          type: boolean
+          description: Indica se a conta pode ser deletada
       required: [id, codigo, descricao, natureza, tipo]

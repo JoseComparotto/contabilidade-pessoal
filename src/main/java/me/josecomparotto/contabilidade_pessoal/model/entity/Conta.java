@@ -50,6 +50,8 @@ public class Conta {
     @JsonIgnoreProperties("superior")
     private final List<Conta> inferiores = new ArrayList<>();
 
+    private Boolean createdBySystem;
+
     @Transient
     public String getCodigo() {
         return getPath().stream()
@@ -68,6 +70,12 @@ public class Conta {
             current = current.getSuperior();
         }
         return path;
+    }
+
+    @Transient
+    public boolean isDeletable() {
+        // Uma conta pode ser deletada se não tiver inferiores e não for uma conta criada pelo sistema
+        return inferiores.isEmpty() && !Boolean.TRUE.equals(createdBySystem);
     }
 
     public Integer getId() {
@@ -120,6 +128,14 @@ public class Conta {
 
     public List<Conta> getInferiores() {
         return inferiores;
+    }
+
+    public Boolean getCreatedBySystem() {
+        return createdBySystem;
+    }
+
+    public void setCreatedBySystem(Boolean createdBySystem) {
+        this.createdBySystem = createdBySystem;
     }
 
 }

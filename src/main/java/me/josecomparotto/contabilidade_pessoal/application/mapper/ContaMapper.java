@@ -1,5 +1,6 @@
 package me.josecomparotto.contabilidade_pessoal.application.mapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,8 @@ public final class ContaMapper {
         dto.setTipo(conta.getTipo());
         dto.setSuperiorId(conta.getSuperior() != null ? conta.getSuperior().getId() : null);
         dto.setPath(conta.getPath());
+        dto.setSaldoAtual(BigDecimal.ZERO); // Saldo não é populado aqui
+        dto.setDeletable(conta.isDeletable());
         return dto;
     }
 
@@ -43,6 +46,8 @@ public final class ContaMapper {
         dto.setDescricao(conta.getDescricao());
         dto.setNatureza(conta.getNatureza());
         dto.setTipo(conta.getTipo());
+        dto.setSaldoAtual(BigDecimal.ZERO); // Saldo não é populado aqui
+        dto.setDeletable(conta.isDeletable());
         if (conta.getInferiores() != null && !conta.getInferiores().isEmpty()) {
             dto.getInferiores().addAll(
                     conta.getInferiores().stream()
