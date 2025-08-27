@@ -196,7 +196,14 @@
             "description": "Conta não encontrada"
           },
           "400": {
-            "description": "Requisição inválida (dados inválidos ou campo não editável)"
+            "description": "Requisição inválida (dados inválidos ou campo não editável)",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       },
@@ -223,7 +230,14 @@
             "description": "Conta removida com sucesso (sem conteúdo)"
           },
           "400": {
-            "description": "Requisição inválida (conta não pode ser deletada)"
+            "description": "Requisição inválida (conta não pode ser deletada)",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "description": "Conta não encontrada"
@@ -312,6 +326,10 @@
           "descricao": {
             "type": "string"
           },
+          "displayText": {
+            "type": "string",
+            "description": "Texto de exibição combinado (ex.: código + descrição)"
+          },
           "superiorId": {
             "type": "integer",
             "format": "int32",
@@ -334,6 +352,13 @@
           "editable": {
             "type": "boolean",
             "description": "Indica se a conta pode ser editada"
+          },
+          "editableProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Lista de propriedades que podem ser editadas"
           },
           "natureza": {
             "$ref": "#/components/schemas/Natureza"
@@ -365,6 +390,10 @@
           "descricao": {
             "type": "string"
           },
+          "displayText": {
+            "type": "string",
+            "description": "Texto de exibição combinado (ex.: código + descrição)"
+          },
           "natureza": {
             "$ref": "#/components/schemas/Natureza"
           },
@@ -395,6 +424,13 @@
           "deletable": {
             "type": "boolean",
             "description": "Indica se a conta pode ser deletada"
+          },
+          "editableProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Lista de propriedades que podem ser editadas"
           }
         },
         "required": [
