@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import me.josecomparotto.contabilidade_pessoal.model.dto.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.ContaNewDto;
+import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 import me.josecomparotto.contabilidade_pessoal.service.ContasService;
 
 @Controller
@@ -21,6 +24,57 @@ public class ContasWebController {
     public String listarContas(Model model) {
         model.addAttribute("contas", contasService.listarContasFlat());
         return "contas/list";
+    }
+
+    // GET /contas/new
+    @GetMapping("/contas/new")
+    public String novaConta(Model model) {
+        model.addAttribute("mode", "create");
+        model.addAttribute("conta", new ContaNewDto());
+        model.addAttribute("tipos", TipoConta.values());
+        model.addAttribute("contas", contasService.listarContasSinteticas());
+        return "contas/form";
+    }
+
+    // POST /contas (create)
+    @PostMapping("/contas")
+    public String criarConta(ContaNewDto contaDto, RedirectAttributes redirectAttrs) {
+        try {
+            ContaFlatDto criada = contasService.criarConta(contaDto);
+            redirectAttrs.addFlashAttribute("success", "Conta criada com sucesso: " + criada.getCodigo());
+            return "redirect:/contas";
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("error", e.getMessage());
+            return "redirect:/contas/new";
+        }
+    }
+
+    // GET /contas/{id}/edit
+    @GetMapping("/contas/{id}/edit")
+    public String editarConta(@PathVariable Integer id, Model model, RedirectAttributes redirectAttrs) {
+        ContaFlatDto dto = contasService.obterContaFlat(id);
+        if (dto == null) {
+            redirectAttrs.addFlashAttribute("error", "Conta não encontrada.");
+            return "redirect:/contas";
+        }
+        model.addAttribute("mode", "edit");
+        model.addAttribute("conta", dto);
+        model.addAttribute("tipos", TipoConta.values());
+        model.addAttribute("contas", contasService.listarContasSinteticas());
+        return "contas/form";
+    }
+
+    // POST /contas/{id}/edit
+    @PostMapping("/contas/{id}/edit")
+    public String salvarEdicao(@PathVariable Integer id, ContaFlatDto contaDto, RedirectAttributes redirectAttrs) {
+        try {
+            contasService.atualizarConta(id, contaDto);
+            redirectAttrs.addFlashAttribute("success", "Conta atualizada com sucesso.");
+            return "redirect:/contas";
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("error", e.getMessage());
+            return "redirect:/contas/" + id + "/edit";
+        }
     }
 
     // POST /contas/{id}/delete

@@ -16,3 +16,7 @@ tbody td { padding: .6rem .8rem; border-bottom: 1px solid #f1f3f7 }
 .btn { padding: .3rem .6rem; border-radius: 4px; border: 1px solid transparent; cursor: pointer; font-size: .9rem }
 .btn.delete { background: #fff; color: #c7383a; border-color: #e6bfc0 }
 .btn.delete:hover { background: #feecec }
+
+/* Botão de editar: similar ao delete, mas com cor azul/teal para ação positiva */
+.btn.edit { background: #fff; color: #0a66c2; border-color: #cfe4fb }
+.btn.edit:hover { background: #eef6ff }

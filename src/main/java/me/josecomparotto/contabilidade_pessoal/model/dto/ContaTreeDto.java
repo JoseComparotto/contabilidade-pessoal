@@ -15,6 +15,7 @@ public class ContaTreeDto {
     private TipoConta tipo;
     private Boolean redutora;
     private final List<ContaTreeDto> inferiores = new ArrayList<>();
+    private Boolean editable;
     private Boolean deletable;
 
     // saldo atual (pode ser nulo se não calculado/populado)
@@ -81,6 +82,14 @@ public class ContaTreeDto {
 
     public void setSaldoAtual(BigDecimal saldoAtual) {
         this.saldoAtual = saldoAtual;
+    }
+
+    public Boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
     }
 
     public Boolean isDeletable() {

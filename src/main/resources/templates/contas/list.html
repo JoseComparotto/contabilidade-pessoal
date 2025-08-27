@@ -5,10 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contas</title>
     <link rel="stylesheet" href="/css/contas.css" />
+    <style>
+        /* Simple toast styles */
+        #toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .toast {
+            min-width: 220px;
+            max-width: 380px;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.08);
+            padding: .6rem .8rem;
+            border-radius: 6px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .6rem;
+        }
+        .toast.success { border-left: 4px solid #16a34a }
+        .toast.error { border-left: 4px solid #dc2626 }
+        .toast .msg { color: #111; font-size: .95rem }
+        .toast .close { background: transparent; border: none; cursor: pointer; font-weight: 700 }
+    </style>
 </head>
 <body>
+    <!-- toast container + hidden flash holders -->
+    <div id="toast-container"></div>
+    <div id="flash-success" th:if="${success}" th:text="${success}" style="display:none"></div>
+    <div id="flash-error" th:if="${error}" th:text="${error}" style="display:none"></div>
     <main class="container">
         <h1>Contas</h1>
+        <div class="controls">
+            <a href="/contas/new">+ Nova conta</a>
+        </div>
 
         <div class="table-wrap">
             <table>
@@ -26,8 +64,9 @@
                         <td th:text="*{codigo != null ? codigo : (id != null ? id : '')}">1</td>
                         <td th:text="*{descricao}">Descrição</td>
                         <td th:text="*{saldoAtualFormatado}">R$ 0,00</td>
-                        <td>
-                            <form th:if="*{deletable}" th:action="@{/contas/{id}/delete(id=*{id})}" method="post" onsubmit="return confirm('Deseja excluir essa conta?');">
+                        <td style="white-space:nowrap; display:flex; gap:.4rem">
+                            <a class="btn edit" th:if="*{editable}" th:href="@{/contas/{id}/edit(id=*{id})}">Editar</a>
+                            <form th:if="*{deletable}" th:action="@{/contas/{id}/delete(id=*{id})}" method="post" onsubmit="return confirm('Deseja excluir essa conta?');" style="display:inline">
                                 <!-- Spring MVC common pattern: use hidden _method if your app expects HTTP DELETE via method override -->
                                 <input type="hidden" name="_method" value="delete" />
                                 <button type="submit" class="btn delete">Excluir</button>
@@ -39,5 +78,36 @@
         </div>
 
     </main>
+
+    <script>
+        // Read any server-side flash messages rendered in hidden divs and show toasts
+        (function(){
+            function createToast(message, type){
+                var container = document.getElementById('toast-container');
+                if(!container) return;
+                var t = document.createElement('div');
+                t.className = 'toast ' + (type||'');
+                var msg = document.createElement('div');
+                msg.className = 'msg';
+                msg.textContent = message;
+                var close = document.createElement('button');
+                close.className = 'close';
+                close.textContent = '×';
+                close.setAttribute('aria-label','Fechar');
+                close.onclick = function(){ container.removeChild(t); };
+                t.appendChild(msg);
+                t.appendChild(close);
+                container.appendChild(t);
+                setTimeout(function(){ if(container.contains(t)) container.removeChild(t); }, 6000);
+            }
+
+            document.addEventListener('DOMContentLoaded', function(){
+                var s = document.getElementById('flash-success');
+                var e = document.getElementById('flash-error');
+                if(s && s.textContent.trim().length) createToast(s.textContent.trim(), 'success');
+                if(e && e.textContent.trim().length) createToast(e.textContent.trim(), 'error');
+            });
+        })();
+    </script>
 </body>
 </html>

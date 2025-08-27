@@ -17,6 +17,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+
 import me.josecomparotto.contabilidade_pessoal.application.converter.NaturezaConverter;
 import me.josecomparotto.contabilidade_pessoal.application.converter.TipoContaConverter;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
@@ -71,6 +72,12 @@ public class Conta {
             current = current.getSuperior();
         }
         return path;
+    }
+
+    @Transient
+    public boolean isEditable() {
+        // Uma conta pode ser editada se não for uma conta criada pelo sistema
+        return !Boolean.TRUE.equals(createdBySystem);
     }
 
     @Transient

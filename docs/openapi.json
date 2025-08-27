@@ -156,6 +156,50 @@
           }
         }
       },
+      "put": {
+        "tags": [
+          "Contas"
+        ],
+        "summary": "Atualizar conta por ID",
+        "operationId": "atualizarConta",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Identificador da conta",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContaFlatDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Conta atualizada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContaFlatDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Conta não encontrada"
+          }
+        }
+      },
       "delete": {
         "tags": [
           "Contas"
@@ -267,6 +311,10 @@
             "type": "boolean",
             "description": "Indica se a conta pode ser deletada"
           },
+          "editable": {
+            "type": "boolean",
+            "description": "Indica se a conta pode ser editada"
+          },
           "natureza": {
             "$ref": "#/components/schemas/Natureza"
           },
@@ -319,6 +367,10 @@
             "format": "double",
             "description": "Saldo atual da conta (pode ser nulo se não calculado)",
             "nullable": true
+          },
+          "editable": {
+            "type": "boolean",
+            "description": "Indica se a conta pode ser editada"
           },
           "deletable": {
             "type": "boolean",

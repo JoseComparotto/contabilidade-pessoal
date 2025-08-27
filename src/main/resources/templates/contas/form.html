@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${mode} == 'edit' ? 'Editar Conta' : 'Nova Conta'">Conta</title>
+    <link rel="stylesheet" href="/css/contas.css" />
+    <style>
+        .form-card {
+            background: #fff;
+            border: 1px solid #e3e6ee;
+            border-radius: 6px;
+            padding: 1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .8rem;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: .25rem;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: .9rem;
+            color: #333
+        }
+
+        input[type="text"],
+        select,
+        input[type="number"],
+        input[type="checkbox"] {
+            padding: .45rem .55rem;
+            border: 1px solid #d9dce4;
+            border-radius: 4px;
+            background: #fff;
+        }
+
+        .actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: .5rem
+        }
+
+        .btn.primary {
+            background: #0a66c2;
+            color: #fff;
+            border-color: #0a66c2
+        }
+
+        .btn.primary:hover {
+            filter: brightness(0.95)
+        }
+
+        .hint {
+            color: #666;
+            font-size: .85rem
+        }
+    </style>
+</head>
+
+<body>
+    <!-- toast container + hidden flash holders -->
+    <div id="toast-container"></div>
+    <div id="flash-success" th:if="${success}" th:text="${success}" style="display:none"></div>
+    <div id="flash-error" th:if="${error}" th:text="${error}" style="display:none"></div>
+    <main class="container">
+        <h1 th:text="${mode} == 'edit' ? 'Editar Conta' : 'Nova Conta'"></h1>
+
+        <div class="controls" style="margin-bottom:1rem">
+            <a href="/contas">← Voltar</a>
+        </div>
+
+        <div class="form-card">
+            <!-- Create mode uses ContaNewDto; Edit mode uses ContaFlatDto -->
+            <form th:action="${mode} == 'edit' ? @{'/contas/' + ${conta.id} + '/edit'} : @{/contas}" method="post">
+                <div class="form-grid">
+                    <div class="field" th:if="${mode} == 'edit'">
+                        <label>Código</label>
+                        <input type="text" th:value="${conta.codigo}" readonly />
+                    </div>
+
+                    <div class="field">
+                        <label for="descricao">Descrição</label>
+                        <input id="descricao" name="descricao" type="text" th:value="${conta.descricao}" required />
+                        <div class="hint">Priorize o padrão "Title Case": iniciais de capa palavra em maísculo.</div>                    </div>
+
+                    <div class="field">
+                        <label for="superiorId">Conta superior</label>
+                        <select id="superiorId" name="superiorId" required>
+                            <option value="" disabled th:selected="${conta.superiorId} == null">Selecione…</option>
+                            <option th:each="c : ${contas}" th:value="${c.id}"
+                                th:text="${c.codigo + ' - ' + c.descricao}"
+                                th:selected="${conta.superiorId} != null ? ${c.id} == ${conta.superiorId} : false">
+                            </option>
+                        </select>
+                        <div class="hint">A nova conta será criada como filha da conta selecionada.</div>
+                    </div>
+
+                    <div class="field">
+                        <label for="tipo">Tipo de Conta</label>
+                        <select id="tipo" name="tipo" required>
+                            <option value="" disabled th:selected="${conta.tipo} == null">Selecione…</option>
+                            <option th:each="t : ${tipos}" th:value="${t.name()}" th:text="${t.name()}"
+                                th:selected="${conta.tipo} != null ? ${t.name()} == ${conta.tipo.name()} : false">
+                            </option>
+                        </select>
+                        <div class="hint">Dica: contas sintéticas podem ter contas filhas; contas
+                            analíticas podem receber lançamentos diretos.</div>
+                    </div>
+
+                    <div class="field">
+                        <label>
+                            <input type="checkbox" name="redutora" th:checked="${conta.redutora} == true" />
+                            Conta redutora
+                        </label>
+                        <div class="hint">Altera a natureza em relação à conta raiz do grupo.</div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn primary" type="submit"
+                        th:text="${mode} == 'edit' ? 'Salvar' : 'Criar'">Salvar</button>
+                    <a class="btn" href="/contas">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // Read any server-side flash messages rendered in hidden divs and show toasts
+        (function(){
+            function createToast(message, type){
+                var container = document.getElementById('toast-container');
+                if(!container) return;
+                var t = document.createElement('div');
+                t.className = 'toast ' + (type||'');
+                var msg = document.createElement('div');
+                msg.className = 'msg';
+                msg.textContent = message;
+                var close = document.createElement('button');
+                close.className = 'close';
+                close.textContent = '×';
+                close.setAttribute('aria-label','Fechar');
+                close.onclick = function(){ container.removeChild(t); };
+                t.appendChild(msg);
+                t.appendChild(close);
+                container.appendChild(t);
+                setTimeout(function(){ if(container.contains(t)) container.removeChild(t); }, 6000);
+            }
+
+            document.addEventListener('DOMContentLoaded', function(){
+                var s = document.getElementById('flash-success');
+                var e = document.getElementById('flash-error');
+                if(s && s.textContent.trim().length) createToast(s.textContent.trim(), 'success');
+                if(e && e.textContent.trim().length) createToast(e.textContent.trim(), 'error');
+            });
+        })();
+    </script>
+</body>
+
+</html>

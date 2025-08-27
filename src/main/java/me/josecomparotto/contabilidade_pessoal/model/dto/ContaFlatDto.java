@@ -18,8 +18,9 @@ public class ContaFlatDto {
     private Integer superiorId;
     private Natureza natureza;
     private TipoConta tipo;
-    private Boolean redutora;
-    private Boolean deletable;
+    private boolean redutora;
+    private boolean editable;
+    private boolean deletable;
 
     // saldo atual (pode ser nulo se não calculado/populado)
     private BigDecimal saldoAtual;
@@ -108,6 +109,14 @@ public class ContaFlatDto {
     }
     public void setRedutora(boolean redutora) {
         this.redutora = redutora;
+    }
+
+    public Boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
     }
 
     public Boolean isDeletable() {
