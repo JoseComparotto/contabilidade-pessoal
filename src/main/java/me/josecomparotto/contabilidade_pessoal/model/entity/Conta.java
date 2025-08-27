@@ -2,7 +2,9 @@ package me.josecomparotto.contabilidade_pessoal.model.entity;
 
 import java.beans.Transient;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -75,6 +77,23 @@ public class Conta {
     }
 
     @Transient
+    public Set<String> getEditableProperties() {
+        Set<String> editableProperties = new HashSet<>();
+        if (isEditable()) {
+            editableProperties.add("descricao");
+            editableProperties.add("redutora");
+
+            if (inferiores.isEmpty()) {
+                // Só permite alterar o tipo se a conta não tiver inferiores
+                editableProperties.add("tipo");
+            }
+        }
+
+        // Retorna uma cópia imutável do conjunto de propriedades editáveis
+        return Set.copyOf(editableProperties);
+    }
+
+    @Transient
     public boolean isEditable() {
         // Uma conta pode ser editada se não for uma conta criada pelo sistema
         return !Boolean.TRUE.equals(createdBySystem);
@@ -82,7 +101,8 @@ public class Conta {
 
     @Transient
     public boolean isDeletable() {
-        // Uma conta pode ser deletada se não tiver inferiores e não for uma conta criada pelo sistema
+        // Uma conta pode ser deletada se não tiver inferiores e não for uma conta
+        // criada pelo sistema
         return inferiores.isEmpty() && !Boolean.TRUE.equals(createdBySystem);
     }
 

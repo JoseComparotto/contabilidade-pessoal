@@ -1,13 +1,18 @@
 package me.josecomparotto.contabilidade_pessoal.service;
 
+import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.stereotype.Service;
 
 import me.josecomparotto.contabilidade_pessoal.application.mapper.ContaMapper;
@@ -208,10 +213,35 @@ public class ContasService {
         }
         Conta conta = opt.get();
 
+        // Verificar se a conta pode ser editada
         if (!conta.isEditable()) {
             throw new IllegalStateException("Conta não pode ser editada");
         }
 
+        // Verificar se os campos que foram alterados são editáveis (via propriedades Spring/JavaBean)
+        {
+            Set<String> editaveis = conta.getEditableProperties();
+            BeanWrapper dtoBw = new BeanWrapperImpl(contaDto);
+            BeanWrapper entBw = new BeanWrapperImpl(conta);
+
+            for (PropertyDescriptor pd : dtoBw.getPropertyDescriptors()) {
+                String prop = pd.getName();
+                if ("class".equals(prop)) continue;
+
+                if (!dtoBw.isReadableProperty(prop) || !entBw.isReadableProperty(prop)) {
+                    continue; // ignora propriedades sem getter correspondente
+                }
+
+                Object novo = dtoBw.getPropertyValue(prop);
+                Object atual = entBw.getPropertyValue(prop);
+
+                boolean alterado = !Objects.equals(novo, atual);
+                if (alterado && !editaveis.contains(prop)) {
+                    throw new IllegalStateException("Campo '" + prop + "' não é editável para esta conta");
+                }
+            }
+        }
+        
         // Validar
         if (contaDto.getDescricao() == null || contaDto.getDescricao().trim().isEmpty()) {
             throw new IllegalArgumentException("Descrição da conta é obrigatória");
@@ -229,4 +259,5 @@ public class ContasService {
         conta = contaRepository.save(conta);
         return ContaMapper.toFlatDto(conta);
     }
+
 }
