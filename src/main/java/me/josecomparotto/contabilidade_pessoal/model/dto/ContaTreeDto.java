@@ -13,6 +13,7 @@ public class ContaTreeDto {
     private String descricao;
     private Natureza natureza;
     private TipoConta tipo;
+    private Boolean redutora;
     private final List<ContaTreeDto> inferiores = new ArrayList<>();
     private Boolean deletable;
 
@@ -64,6 +65,14 @@ public class ContaTreeDto {
 
     public void setTipo(TipoConta tipo) {
         this.tipo = tipo;
+    }
+
+    public boolean isRedutora() {
+        return redutora;
+    }
+
+    public void setRedutora(boolean redutora) {
+        this.redutora = redutora;
     }
 
     public BigDecimal getSaldoAtual() {

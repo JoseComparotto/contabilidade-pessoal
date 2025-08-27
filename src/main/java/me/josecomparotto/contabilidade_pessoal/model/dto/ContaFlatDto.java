@@ -18,6 +18,7 @@ public class ContaFlatDto {
     private Integer superiorId;
     private Natureza natureza;
     private TipoConta tipo;
+    private Boolean redutora;
     private Boolean deletable;
 
     // saldo atual (pode ser nulo se não calculado/populado)
@@ -100,6 +101,13 @@ public class ContaFlatDto {
         }
     NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
         return nf.format(saldoAtual);
+    }
+
+    public boolean isRedutora() {
+        return redutora;
+    }
+    public void setRedutora(boolean redutora) {
+        this.redutora = redutora;
     }
 
     public Boolean isDeletable() {

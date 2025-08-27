@@ -25,6 +25,7 @@ public final class ContaMapper {
         dto.setSuperiorId(conta.getSuperior() != null ? conta.getSuperior().getId() : null);
         dto.setPath(conta.getPath());
         dto.setSaldoAtual(BigDecimal.ZERO); // Saldo não é populado aqui
+        dto.setRedutora(conta.isRedutora());
         dto.setDeletable(conta.isDeletable());
         return dto;
     }
@@ -47,6 +48,7 @@ public final class ContaMapper {
         dto.setNatureza(conta.getNatureza());
         dto.setTipo(conta.getTipo());
         dto.setSaldoAtual(BigDecimal.ZERO); // Saldo não é populado aqui
+        dto.setRedutora(conta.isRedutora());
         dto.setDeletable(conta.isDeletable());
         if (conta.getInferiores() != null && !conta.getInferiores().isEmpty()) {
             dto.getInferiores().addAll(

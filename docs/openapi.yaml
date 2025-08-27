@@ -120,6 +120,9 @@ components:
           type: integer
           format: int32
           nullable: true
+        redutora:
+          type: boolean
+          description: Indica se a conta é redutora (se a natureza é diferente da raiz)
         saldoAtual:
           type: number
           format: double
@@ -154,6 +157,9 @@ components:
           items:
             $ref: '#/components/schemas/ContaTreeDto'
           description: Contas filhas
+        redutora:
+          type: boolean
+          description: Indica se a conta é redutora (true quando a natureza for diferente da raiz)
         saldoAtual:
           type: number
           format: double

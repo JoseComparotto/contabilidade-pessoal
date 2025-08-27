@@ -4,6 +4,7 @@ import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Entity;
@@ -76,6 +77,21 @@ public class Conta {
     public boolean isDeletable() {
         // Uma conta pode ser deletada se não tiver inferiores e não for uma conta criada pelo sistema
         return inferiores.isEmpty() && !Boolean.TRUE.equals(createdBySystem);
+    }
+
+    @Transient
+    @JsonIgnore
+    public Conta getRaiz() {
+        Conta current = this;
+        while (current.getSuperior() != null) {
+            current = current.getSuperior();
+        }
+        return current;
+    }
+
+    @Transient
+    public boolean isRedutora() {
+        return !this.natureza.equals(getRaiz().getNatureza());
     }
 
     public Integer getId() {
