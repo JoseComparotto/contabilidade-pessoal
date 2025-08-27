@@ -101,6 +101,22 @@ public class Conta {
         return !this.natureza.equals(getRaiz().getNatureza());
     }
 
+    @Transient
+    public void setRedutora(boolean redutora) {
+        Natureza raizNatureza = getRaiz().getNatureza();
+
+        if (!redutora) {
+            this.natureza = raizNatureza;
+            return;
+        }
+
+        this.natureza = naturezaOposta(raizNatureza);
+    }
+
+    private static Natureza naturezaOposta(Natureza natureza) {
+        return natureza.equals(Natureza.DEVEDORA) ? Natureza.CREDORA : Natureza.DEVEDORA;
+    }
+
     public Integer getId() {
         return id;
     }

@@ -6,7 +6,7 @@ public class ContaNewDto {
     private Integer superiorId;
     private String descricao;
     private TipoConta tipo;
-    private Boolean redutora = false;
+    private boolean redutora;
 
     public ContaNewDto() {
     }
@@ -35,11 +35,11 @@ public class ContaNewDto {
         this.tipo = tipo;
     }
 
-    public Boolean isRedutora() {
+    public boolean isRedutora() {
         return redutora;
     }
 
-    public void setRedutora(Boolean redutora) {
+    public void setRedutora(boolean redutora) {
         this.redutora = redutora;
     }
 }

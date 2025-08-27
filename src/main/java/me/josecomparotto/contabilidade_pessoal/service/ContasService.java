@@ -176,19 +176,10 @@ public class ContasService {
                 throw new IllegalArgumentException("Conta superior não encontrada: " + contaDto.getSuperiorId());
             }
             Conta sup = optSup.get();
-            Conta raiz = sup.getRaiz();
             conta.setSuperior(sup);
 
             // Definir natureza da conta
-            if(Boolean.TRUE.equals(contaDto.isRedutora())) {
-                if(Natureza.CREDORA.equals(raiz.getNatureza())) {
-                    conta.setNatureza(Natureza.DEVEDORA);
-                }else{
-                    conta.setNatureza(Natureza.CREDORA);
-                }
-            }else {
-                conta.setNatureza(sup.getNatureza());
-            }
+            conta.setRedutora(contaDto.isRedutora());
 
             // Definir sequencia como o próximo número disponível entre os inferiores
             int nextSeq = 1;
