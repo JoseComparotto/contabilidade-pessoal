@@ -23,6 +23,7 @@ import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaTreeDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
+import me.josecomparotto.contabilidade_pessoal.model.enums.TipoMovimento;
 import me.josecomparotto.contabilidade_pessoal.repository.ContaRepository;
 
 @Service
@@ -148,7 +149,8 @@ public class ContasService {
 
     public boolean deletarContaPorId(Integer id) {
         Optional<Conta> opt = contaRepository.findById(id);
-        if (opt.isEmpty()) return false;
+        if (opt.isEmpty())
+            return false;
         Conta c = opt.get();
 
         if (!c.isDeletable()) {
@@ -161,7 +163,7 @@ public class ContasService {
 
     public ContaFlatDto criarConta(ContaNewDto contaDto) {
 
-        // Validar dados da conta
+        // Validar dados iniciais da conta
         if(contaDto.getDescricao() == null || contaDto.getDescricao().trim().isEmpty()) {
             throw new IllegalArgumentException("Descrição da conta é obrigatória");
         }
@@ -184,8 +186,18 @@ public class ContasService {
             Conta sup = optSup.get();
             conta.setSuperior(sup);
 
-            // Definir natureza da conta
-            conta.setRedutora(contaDto.isRedutora());
+            // Herdar tipo de movimento da raiz se não estiver definido
+            if (contaDto.getTipoMovimento() == null) {
+                contaDto.setTipoMovimento(sup.getTipoMovimento());
+            }
+            
+            // Definir tipo de movimento
+            conta.setTipoMovimento(contaDto.getTipoMovimento());
+
+            // Validar tipo de movimento
+            if (!TipoMovimento.MISTO.equals(sup.getTipoMovimento()) && !Objects.equals(conta.getTipoMovimento(), sup.getTipoMovimento())) {
+                throw new IllegalArgumentException("Tipo de movimento da conta superior não permite que contas inferiores tenham tipo diferente de: " + sup.getTipoMovimento());
+            }
 
             // Definir sequencia como o próximo número disponível entre os inferiores
             int nextSeq = 1;
@@ -212,13 +224,15 @@ public class ContasService {
             throw new IllegalArgumentException("Conta não encontrada: " + id);
         }
         Conta conta = opt.get();
+        Conta sup = conta.getSuperior();
 
         // Verificar se a conta pode ser editada
         if (!conta.isEditable()) {
             throw new IllegalStateException("Conta não pode ser editada");
         }
 
-        // Verificar se os campos que foram alterados são editáveis (via propriedades Spring/JavaBean)
+        // Verificar se os campos que foram alterados são editáveis (via propriedades
+        // Spring/JavaBean)
         {
             Set<String> editaveis = conta.getEditableProperties();
             BeanWrapper dtoBw = new BeanWrapperImpl(contaDto);
@@ -226,7 +240,8 @@ public class ContasService {
 
             for (PropertyDescriptor pd : dtoBw.getPropertyDescriptors()) {
                 String prop = pd.getName();
-                if ("class".equals(prop)) continue;
+                if ("class".equals(prop))
+                    continue;
 
                 if (!dtoBw.isReadableProperty(prop) || !entBw.isReadableProperty(prop)) {
                     continue; // ignora propriedades sem getter correspondente
@@ -241,7 +256,7 @@ public class ContasService {
                 }
             }
         }
-        
+
         // Validar
         if (contaDto.getDescricao() == null || contaDto.getDescricao().trim().isEmpty()) {
             throw new IllegalArgumentException("Descrição da conta é obrigatória");
@@ -249,11 +264,26 @@ public class ContasService {
         if (contaDto.getTipo() == null) {
             throw new IllegalArgumentException("Tipo da conta é obrigatório");
         }
+        if (contaDto.getTipoMovimento() == null) {
+            throw new IllegalArgumentException("Tipo de movimento da conta é obrigatório");
+        }
+        
+        // Validar tipo de movimento
+        if (!TipoMovimento.MISTO.equals(sup.getTipoMovimento()) && !Objects.equals(contaDto.getTipoMovimento(), sup.getTipoMovimento())) {
+            throw new IllegalArgumentException("Tipo de movimento da conta superior não permite que contas inferiores tenham tipo diferente de: " + sup.getTipoMovimento());
+        }
+
+        // Verificar se existem contas inferiores com tipo de movimento MISTO
+        List<Conta> inferiores = conta.getTodasInferiores();
+        boolean algumaInferiorDiferente = inferiores.stream().anyMatch(c -> !Objects.equals(c.getTipoMovimento(), contaDto.getTipoMovimento()));
+        if (!TipoMovimento.MISTO.equals(contaDto.getTipoMovimento()) && algumaInferiorDiferente) {
+            throw new IllegalArgumentException("Não é possível alterar o tipo de movimento desta conta para o tipo " + contaDto.getTipoMovimento() + ", pois existem contas inferiores com tipo diferente de: " + contaDto.getTipoMovimento());
+        }
 
         // Atualizar descrição e tipo
         conta.setDescricao(contaDto.getDescricao());
         conta.setTipo(contaDto.getTipo());
-        conta.setRedutora(contaDto.isRedutora());
+        conta.setTipoMovimento(contaDto.getTipoMovimento());
 
         // Salvar alterações
         conta = contaRepository.save(conta);

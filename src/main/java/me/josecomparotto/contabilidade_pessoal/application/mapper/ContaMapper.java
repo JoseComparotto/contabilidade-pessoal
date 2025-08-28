@@ -1,6 +1,5 @@
 package me.josecomparotto.contabilidade_pessoal.application.mapper;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,8 +26,8 @@ public final class ContaMapper {
         dto.setTipo(conta.getTipo());
         dto.setSuperiorId(conta.getSuperior() != null ? conta.getSuperior().getId() : null);
         dto.setPath(conta.getPath());
-        dto.setSaldoAtual(BigDecimal.ZERO); // Saldo não é populado aqui
-        dto.setRedutora(conta.isRedutora());
+        dto.setSaldoAtual(conta.getSaldoAtual());
+        dto.setTipoMovimento(conta.getTipoMovimento());
         dto.setEditable(conta.isEditable());
         dto.setDeletable(conta.isDeletable());
         dto.setEditableProperties(conta.getEditableProperties());
@@ -53,8 +52,8 @@ public final class ContaMapper {
         dto.setDisplayText(conta.getDisplayText());
         dto.setNatureza(conta.getNatureza());
         dto.setTipo(conta.getTipo());
-        dto.setSaldoAtual(BigDecimal.ZERO); // Saldo não é populado aqui
-        dto.setRedutora(conta.isRedutora());
+        dto.setSaldoAtual(conta.getSaldoAtual());
+        dto.setTipoMovimento(conta.getTipoMovimento());
         dto.setEditable(conta.isEditable());
         dto.setDeletable(conta.isDeletable());
         dto.setEditableProperties(conta.getEditableProperties());
@@ -91,7 +90,7 @@ public final class ContaMapper {
         ContaEditDto dto = new ContaEditDto();
         dto.setDescricao(contaOld.getDescricao());
         dto.setTipo(contaOld.getTipo());
-        dto.setRedutora(contaOld.isRedutora());
+        dto.setTipoMovimento(contaOld.getTipoMovimento());
         return dto;
     }
 }

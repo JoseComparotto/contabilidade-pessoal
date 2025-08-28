@@ -24,9 +24,9 @@
                 <tbody>
                     <!-- Flattened view renders a list of ContaFlatDto which has id, codigo, descricao, natureza, tipo -->
                     <tr th:each="c : ${contas}" th:object="${c}" th:classappend="(${c.tipo.name() == 'SINTETICA'} ? 'sintetica ' : '') 
-                   + (${c.redutora} ? 'redutora' : '')">
+                   + (${c.tipoMovimento.name() == 'REDUTOR'} ? 'redutora' : '')">
                         <td th:text="*{codigo != null ? codigo : (id != null ? id : '')}">1</td>
-                        <td th:text="*{ (redutora ? '(-) ' : '') + descricao}">Descrição</td>
+                        <td th:text="*{ (tipoMovimento.name() == 'REDUTOR' ? '(-) ' : '') + descricao}">Descrição</td>
                         <td th:text="*{saldoAtualFormatado}">R$ 0,00</td>
                         <td style="white-space:nowrap; display:flex; gap:.4rem">
                             <a class="btn edit icon" th:href="*{editable} ? @{/contas/{id}/edit(id=*{id})} : ''"

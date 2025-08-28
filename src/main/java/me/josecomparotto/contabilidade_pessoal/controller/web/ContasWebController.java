@@ -13,6 +13,7 @@ import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
+import me.josecomparotto.contabilidade_pessoal.model.enums.TipoMovimento;
 import me.josecomparotto.contabilidade_pessoal.service.ContasService;
 
 @Controller
@@ -34,6 +35,7 @@ public class ContasWebController {
         model.addAttribute("mode", "create");
         model.addAttribute("conta", new ContaNewDto());
         model.addAttribute("tipos", TipoConta.values());
+        model.addAttribute("tiposMovimento", TipoMovimento.values());
         model.addAttribute("contas", contasService.listarContasSinteticas());
         return "contas/form";
     }
@@ -62,6 +64,7 @@ public class ContasWebController {
         model.addAttribute("mode", "edit");
         model.addAttribute("conta", dto);
         model.addAttribute("tipos", TipoConta.values());
+        model.addAttribute("tiposMovimento", TipoMovimento.values());
         model.addAttribute("contas", contasService.listarContasSinteticas());
         return "contas/form";
     }

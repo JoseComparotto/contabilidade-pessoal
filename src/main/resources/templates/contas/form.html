@@ -19,7 +19,7 @@
                                                     canEditDescricao=${mode == 'edit' ? conta.editableProperties.contains('descricao') : true},
                                                     isSelectDisabled=${mode == 'edit'},
                                                     canEditTipo=${mode == 'edit' ? conta.editableProperties.contains('tipo') : true},
-                                                    canEditRedutora=${mode == 'edit' ? conta.editableProperties.contains('redutora') : true}
+                                                    canEditTipoMovimento=${mode == 'edit' ? conta.editableProperties.contains('tipoMovimento') : true}
                                                 ">
                 <div class="form-grid">
 
@@ -47,9 +47,9 @@
                         true, ${not canEditTipo}, 'Dica: contas sintéticas podem ter contas filhas; contas analíticas podem receber lançamentos diretos.', true)
                     }"></div>
 
-                    <!-- Conta redutora -->
-                    <div th:replace="~{fragments/form-controls :: checkboxField(
-                        'redutora', 'Conta redutora', ${conta.redutora} == true, ${not canEditRedutora}, 'Altera a natureza em relação à conta raiz do grupo.', true)
+                    <!-- Tipo de Movimento (Segmentado) -->
+                    <div th:replace="~{fragments/form-controls :: segmentedEnum(
+                        'tipoMovimento', 'Tipo de Movimento', ${tiposMovimento}, ${conta.tipoMovimento != null ? conta.tipoMovimento.name() : null}, 'TipoMovimento.', false, ${not canEditTipoMovimento}, 'Como a conta aceita lançamentos em relação à natureza da raiz do grupo.', true)
                     }"></div>
                 </div>
 

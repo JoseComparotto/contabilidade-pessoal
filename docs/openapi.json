@@ -264,6 +264,15 @@
           "SINTETICA"
         ]
       },
+      "TipoMovimento": {
+        "type": "string",
+        "description": "Como a conta aceita lançamentos em relação à natureza da raiz",
+        "enum": [
+          "NATURAL",
+          "REDUTOR",
+          "MISTO"
+        ]
+      },
       "ContaNewDto": {
         "type": "object",
         "description": "DTO para criação de nova conta",
@@ -280,9 +289,8 @@
           "tipo": {
             "$ref": "#/components/schemas/TipoConta"
           },
-          "redutora": {
-            "type": "boolean",
-            "description": "Indica se a conta é redutora (opcional, default false)"
+          "tipoMovimento": {
+            "$ref": "#/components/schemas/TipoMovimento"
           }
         },
         "required": [
@@ -301,9 +309,8 @@
           "tipo": {
             "$ref": "#/components/schemas/TipoConta"
           },
-          "redutora": {
-            "type": "boolean",
-            "description": "Indica se a conta é redutora (opcional, default false)"
+          "tipoMovimento": {
+            "$ref": "#/components/schemas/TipoMovimento"
           }
         },
         "required": [
@@ -335,9 +342,8 @@
             "format": "int32",
             "nullable": true
           },
-          "redutora": {
-            "type": "boolean",
-            "description": "Indica se a conta é redutora (se a natureza é diferente da raiz)"
+          "tipoMovimento": {
+            "$ref": "#/components/schemas/TipoMovimento"
           },
           "saldoAtual": {
             "type": "number",
@@ -407,9 +413,8 @@
             },
             "description": "Contas filhas"
           },
-          "redutora": {
-            "type": "boolean",
-            "description": "Indica se a conta é redutora (true quando a natureza for diferente da raiz)"
+          "tipoMovimento": {
+            "$ref": "#/components/schemas/TipoMovimento"
           },
           "saldoAtual": {
             "type": "number",

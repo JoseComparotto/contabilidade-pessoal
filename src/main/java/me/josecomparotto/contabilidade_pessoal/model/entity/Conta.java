@@ -1,10 +1,13 @@
 package me.josecomparotto.contabilidade_pessoal.model.entity;
 
 import java.beans.Transient;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -24,6 +27,7 @@ import me.josecomparotto.contabilidade_pessoal.application.converter.NaturezaCon
 import me.josecomparotto.contabilidade_pessoal.application.converter.TipoContaConverter;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
+import me.josecomparotto.contabilidade_pessoal.model.enums.TipoMovimento;
 
 @Entity
 @Table(name = "tb_contas", schema = "public")
@@ -54,6 +58,9 @@ public class Conta {
     @JsonIgnoreProperties("superior")
     private final List<Conta> inferiores = new ArrayList<>();
 
+    @Column(name = "aceita_movimento_oposto")
+    private Boolean aceitaMovimentoOposto;
+
     private Boolean createdBySystem;
 
     @Transient
@@ -81,7 +88,9 @@ public class Conta {
         Set<String> editableProperties = new HashSet<>();
         if (isEditable()) {
             editableProperties.add("descricao");
-            editableProperties.add("redutora");
+
+            if(canEditTipoMovimento())
+            editableProperties.add("tipoMovimento");
 
             if (inferiores.isEmpty()) {
                 // Só permite alterar o tipo se a conta não tiver inferiores
@@ -91,6 +100,37 @@ public class Conta {
 
         // Retorna uma cópia imutável do conjunto de propriedades editáveis
         return Set.copyOf(editableProperties);
+    }
+
+    private boolean canEditTipoMovimento() {
+
+        Set<TipoMovimento> tiposInferiores = getTodasInferiores().stream()
+                .map(Conta::getTipoMovimento)
+                .collect(Collectors.toSet());
+
+        boolean algumaInferiorDiferente = tiposInferiores.stream().anyMatch(t -> !Objects.equals(t, getTipoMovimento()));
+
+        // Se a atual não é mista e existe alguma conta inferior diferente, então não aceita
+        if(!TipoMovimento.MISTO.equals(getTipoMovimento()) && algumaInferiorDiferente) {
+            return false;
+        }
+
+        // Se a atual for mista e existem ao menos uma conta inferior mista, então não aceita
+        if(TipoMovimento.MISTO.equals(getTipoMovimento()) && tiposInferiores.contains(TipoMovimento.MISTO)) {
+            return false;
+        }
+
+        // Se a atual for mista e existir tanto inferior natual quanto redutor, então não aceita
+        if(TipoMovimento.MISTO.equals(getTipoMovimento()) && tiposInferiores.contains(TipoMovimento.NATURAL) && tiposInferiores.contains(TipoMovimento.REDUTOR)) {
+            return false;
+        }
+
+        // Se a conta superior for mista, então aceita
+        if(superior != null && TipoMovimento.MISTO.equals(superior.getTipoMovimento())) {
+            return true;
+        }
+
+        return false;
     }
 
     @Transient
@@ -117,20 +157,68 @@ public class Conta {
     }
 
     @Transient
-    public boolean isRedutora() {
+    @JsonIgnore
+    public List<Conta> getTodasInferiores() {
+        List<Conta> todasInferiores = new ArrayList<>();
+        List<Conta> stack = new ArrayList<>();
+        for (Conta inferior : inferiores) {
+            stack.add(inferior);
+        }
+
+        Set<Conta> visited = new HashSet<>();
+
+        while (!stack.isEmpty()) {
+            Conta current = stack.remove(stack.size() - 1); // pop
+            if (!visited.add(current)) {
+                continue;
+            }
+            todasInferiores.add(current);
+
+            List<Conta> children = current.getInferiores();
+            for (Conta child : children) {
+                stack.add(child);
+            }
+        }
+        return todasInferiores;
+    }
+
+    private boolean isRedutora() {
         return !this.natureza.equals(getRaiz().getNatureza());
     }
 
     @Transient
-    public void setRedutora(boolean redutora) {
-        Natureza raizNatureza = getRaiz().getNatureza();
-
-        if (!redutora) {
-            this.natureza = raizNatureza;
-            return;
+    public TipoMovimento getTipoMovimento() {
+        if(isRedutora()) {
+            return TipoMovimento.REDUTOR;
+        }else if(aceitaMovimentoOposto) {
+            return TipoMovimento.MISTO;
+        }else{
+            return TipoMovimento.NATURAL;
         }
+    }
 
-        this.natureza = naturezaOposta(raizNatureza);
+    @Transient
+    public void setTipoMovimento(TipoMovimento tipoMovimento) {
+        switch (tipoMovimento) {
+            case REDUTOR:
+                this.natureza = naturezaOposta(getRaiz().getNatureza());
+                this.aceitaMovimentoOposto = false;
+                break;
+            case MISTO:
+                this.natureza = getRaiz().getNatureza();
+                this.aceitaMovimentoOposto = true;
+                break;
+            case NATURAL:
+                this.natureza = getRaiz().getNatureza();
+                this.aceitaMovimentoOposto = false;
+                break;
+        }
+    }
+
+    @Transient
+    public BigDecimal getSaldoAtual() {
+        // Saldo não é populado aqui
+        return BigDecimal.ZERO;
     }
 
     @Transient

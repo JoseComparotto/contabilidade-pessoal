@@ -9,6 +9,7 @@ import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
+import me.josecomparotto.contabilidade_pessoal.model.enums.TipoMovimento;
 
 public class ContaTreeDto implements IDto<Conta> {
     private Integer id;
@@ -17,7 +18,7 @@ public class ContaTreeDto implements IDto<Conta> {
     private String displayText;
     private Natureza natureza;
     private TipoConta tipo;
-    private Boolean redutora;
+    private TipoMovimento tipoMovimento;
     private final List<ContaTreeDto> inferiores = new ArrayList<>();
     private Boolean editable;
     private Boolean deletable;
@@ -81,12 +82,12 @@ public class ContaTreeDto implements IDto<Conta> {
         this.tipo = tipo;
     }
 
-    public boolean isRedutora() {
-        return redutora;
+    public TipoMovimento getTipoMovimento() {
+        return tipoMovimento;
     }
-
-    public void setRedutora(boolean redutora) {
-        this.redutora = redutora;
+    
+    public void setTipoMovimento(TipoMovimento tipoMovimento) {
+        this.tipoMovimento = tipoMovimento;
     }
 
     public BigDecimal getSaldoAtual() {

@@ -13,6 +13,7 @@ import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
+import me.josecomparotto.contabilidade_pessoal.model.enums.TipoMovimento;
 
 public class ContaFlatDto implements IDto<Conta> {
     private Integer id;
@@ -22,7 +23,7 @@ public class ContaFlatDto implements IDto<Conta> {
     private Integer superiorId;
     private Natureza natureza;
     private TipoConta tipo;
-    private boolean redutora;
+    private TipoMovimento tipoMovimento;
     private boolean editable;
     private boolean deletable;
     private Set<String> editableProperties;
@@ -117,11 +118,12 @@ public class ContaFlatDto implements IDto<Conta> {
         return nf.format(saldoAtual);
     }
 
-    public boolean isRedutora() {
-        return redutora;
+    public TipoMovimento getTipoMovimento() {
+        return tipoMovimento;
     }
-    public void setRedutora(boolean redutora) {
-        this.redutora = redutora;
+    
+    public void setTipoMovimento(TipoMovimento tipoMovimento) {
+        this.tipoMovimento = tipoMovimento;
     }
 
     public Boolean isEditable() {
