@@ -15,5 +15,19 @@ services:
       timeout: 3s
       retries: 20
 
+  app:
+    build: .
+    container_name: contabilidade_app
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - DB_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
+
+    restart: unless-stopped
+
 volumes:
   db-data:
