@@ -103,14 +103,19 @@ public class Conta {
                 editableProperties.add("tipoMovimento");
             }
 
-            if (inferiores.isEmpty()) {
-                // Só permite alterar o tipo se a conta não tiver inferiores
+            if (canEditTipo()) {
                 editableProperties.add("tipo");
             }
         }
 
         // Retorna uma cópia imutável do conjunto de propriedades editáveis
         return Set.copyOf(editableProperties);
+    }
+
+    private boolean canEditTipo() {
+        // Regras consideradas:
+        // - O tipo só pode ser alterado se a conta não tiver inferiores nem lançamentos diretos.
+        return inferiores.isEmpty() && lancamentosDebito.isEmpty() && lancamentosCredito.isEmpty();
     }
 
     private boolean canEditTipoMovimento() {
