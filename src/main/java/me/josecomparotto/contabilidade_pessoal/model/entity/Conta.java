@@ -63,6 +63,14 @@ public class Conta {
 
     private Boolean createdBySystem;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "contaDebito")
+    private final List<Lancamento> lancamentosDebito = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "contaCredito")
+    private final List<Lancamento> lancamentosCredito = new ArrayList<>();
+
     @Transient
     public String getCodigo() {
         return getPath().stream()
@@ -216,8 +224,41 @@ public class Conta {
     }
 
     @Transient
-    public BigDecimal getSaldoAtual() {
-        // Saldo não é populado aqui
+    public BigDecimal getSaldoNatural() {
+        switch (getNatureza()) {
+            case CREDORA:
+                return getSaldoMatematico();
+            case DEVEDORA:
+                return getSaldoMatematico().multiply(BigDecimal.valueOf(-1));
+            default:
+                return BigDecimal.ZERO;
+        }
+    }
+
+    @Transient
+    public BigDecimal getSaldoMatematico() {
+
+        switch (getTipo()) {
+            // Se for analítica, o saldo é o somatório líquido dos lançamentos
+            case ANALITICA:
+                BigDecimal saldoDebito = lancamentosDebito.stream()
+                        .map(Lancamento::getValor)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal saldoCredito = lancamentosCredito.stream()
+                        .map(Lancamento::getValor)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            return saldoCredito.subtract(saldoDebito);
+
+            // Se for sintética, o saldo é o somatório dos saldos das contas inferiores analíticas
+            case SINTETICA:
+                return getTodasInferiores().stream()
+                        .filter(c -> TipoConta.ANALITICA.equals(c.getTipo()))
+                        .map(Conta::getSaldoMatematico)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+            default:
+                break;
+        }
+
         return BigDecimal.ZERO;
     }
 
@@ -295,6 +336,14 @@ public class Conta {
 
     public void setCreatedBySystem(Boolean createdBySystem) {
         this.createdBySystem = createdBySystem;
+    }
+
+    public List<Lancamento> getLancamentosDebito() {
+        return lancamentosDebito;
+    }
+
+    public List<Lancamento> getLancamentosCredito() {
+        return lancamentosCredito;
     }
 
 }
