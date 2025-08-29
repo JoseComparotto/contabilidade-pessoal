@@ -19,6 +19,7 @@ public class ContaTreeDto implements IDto<Conta> {
     private Natureza natureza;
     private TipoConta tipo;
     private TipoMovimento tipoMovimento;
+    private Set<TipoMovimento> tiposMovimentoPossiveis;
     private final List<ContaTreeDto> inferiores = new ArrayList<>();
     private Boolean editable;
     private Boolean deletable;
@@ -85,7 +86,15 @@ public class ContaTreeDto implements IDto<Conta> {
     public TipoMovimento getTipoMovimento() {
         return tipoMovimento;
     }
-    
+
+    public Set<TipoMovimento> getTiposMovimentoPossiveis() {
+        return tiposMovimentoPossiveis;
+    }
+
+    public void setTiposMovimentoPossiveis(Set<TipoMovimento> tiposMovimentoPossiveis) {
+        this.tiposMovimentoPossiveis = tiposMovimentoPossiveis;
+    }
+
     public void setTipoMovimento(TipoMovimento tipoMovimento) {
         this.tipoMovimento = tipoMovimento;
     }
@@ -121,7 +130,7 @@ public class ContaTreeDto implements IDto<Conta> {
     public Set<String> getEditableProperties() {
         return editableProperties;
     }
-    
+
     public void setEditableProperties(Set<String> editableProperties) {
         this.editableProperties = editableProperties;
     }

@@ -18,14 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
-import me.josecomparotto.contabilidade_pessoal.service.ContasService;
+import me.josecomparotto.contabilidade_pessoal.service.ContaService;
 
 @RestController
 @RequestMapping("/api/contas")
-public class ContasApiController {
+public class ContaApiController {
 
     @Autowired
-    private ContasService contasService;
+    private ContaService contasService;
 
     // GET /api/contas?view=tree|flat (default=flat)
     @GetMapping

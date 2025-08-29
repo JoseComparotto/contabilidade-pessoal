@@ -14,13 +14,13 @@ import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoMovimento;
-import me.josecomparotto.contabilidade_pessoal.service.ContasService;
+import me.josecomparotto.contabilidade_pessoal.service.ContaService;
 
 @Controller
-public class ContasWebController {
+public class ContaWebController {
 
     @Autowired
-    private ContasService contasService;
+    private ContaService contasService;
 
     // GET /contas
     @GetMapping("/contas")
@@ -64,7 +64,7 @@ public class ContasWebController {
         model.addAttribute("mode", "edit");
         model.addAttribute("conta", dto);
         model.addAttribute("tipos", TipoConta.values());
-        model.addAttribute("tiposMovimento", TipoMovimento.values());
+        model.addAttribute("tiposMovimento", dto.getTiposMovimentoPossiveis());
         model.addAttribute("contas", contasService.listarContasSinteticas());
         return "contas/form";
     }

@@ -26,8 +26,9 @@ public final class ContaMapper {
         dto.setTipo(conta.getTipo());
         dto.setSuperiorId(conta.getSuperior() != null ? conta.getSuperior().getId() : null);
         dto.setPath(conta.getPath());
-        dto.setSaldoAtual(conta.getSaldoAtual());
+        dto.setSaldoAtual(conta.getSaldoNatural());
         dto.setTipoMovimento(conta.getTipoMovimento());
+        dto.setTiposMovimentoPossiveis(conta.getTiposMovimentoPossiveis());
         dto.setEditable(conta.isEditable());
         dto.setDeletable(conta.isDeletable());
         dto.setEditableProperties(conta.getEditableProperties());
@@ -52,8 +53,9 @@ public final class ContaMapper {
         dto.setDisplayText(conta.getDisplayText());
         dto.setNatureza(conta.getNatureza());
         dto.setTipo(conta.getTipo());
-        dto.setSaldoAtual(conta.getSaldoAtual());
+        dto.setSaldoAtual(conta.getSaldoNatural());
         dto.setTipoMovimento(conta.getTipoMovimento());
+        dto.setTiposMovimentoPossiveis(conta.getTiposMovimentoPossiveis());
         dto.setEditable(conta.isEditable());
         dto.setDeletable(conta.isDeletable());
         dto.setEditableProperties(conta.getEditableProperties());

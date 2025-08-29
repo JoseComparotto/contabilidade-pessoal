@@ -115,6 +115,94 @@ Observação: a aplicação usa dois contextos de credenciais no Flyway e no JPA
 
 Swagger UI: /api/docs. O arquivo docs/openapi.json é copiado para static/api/openapi.json durante o build (plugin maven-resources), e servido em /api/openapi.json.
 
+## Regras de Negócio
+
+Esta seção consolida as regras vigentes no domínio (banco + backend). Onde aplicável, são impostas por gatilhos/constraints no PostgreSQL e refletidas na UI/serviço.
+
+### Contas (tb_contas)
+
+- Estrutura e imutabilidade
+  - Colunas imutáveis após criação: id, created_by_system, id_superior, sequencia, created_at e updated_at (exceto quando atualizado automaticamente pelo gatilho de auditoria).
+  - updated_at é preenchido automaticamente a cada UPDATE (trigger BEFORE UPDATE).
+  - Entre irmãos (mesmo id_superior) a sequencia é única (código derivado do caminho, ex.: 1.2.3).
+
+- Hierarquia e tipo (analítica/sintética)
+  - Uma conta superior deve ser sempre sintética (analitica = false).
+  - Não é permitido tornar uma conta analítica (analitica = true) se ela já possui inferiores.
+  - Contas sintéticas (analitica = false) não podem possuir lançamentos associados (nem crédito nem débito).
+
+- Natureza e “redutora”
+  - A natureza “redutora” é relativa à raiz do grupo: uma conta é redutora quando sua natureza (credora/devedora) difere da natureza da raiz.
+  - Uma conta redutora não pode ter inferiores não-redutoras (validação tanto do lado do pai quanto do filho imediato).
+
+- Aceita movimento oposto (aceita_movimento_oposto)
+  - Contas redutoras nunca podem aceitar movimento oposto.
+  - Uma conta só pode aceitar movimento oposto se a superior também aceitar.
+  - Não é permitido definir aceita_movimento_oposto = false enquanto existir qualquer descendente que aceite.
+  - Provisionamento inicial: raízes com sequencia 1, 2 e 3 e todos os seus descendentes não-redutoras iniciam aceitando movimento oposto.
+
+- Ativação (ativa)
+  - Ao inativar uma conta (ativa = false), a soma dos débitos deve ser igual à soma dos créditos (saldo líquido zero) para permitir a atualização.
+
+- Edição/Exclusão na UI/Serviço
+  - createdBySystem = true impede edição e exclusão.
+  - Alterar tipo (analítica/sintética) é bloqueado quando há inferiores; demais regras de edição obedecem às validações acima.
+
+### Lançamentos (tb_lancamentos)
+
+- Regras de dados
+  - descricao não pode ser vazia.
+  - valor > 0 (zero e negativos não são permitidos).
+  - id_conta_credito e id_conta_debito devem ser distintos.
+  - Ambas as contas usadas devem ser analíticas.
+
+- Sentido do movimento vs. natureza da conta
+  - Natureza relativa: a condição de um lançamento ser NATURAL ou REDUTOR é avaliada em relação à natureza absoluta (credora/devedora) da conta considerada. Para lançamentos indiretos (agregados via contas sintéticas), a natureza das contas intermediárias não altera a classificação; considera-se apenas a natureza da conta atual e o lado do lançamento (débito/crédito).
+  - Movimento contrário (REDUTOR) só é permitido quando a conta aceitar movimento oposto.
+  - Exemplos:
+    - Conta credora: crédito é NATURAL; débito é REDUTOR (oposto).
+    - Conta devedora: débito é NATURAL; crédito é REDUTOR (oposto).
+
+- Imutabilidade quando há contas inativas
+  - Um lançamento associado a qualquer conta inativa (crédito ou débito) é imutável: não pode sofrer UPDATE nem DELETE enquanto a associação envolver conta(s) inativa(s).
+
+- Auditoria
+  - updated_at é atualizado automaticamente em UPDATE (usa a mesma função de auditoria das contas).
+
+### Segurança e RLS
+
+- Contas (tb_contas)
+  - RLS habilitado. Role intermediária: core_contas_manage.
+  - Políticas:
+    - SELECT: permitido para core_contas_manage.
+    - INSERT/UPDATE/DELETE: permitidos apenas quando created_by_system = false.
+  - Permissões públicas amplas são revogadas.
+
+- Lançamentos (tb_lancamentos)
+  - Role core_lancamentos_manage com SELECT/INSERT/UPDATE/DELETE na tabela e SELECT/USAGE na sequência.
+
+## Glossário de Negócios
+
+- Plano de contas: estrutura hierárquica das contas contábeis usada para classificar lançamentos.
+- Conta: nó do plano de contas. Pode ser sintética (agrupadora) ou analítica (lançável).
+- Conta sintética (analitica=false): não recebe lançamentos; serve para agrupar contas analíticas.
+- Conta analítica (analitica=true): pode receber lançamentos (débito/crédito).
+- Superior / Inferior / Raiz: relação hierárquica. Raiz é a conta sem superior; inferiores são os filhos.
+- Sequência / Código: número ordinal entre irmãos; o código da conta é a concatenação das sequências no caminho (ex.: 1.2.3).
+- Natureza (credora/devedora): indicação do lado natural do saldo/movimento da conta.
+- Natureza relativa: classificação do lançamento (NATURAL ou REDUTOR) em relação à natureza absoluta da conta avaliada. Em lançamentos indiretos (quando vistos de uma conta sintética), ignora-se a natureza das contas intermediárias; considera-se apenas a natureza da conta atual e se o lançamento é débito (lado D) ou crédito (lado C).
+- Conta redutora: conta cuja natureza difere da natureza da raiz do seu grupo.
+- Aceita movimento oposto: permissão para registrar movimentos no sentido contrário à natureza da conta.
+- Lançamento: registro contábil com data de competência, valor, conta de débito e conta de crédito.
+- Débito / Crédito: lados do lançamento. O sentido “natural” depende da natureza da conta.
+- Movimento natural: débito em conta devedora ou crédito em conta credora.
+- Movimento oposto: débito em conta credora ou crédito em conta devedora; só permitido quando a conta aceitar.
+- Data de competência: data em que o efeito econômico do lançamento ocorre.
+- Saldo natural: saldo calculado respeitando a natureza da conta.
+- Saldo matemático: diferença algébrica de débitos e créditos sem considerar a natureza.
+- Conta ativa/inativa: contas inativas não podem ter saldo líquido diferente de zero para serem inativadas; lançamentos associados a contas inativas tornam-se imutáveis.
+- created_by_system: flag que indica contas provisionadas pelo sistema; impede edição e exclusão.
+
 ## UI Web
 
 - Lista de contas: /contas (exibe código, descrição, saldo formatado e ações). Linhas de contas sintéticas ficam em negrito; contas redutoras em itálico.
