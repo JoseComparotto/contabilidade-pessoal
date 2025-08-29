@@ -1,6 +1,5 @@
 package me.josecomparotto.contabilidade_pessoal.model.entity;
 
-import java.beans.Transient;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,6 +21,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 import me.josecomparotto.contabilidade_pessoal.application.converter.NaturezaConverter;
 import me.josecomparotto.contabilidade_pessoal.application.converter.TipoContaConverter;
@@ -42,8 +42,10 @@ public class Conta {
     @JsonIgnoreProperties("inferiores")
     private Conta superior;
 
+    @Column(name = "sequencia")
     private Integer sequencia;
 
+    @Column(name = "descricao")
     private String descricao;
 
     @Column(name = "credora")
@@ -61,6 +63,7 @@ public class Conta {
     @Column(name = "aceita_movimento_oposto")
     private Boolean aceitaMovimentoOposto;
 
+    @Column(name = "created_by_system")
     private Boolean createdBySystem;
 
     @JsonIgnore
@@ -97,8 +100,9 @@ public class Conta {
         if (isEditable()) {
             editableProperties.add("descricao");
 
-            if(canEditTipoMovimento())
-            editableProperties.add("tipoMovimento");
+            if (canEditTipoMovimento()) {
+                editableProperties.add("tipoMovimento");
+            }
 
             if (inferiores.isEmpty()) {
                 // Só permite alterar o tipo se a conta não tiver inferiores
@@ -116,25 +120,31 @@ public class Conta {
                 .map(Conta::getTipoMovimento)
                 .collect(Collectors.toSet());
 
-        boolean algumaInferiorDiferente = tiposInferiores.stream().anyMatch(t -> !Objects.equals(t, getTipoMovimento()));
+        boolean algumaInferiorDiferente = tiposInferiores.stream()
+                .anyMatch(t -> !Objects.equals(t, getTipoMovimento()));
 
-        // Se a atual não é mista e existe alguma conta inferior diferente, então não aceita
-        if(!TipoMovimento.MISTO.equals(getTipoMovimento()) && algumaInferiorDiferente) {
+        // Se a atual não é mista e existe alguma conta inferior diferente, então não
+        // aceita
+        if (!TipoMovimento.MISTO.equals(getTipoMovimento()) && algumaInferiorDiferente) {
             return false;
         }
 
-        // Se a atual for mista e existem ao menos uma conta inferior mista, então não aceita
-        if(TipoMovimento.MISTO.equals(getTipoMovimento()) && tiposInferiores.contains(TipoMovimento.MISTO)) {
+        // Se a atual for mista e existem ao menos uma conta inferior mista, então não
+        // aceita
+        if (TipoMovimento.MISTO.equals(getTipoMovimento()) && tiposInferiores.contains(TipoMovimento.MISTO)) {
             return false;
         }
 
-        // Se a atual for mista e existir tanto inferior natual quanto redutor, então não aceita
-        if(TipoMovimento.MISTO.equals(getTipoMovimento()) && tiposInferiores.contains(TipoMovimento.NATURAL) && tiposInferiores.contains(TipoMovimento.REDUTOR)) {
+        // Se a atual for mista e existir tanto inferior natual quanto redutor, então
+        // não aceita
+        if (TipoMovimento.MISTO.equals(getTipoMovimento())
+                && tiposInferiores.contains(TipoMovimento.NATURAL)
+                && tiposInferiores.contains(TipoMovimento.REDUTOR)) {
             return false;
         }
 
         // Se a conta superior for mista, então aceita
-        if(superior != null && TipoMovimento.MISTO.equals(superior.getTipoMovimento())) {
+        if (superior != null && TipoMovimento.MISTO.equals(superior.getTipoMovimento())) {
             return true;
         }
 
@@ -191,16 +201,19 @@ public class Conta {
     }
 
     private boolean isRedutora() {
-        return !this.natureza.equals(getRaiz().getNatureza());
+        Natureza raiz = getRaiz() != null ? getRaiz().getNatureza() : null;
+        Natureza atual = this.natureza;
+        // Redutora quando a natureza difere da raiz; nulls tratados como não redutora
+        return (raiz != null && atual != null) && !atual.equals(raiz);
     }
 
     @Transient
     public TipoMovimento getTipoMovimento() {
-        if(isRedutora()) {
+        if (isRedutora()) {
             return TipoMovimento.REDUTOR;
-        }else if(aceitaMovimentoOposto) {
+        } else if (Boolean.TRUE.equals(aceitaMovimentoOposto)) {
             return TipoMovimento.MISTO;
-        }else{
+        } else {
             return TipoMovimento.NATURAL;
         }
     }
@@ -220,12 +233,19 @@ public class Conta {
                 this.natureza = getRaiz().getNatureza();
                 this.aceitaMovimentoOposto = false;
                 break;
+            default:
+                // No-op
+                break;
         }
     }
 
     @Transient
     public BigDecimal getSaldoNatural() {
-        switch (getNatureza()) {
+        Natureza n = getNatureza();
+        if (n == null) {
+            return BigDecimal.ZERO;
+        }
+        switch (n) {
             case CREDORA:
                 return getSaldoMatematico();
             case DEVEDORA:
@@ -246,10 +266,11 @@ public class Conta {
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
                 BigDecimal saldoCredito = lancamentosCredito.stream()
                         .map(Lancamento::getValor)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            return saldoCredito.subtract(saldoDebito);
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                return saldoCredito.subtract(saldoDebito);
 
-            // Se for sintética, o saldo é o somatório dos saldos das contas inferiores analíticas
+            // Se for sintética, o saldo é o somatório dos saldos das contas inferiores
+            // analíticas
             case SINTETICA:
                 return getTodasInferiores().stream()
                         .filter(c -> TipoConta.ANALITICA.equals(c.getTipo()))
@@ -267,11 +288,10 @@ public class Conta {
         Conta raiz = getRaiz();
 
         return String.format("%s. %s%s%s",
-            getCodigo(),
-            isRedutora() ? "(-) " : "",
-            getDescricao(),
-            !this.equals(raiz) ? String.format(" (%s)", raiz.getDescricao()) : ""
-        );
+                getCodigo(),
+                isRedutora() ? "(-) " : "",
+                getDescricao(),
+                !this.equals(raiz) ? String.format(" (%s)", raiz.getDescricao()) : "");
     }
 
     private static Natureza naturezaOposta(Natureza natureza) {
