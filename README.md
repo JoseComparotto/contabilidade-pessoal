@@ -157,9 +157,11 @@ Esta seção consolida as regras vigentes no domínio (banco + backend). Onde ap
   - Ambas as contas usadas devem ser analíticas.
 
 - Sentido do movimento vs. natureza da conta
-  - Movimento contrário à natureza da conta só é permitido quando a conta aceitar movimento oposto:
-    - Conta credora: crédito é natural; débito é contrário.
-    - Conta devedora: débito é natural; crédito é contrário.
+  - Natureza relativa: a condição de um lançamento ser NATURAL ou REDUTOR é avaliada em relação à natureza absoluta (credora/devedora) da conta considerada. Para lançamentos indiretos (agregados via contas sintéticas), a natureza das contas intermediárias não altera a classificação; considera-se apenas a natureza da conta atual e o lado do lançamento (débito/crédito).
+  - Movimento contrário (REDUTOR) só é permitido quando a conta aceitar movimento oposto.
+  - Exemplos:
+    - Conta credora: crédito é NATURAL; débito é REDUTOR (oposto).
+    - Conta devedora: débito é NATURAL; crédito é REDUTOR (oposto).
 
 - Imutabilidade quando há contas inativas
   - Um lançamento associado a qualquer conta inativa (crédito ou débito) é imutável: não pode sofrer UPDATE nem DELETE enquanto a associação envolver conta(s) inativa(s).
@@ -188,6 +190,7 @@ Esta seção consolida as regras vigentes no domínio (banco + backend). Onde ap
 - Superior / Inferior / Raiz: relação hierárquica. Raiz é a conta sem superior; inferiores são os filhos.
 - Sequência / Código: número ordinal entre irmãos; o código da conta é a concatenação das sequências no caminho (ex.: 1.2.3).
 - Natureza (credora/devedora): indicação do lado natural do saldo/movimento da conta.
+- Natureza relativa: classificação do lançamento (NATURAL ou REDUTOR) em relação à natureza absoluta da conta avaliada. Em lançamentos indiretos (quando vistos de uma conta sintética), ignora-se a natureza das contas intermediárias; considera-se apenas a natureza da conta atual e se o lançamento é débito (lado D) ou crédito (lado C).
 - Conta redutora: conta cuja natureza difere da natureza da raiz do seu grupo.
 - Aceita movimento oposto: permissão para registrar movimentos no sentido contrário à natureza da conta.
 - Lançamento: registro contábil com data de competência, valor, conta de débito e conta de crédito.

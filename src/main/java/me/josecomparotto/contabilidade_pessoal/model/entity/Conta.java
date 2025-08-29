@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -115,40 +114,86 @@ public class Conta {
     }
 
     private boolean canEditTipoMovimento() {
+        // Regras consideradas:
+        // - MISTO é permitido se, e somente se, a superior também for MISTO.
+        // - NATURAL só pode ser definido se todos os descendentes forem NATURAL,
+        //   o superior NÃO for REDUTOR e só houver lançamentos naturais.
+        // - REDUTOR só pode ser definido se todos os descendentes forem REDUTOR,
+        //   o superior NÃO for NATURAL e só houver lançamentos redutores.
 
-        Set<TipoMovimento> tiposInferiores = getTodasInferiores().stream()
-                .map(Conta::getTipoMovimento)
-                .collect(Collectors.toSet());
+        final TipoMovimento atual = getTipoMovimento();
 
-        boolean algumaInferiorDiferente = tiposInferiores.stream()
-                .anyMatch(t -> !Objects.equals(t, getTipoMovimento()));
+        final TipoMovimento tipoSuperior = (superior == null) ? null : superior.getTipoMovimento();
+        final boolean superiorEhMisto = TipoMovimento.MISTO.equals(tipoSuperior);
+        final boolean superiorEhRedutor = TipoMovimento.REDUTOR.equals(tipoSuperior);
+        final boolean superiorEhNatural = TipoMovimento.NATURAL.equals(tipoSuperior);
 
-        // Se a atual não é mista e existe alguma conta inferior diferente, então não
-        // aceita
-        if (!TipoMovimento.MISTO.equals(getTipoMovimento()) && algumaInferiorDiferente) {
-            return false;
+        // Descendentes
+        final List<Conta> descendentes = getTodasInferiores();
+        final boolean todosDescNat = descendentes.stream()
+                .allMatch(c -> TipoMovimento.NATURAL.equals(c.getTipoMovimento()));
+        final boolean todosDescRed = descendentes.stream()
+                .allMatch(c -> TipoMovimento.REDUTOR.equals(c.getTipoMovimento()));
+
+        // Lançamentos da própria conta ou de descendentes
+        final boolean temMovimentoNatural = !getTodosLancamentosPorNaturezaRelativa(true).isEmpty();
+        final boolean temMovimentoRedutor = !getTodosLancamentosPorNaturezaRelativa(false).isEmpty();
+
+        // Possibilidades de transição a partir do estado atual
+        boolean podeVirarMisto = !TipoMovimento.MISTO.equals(atual) && superiorEhMisto;
+        boolean podeVirarNatural = !TipoMovimento.NATURAL.equals(atual) && todosDescNat && !superiorEhRedutor
+                && !temMovimentoRedutor;
+        boolean podeVirarRedutor = !TipoMovimento.REDUTOR.equals(atual) && todosDescRed && !superiorEhNatural
+                && !temMovimentoNatural;
+
+        return podeVirarMisto || podeVirarNatural || podeVirarRedutor;
+    }
+
+    private List<Lancamento> getTodosLancamentosPorNaturezaRelativa(boolean naturais) {
+        // Natureza relativa: classifica "natural" ou "redutor" em relação à NATUREZA desta conta
+        // (credora -> crédito natural; devedora -> débito natural), independentemente
+        // das naturezas das contas intermediárias. Para contas sintéticas, agregamos
+        // os lançamentos das inferiores e aplicamos esta mesma regra da conta atual.
+
+        Natureza nat = getNatureza();
+        if (nat == null) {
+            return List.of();
         }
 
-        // Se a atual for mista e existem ao menos uma conta inferior mista, então não
-        // aceita
-        if (TipoMovimento.MISTO.equals(getTipoMovimento()) && tiposInferiores.contains(TipoMovimento.MISTO)) {
-            return false;
+        boolean naturalEhCredito = Natureza.CREDORA.equals(nat);
+        List<Lancamento> creditos = getTodosLancamentosCredito();
+        List<Lancamento> debitos  = getTodosLancamentosDebito();
+
+        if (naturais) {
+            return naturalEhCredito ? creditos : debitos;
+        } else {
+            return naturalEhCredito ? debitos : creditos;
+        }
+    }
+
+    private List<Lancamento> getTodosLancamentosCredito() {
+
+        if(TipoConta.SINTETICA.equals(getTipo())) {
+            // Se for sintética, retorna os lançamentos das contas inferiores
+            return getTodasInferiores().stream()
+                    .map(Conta::getTodosLancamentosCredito)
+                    .flatMap(List::stream)
+                    .collect(Collectors.toList());
         }
 
-        // Se a atual for mista e existir tanto inferior natual quanto redutor, então
-        // não aceita
-        if (TipoMovimento.MISTO.equals(getTipoMovimento())
-                && tiposInferiores.contains(TipoMovimento.NATURAL)
-                && tiposInferiores.contains(TipoMovimento.REDUTOR)) {
-            return false;
+        return lancamentosCredito.stream().toList();
+    }
+
+    private List<Lancamento> getTodosLancamentosDebito() {
+        if(TipoConta.SINTETICA.equals(getTipo())) {
+            // Se for sintética, retorna os lançamentos das contas inferiores
+            return getTodasInferiores().stream()
+                    .map(Conta::getTodosLancamentosDebito)
+                    .flatMap(List::stream)
+                    .collect(Collectors.toList());
         }
 
-        // Se a conta superior for mista, então aceita
-        if (superior != null && TipoMovimento.MISTO.equals(superior.getTipoMovimento())) {
-            return true;
-        }
-
-        return false;
+        return lancamentosDebito.stream().toList();
     }
 
     @Transient
@@ -159,9 +204,10 @@ public class Conta {
 
     @Transient
     public boolean isDeletable() {
-        // Uma conta pode ser deletada se não tiver inferiores e não for uma conta
+        // Uma conta pode ser deletada se não tiver inferiores, lançamentos e não for uma conta
         // criada pelo sistema
-        return inferiores.isEmpty() && !Boolean.TRUE.equals(createdBySystem);
+        return inferiores.isEmpty() && lancamentosDebito.isEmpty() && lancamentosCredito.isEmpty()
+                && !Boolean.TRUE.equals(createdBySystem);
     }
 
     @Transient
