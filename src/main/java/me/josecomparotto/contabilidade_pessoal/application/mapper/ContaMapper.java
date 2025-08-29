@@ -28,6 +28,7 @@ public final class ContaMapper {
         dto.setPath(conta.getPath());
         dto.setSaldoAtual(conta.getSaldoNatural());
         dto.setTipoMovimento(conta.getTipoMovimento());
+        dto.setTiposMovimentoPossiveis(conta.getTiposMovimentoPossiveis());
         dto.setEditable(conta.isEditable());
         dto.setDeletable(conta.isDeletable());
         dto.setEditableProperties(conta.getEditableProperties());
@@ -54,6 +55,7 @@ public final class ContaMapper {
         dto.setTipo(conta.getTipo());
         dto.setSaldoAtual(conta.getSaldoNatural());
         dto.setTipoMovimento(conta.getTipoMovimento());
+        dto.setTiposMovimentoPossiveis(conta.getTiposMovimentoPossiveis());
         dto.setEditable(conta.isEditable());
         dto.setDeletable(conta.isDeletable());
         dto.setEditableProperties(conta.getEditableProperties());

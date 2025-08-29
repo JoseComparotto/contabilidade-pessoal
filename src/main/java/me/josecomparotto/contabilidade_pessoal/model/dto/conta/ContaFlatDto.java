@@ -24,6 +24,7 @@ public class ContaFlatDto implements IDto<Conta> {
     private Natureza natureza;
     private TipoConta tipo;
     private TipoMovimento tipoMovimento;
+    private Set<TipoMovimento> tiposMovimentoPossiveis;
     private boolean editable;
     private boolean deletable;
     private Set<String> editableProperties;
@@ -124,6 +125,14 @@ public class ContaFlatDto implements IDto<Conta> {
     
     public void setTipoMovimento(TipoMovimento tipoMovimento) {
         this.tipoMovimento = tipoMovimento;
+    }
+
+    public Set<TipoMovimento> getTiposMovimentoPossiveis() {
+        return tiposMovimentoPossiveis;
+    }
+
+    public void setTiposMovimentoPossiveis(Set<TipoMovimento> tiposMovimentoPossiveis) {
+        this.tiposMovimentoPossiveis = tiposMovimentoPossiveis;
     }
 
     public Boolean isEditable() {

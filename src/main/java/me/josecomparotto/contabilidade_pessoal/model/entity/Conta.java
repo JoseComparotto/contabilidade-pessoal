@@ -114,17 +114,26 @@ public class Conta {
 
     private boolean canEditTipo() {
         // Regras consideradas:
-        // - O tipo só pode ser alterado se a conta não tiver inferiores nem lançamentos diretos.
+        // - O tipo só pode ser alterado se a conta não tiver inferiores nem lançamentos
+        // diretos.
         return inferiores.isEmpty() && lancamentosDebito.isEmpty() && lancamentosCredito.isEmpty();
     }
 
     private boolean canEditTipoMovimento() {
+        return getTiposMovimentoPossiveis().size() > 1;
+    }
+
+    @Transient
+    public Set<TipoMovimento> getTiposMovimentoPossiveis() {
         // Regras consideradas:
         // - MISTO é permitido se, e somente se, a superior também for MISTO.
         // - NATURAL só pode ser definido se todos os descendentes forem NATURAL,
-        //   o superior NÃO for REDUTOR e só houver lançamentos naturais.
+        // o superior NÃO for REDUTOR e só houver lançamentos naturais.
         // - REDUTOR só pode ser definido se todos os descendentes forem REDUTOR,
-        //   o superior NÃO for NATURAL e só houver lançamentos redutores.
+        // o superior NÃO for NATURAL e só houver lançamentos redutores.
+
+        Set<TipoMovimento> tiposPossiveis = new HashSet<>();
+        tiposPossiveis.add(getTipoMovimento()); // Sempre pode manter o tipo atual
 
         final TipoMovimento atual = getTipoMovimento();
 
@@ -151,11 +160,22 @@ public class Conta {
         boolean podeVirarRedutor = !TipoMovimento.REDUTOR.equals(atual) && todosDescRed && !superiorEhNatural
                 && !temMovimentoNatural;
 
-        return podeVirarMisto || podeVirarNatural || podeVirarRedutor;
+        if (podeVirarMisto) {
+            tiposPossiveis.add(TipoMovimento.MISTO);
+        }
+        if (podeVirarNatural) {
+            tiposPossiveis.add(TipoMovimento.NATURAL);
+        }
+        if (podeVirarRedutor) {
+            tiposPossiveis.add(TipoMovimento.REDUTOR);
+        }
+
+        return tiposPossiveis;
     }
 
     private List<Lancamento> getTodosLancamentosPorNaturezaRelativa(boolean naturais) {
-        // Natureza relativa: classifica "natural" ou "redutor" em relação à NATUREZA desta conta
+        // Natureza relativa: classifica "natural" ou "redutor" em relação à NATUREZA
+        // desta conta
         // (credora -> crédito natural; devedora -> débito natural), independentemente
         // das naturezas das contas intermediárias. Para contas sintéticas, agregamos
         // os lançamentos das inferiores e aplicamos esta mesma regra da conta atual.
@@ -167,7 +187,7 @@ public class Conta {
 
         boolean naturalEhCredito = Natureza.CREDORA.equals(nat);
         List<Lancamento> creditos = getTodosLancamentosCredito();
-        List<Lancamento> debitos  = getTodosLancamentosDebito();
+        List<Lancamento> debitos = getTodosLancamentosDebito();
 
         if (naturais) {
             return naturalEhCredito ? creditos : debitos;
@@ -178,7 +198,7 @@ public class Conta {
 
     private List<Lancamento> getTodosLancamentosCredito() {
 
-        if(TipoConta.SINTETICA.equals(getTipo())) {
+        if (TipoConta.SINTETICA.equals(getTipo())) {
             // Se for sintética, retorna os lançamentos das contas inferiores
             return getTodasInferiores().stream()
                     .map(Conta::getTodosLancamentosCredito)
@@ -190,7 +210,7 @@ public class Conta {
     }
 
     private List<Lancamento> getTodosLancamentosDebito() {
-        if(TipoConta.SINTETICA.equals(getTipo())) {
+        if (TipoConta.SINTETICA.equals(getTipo())) {
             // Se for sintética, retorna os lançamentos das contas inferiores
             return getTodasInferiores().stream()
                     .map(Conta::getTodosLancamentosDebito)
@@ -209,7 +229,8 @@ public class Conta {
 
     @Transient
     public boolean isDeletable() {
-        // Uma conta pode ser deletada se não tiver inferiores, lançamentos e não for uma conta
+        // Uma conta pode ser deletada se não tiver inferiores, lançamentos e não for
+        // uma conta
         // criada pelo sistema
         return inferiores.isEmpty() && lancamentosDebito.isEmpty() && lancamentosCredito.isEmpty()
                 && !Boolean.TRUE.equals(createdBySystem);

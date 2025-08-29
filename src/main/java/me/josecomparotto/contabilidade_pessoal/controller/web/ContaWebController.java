@@ -64,7 +64,7 @@ public class ContaWebController {
         model.addAttribute("mode", "edit");
         model.addAttribute("conta", dto);
         model.addAttribute("tipos", TipoConta.values());
-        model.addAttribute("tiposMovimento", TipoMovimento.values());
+        model.addAttribute("tiposMovimento", dto.getTiposMovimentoPossiveis());
         model.addAttribute("contas", contasService.listarContasSinteticas());
         return "contas/form";
     }

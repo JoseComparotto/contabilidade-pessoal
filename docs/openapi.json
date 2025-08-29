@@ -444,6 +444,13 @@
           "tipoMovimento": {
             "$ref": "#/components/schemas/TipoMovimento"
           },
+          "tiposMovimentoPossiveis": {
+            "type": "array",
+            "description": "Conjunto de tipos de movimento permitidos para a conta conforme as regras de negócio",
+            "items": {
+              "$ref": "#/components/schemas/TipoMovimento"
+            }
+          },
           "saldoAtual": {
             "type": "number",
             "format": "double",
@@ -514,6 +521,13 @@
           },
           "tipoMovimento": {
             "$ref": "#/components/schemas/TipoMovimento"
+          },
+          "tiposMovimentoPossiveis": {
+            "type": "array",
+            "description": "Conjunto de tipos de movimento permitidos para a conta conforme as regras de negócio",
+            "items": {
+              "$ref": "#/components/schemas/TipoMovimento"
+            }
           },
           "saldoAtual": {
             "type": "number",
