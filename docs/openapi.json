@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Contabilidade Pessoal API",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "description": "API para gerenciamento e consulta de contas contábeis.\n\nObservações:\n- O parâmetro de consulta `view` controla a forma de retorno: `flat` (padrão) ou `tree`.\n- Em `flat`, os itens seguem a estrutura de `ContaFlatDto`.\n- Em `tree`, os itens seguem a estrutura de `ContaTreeDto` (recursiva via `inferiores`)."
   },
   "servers": [
