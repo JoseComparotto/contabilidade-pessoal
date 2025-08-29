@@ -14,13 +14,13 @@ import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoMovimento;
-import me.josecomparotto.contabilidade_pessoal.service.ContasService;
+import me.josecomparotto.contabilidade_pessoal.service.ContaService;
 
 @Controller
-public class ContasWebController {
+public class ContaWebController {
 
     @Autowired
-    private ContasService contasService;
+    private ContaService contasService;
 
     // GET /contas
     @GetMapping("/contas")

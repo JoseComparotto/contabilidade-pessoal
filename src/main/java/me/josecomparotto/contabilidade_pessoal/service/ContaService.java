@@ -27,7 +27,7 @@ import me.josecomparotto.contabilidade_pessoal.model.enums.TipoMovimento;
 import me.josecomparotto.contabilidade_pessoal.repository.ContaRepository;
 
 @Service
-public class ContasService {
+public class ContaService {
 
     @Autowired
     private ContaRepository contaRepository;
