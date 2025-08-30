@@ -40,6 +40,9 @@ tbody td { padding: .6rem .8rem; border-bottom: 1px solid #f1f3f7 }
 .btn.edit.icon:hover { background: #eef6ff }
 .btn.delete.icon { color: #c7383a; border-color: #f5d6d7; background: #fff }
 .btn.delete.icon:hover { background: #fff5f5 }
+/* Details button: neutral/info style */
+.btn.details.icon { color: #2563eb; border-color: #dbeafe; background: #fff }
+.btn.details.icon:hover { background: #eef2ff }
 
 /* Accessible helper to visually hide text but keep it available for screen readers */
 .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0 }
@@ -62,6 +65,14 @@ tbody td { padding: .6rem .8rem; border-bottom: 1px solid #f1f3f7 }
 .field { display: flex; flex-direction: column; gap: .25rem }
 label { font-weight: 600; font-size: .9rem; color: #333 }
 input[type="text"], select, input[type="number"], input[type="checkbox"] { padding: .45rem .55rem; border: 1px solid #d9dce4; border-radius: 4px; background: #fff }
+.as-input { display: inline-block; padding: .45rem .55rem; border: 1px solid #d9dce4; border-radius: 4px; background: #fff; color: #0a66c2; text-decoration: none }
+.as-input:hover { background: #f6faff; text-decoration: none }
+
+/* Input with clickable overlay link */
+.input-link { position: relative; display: inline-block; width: 100% }
+.input-link > input[type="text"] { width: 100% }
+.input-link > a.cover { position: absolute; inset: 0; border-radius: 4px; text-decoration: none }
+.input-link > a.cover:focus-visible { outline: 2px solid #0a66c2; outline-offset: 2px }
 .actions { margin-top: 1rem; display: flex; gap: .5rem }
 .btn.primary { background: #0a66c2; color: #fff; border-color: #0a66c2 }
 .btn.primary:hover { filter: brightness(0.95) }

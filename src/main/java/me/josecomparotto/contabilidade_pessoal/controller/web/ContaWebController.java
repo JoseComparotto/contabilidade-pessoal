@@ -29,6 +29,18 @@ public class ContaWebController {
         return "contas/list";
     }
 
+    // GET /contas/{id}
+    @GetMapping("/contas/{id}")
+    public String detalhesConta(@PathVariable Integer id, Model model, RedirectAttributes redirectAttrs) {
+        ContaFlatDto dto = contasService.obterContaFlat(id);
+        if (dto == null) {
+            redirectAttrs.addFlashAttribute("error", "Conta não encontrada.");
+            return "redirect:/contas";
+        }
+        model.addAttribute("conta", dto);
+        return "contas/detail";
+    }
+
     // GET /contas/new
     @GetMapping("/contas/new")
     public String novaConta(Model model) {
@@ -76,7 +88,7 @@ public class ContaWebController {
             ContaEditDto editDto = ContaMapper.toEditDto(contaDto);
             contasService.atualizarConta(id, editDto);
             redirectAttrs.addFlashAttribute("success", "Conta atualizada com sucesso.");
-            return "redirect:/contas";
+            return "redirect:/contas/" + id;
         } catch (Exception e) {
             redirectAttrs.addFlashAttribute("error", e.getMessage());
             return "redirect:/contas/" + id + "/edit";

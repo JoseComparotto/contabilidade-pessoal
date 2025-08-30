@@ -53,7 +53,7 @@
                     }"></div>
                 </div>
 
-                <div th:replace="~{fragments/form-controls :: formActions(${mode} == 'edit' ? 'Salvar' : 'Criar', '/contas')}"></div>
+                <div th:replace="~{fragments/form-controls :: formActions(${mode} == 'edit' ? 'Salvar' : 'Criar', ${mode} == 'edit' ? '/contas/' + ${conta.id} : '/contas')}"></div>
             </form>
         </div>
     </main>
