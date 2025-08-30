@@ -1,0 +1,38 @@
+/* Links in control areas */
+.controls { margin-bottom: .5rem }
+.controls a { color: #0a66c2; text-decoration: none }
+.controls a:hover { text-decoration: underline }
+
+/* Buttons */
+.btn { padding: .3rem .6rem; border-radius: 4px; border: 1px solid transparent; cursor: pointer; font-size: .9rem; text-decoration: none; color: inherit }
+.btn:link, .btn:visited { text-decoration: none; color: inherit }
+.btn:hover { text-decoration: none }
+.btn:focus-visible { outline: 2px solid #0a66c2; outline-offset: 2px }
+.btn.delete { background: #fff; color: #c7383a; border-color: #e6bfc0 }
+.btn.delete:hover { background: #feecec }
+.btn.cancel { background: #fff; color: #c7383a; border-color: #e6bfc0 }
+.btn.cancel:hover { background: #feecec }
+.btn.edit { background: #fff; color: #0a66c2; border-color: #cfe4fb }
+.btn.edit:hover { background: #eef6ff }
+
+/* Icon buttons */
+.btn.icon { padding: .35rem; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; box-sizing: border-box }
+.btn.icon svg, .btn.icon i { width: 18px; height: 18px; display: block; font-size: 18px; line-height: 18px }
+.btn.icon .sr-only { display: none }
+
+/* Variants */
+.btn.edit.icon { color: #0a66c2; border-color: #d8eefd; background: #fff }
+.btn.edit.icon:hover { background: #eef6ff }
+.btn.delete.icon { color: #c7383a; border-color: #f5d6d7; background: #fff }
+.btn.delete.icon:hover { background: #fff5f5 }
+.btn.details.icon { color: #2563eb; border-color: #dbeafe; background: #fff }
+.btn.details.icon:hover { background: #eef2ff }
+
+/* Accessibility helpers */
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0 }
+.btn.disabled, .btn.disabled.icon, .btn[aria-disabled="true"] { opacity: 0.45; pointer-events: none; cursor: default }
+.btn.disabled svg { opacity: 0.9 }
+
+/* Primary button */
+.btn.primary { background: #0a66c2; color: #fff; border-color: #0a66c2 }
+.btn.primary:hover { filter: brightness(0.95) }

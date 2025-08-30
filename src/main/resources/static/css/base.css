@@ -1,0 +1,4 @@
+/* Base styles: typography, layout */
+body { font-family: Inter, Roboto, Arial, sans-serif; margin: 0; padding: 1rem; background: #f6f7fb; color: #222 }
+.container { max-width: 980px; margin: 0 auto }
+h1 { margin-bottom: .5rem }

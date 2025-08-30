@@ -1,0 +1,9 @@
+/* Tables and table containers */
+.table-wrap { background: #fff; border: 1px solid #e3e6ee; border-radius: 6px; padding: .5rem }
+table { width: 100%; border-collapse: collapse }
+thead th { text-align: left; padding: .6rem .8rem; border-bottom: 1px solid #eee; color: #333 }
+tbody td { padding: .6rem .8rem; border-bottom: 1px solid #f1f3f7 }
+
+/* Row semantic states */
+.sintetica td { font-weight: 700 }
+.redutora td { font-style: italic; }
