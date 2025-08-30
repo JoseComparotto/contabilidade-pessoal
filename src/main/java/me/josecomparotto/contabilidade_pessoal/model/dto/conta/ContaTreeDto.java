@@ -9,7 +9,6 @@ import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
-import me.josecomparotto.contabilidade_pessoal.model.enums.TipoMovimento;
 
 public class ContaTreeDto implements IDto<Conta> {
     private Integer id;
@@ -18,8 +17,8 @@ public class ContaTreeDto implements IDto<Conta> {
     private String displayText;
     private Natureza natureza;
     private TipoConta tipo;
-    private TipoMovimento tipoMovimento;
-    private Set<TipoMovimento> tiposMovimentoPossiveis;
+    private Boolean redutora;
+    private Boolean aceitaMovimentoOposto;
     private final List<ContaTreeDto> inferiores = new ArrayList<>();
     private Boolean editable;
     private Boolean deletable;
@@ -83,22 +82,6 @@ public class ContaTreeDto implements IDto<Conta> {
         this.tipo = tipo;
     }
 
-    public TipoMovimento getTipoMovimento() {
-        return tipoMovimento;
-    }
-
-    public Set<TipoMovimento> getTiposMovimentoPossiveis() {
-        return tiposMovimentoPossiveis;
-    }
-
-    public void setTiposMovimentoPossiveis(Set<TipoMovimento> tiposMovimentoPossiveis) {
-        this.tiposMovimentoPossiveis = tiposMovimentoPossiveis;
-    }
-
-    public void setTipoMovimento(TipoMovimento tipoMovimento) {
-        this.tipoMovimento = tipoMovimento;
-    }
-
     public BigDecimal getSaldoAtual() {
         return saldoAtual;
     }
@@ -135,4 +118,19 @@ public class ContaTreeDto implements IDto<Conta> {
         this.editableProperties = editableProperties;
     }
 
+    public Boolean getRedutora() {
+        return redutora;
+    }
+
+    public void setRedutora(Boolean redutora) {
+        this.redutora = redutora;
+    }
+
+    public Boolean getAceitaMovimentoOposto() {
+        return aceitaMovimentoOposto;
+    }
+
+    public void setAceitaMovimentoOposto(Boolean aceitaMovimentoOposto) {
+        this.aceitaMovimentoOposto = aceitaMovimentoOposto;
+    }
 }

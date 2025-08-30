@@ -51,7 +51,7 @@
 
     <!-- Checkbox field -->
     <div class="field"
-        th:fragment="checkboxField(name, label, checked, isDisabled=false, hint, preserveWhenDisabled)">
+        th:fragment="checkboxField(name, label, checked, isDisabled, hint, preserveWhenDisabled)">
         <label>
             <input type="checkbox" th:name="${name}" th:checked="${checked?:false}"
                 th:attr="disabled=${isDisabled} ? 'disabled' : null" />

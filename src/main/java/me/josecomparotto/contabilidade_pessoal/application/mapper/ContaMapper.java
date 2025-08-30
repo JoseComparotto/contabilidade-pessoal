@@ -27,8 +27,8 @@ public final class ContaMapper {
         dto.setSuperiorId(conta.getSuperior() != null ? conta.getSuperior().getId() : null);
         dto.setPath(conta.getPath());
         dto.setSaldoAtual(conta.getSaldoNatural());
-        dto.setTipoMovimento(conta.getTipoMovimento());
-        dto.setTiposMovimentoPossiveis(conta.getTiposMovimentoPossiveis());
+        dto.setRedutora(conta.isRedutora());
+        dto.setAceitaMovimentoOposto(conta.getAceitaMovimentoOposto());
         dto.setEditable(conta.isEditable());
         dto.setDeletable(conta.isDeletable());
         dto.setEditableProperties(conta.getEditableProperties());
@@ -54,8 +54,8 @@ public final class ContaMapper {
         dto.setNatureza(conta.getNatureza());
         dto.setTipo(conta.getTipo());
         dto.setSaldoAtual(conta.getSaldoNatural());
-        dto.setTipoMovimento(conta.getTipoMovimento());
-        dto.setTiposMovimentoPossiveis(conta.getTiposMovimentoPossiveis());
+        dto.setRedutora(conta.isRedutora());
+        dto.setAceitaMovimentoOposto(conta.getAceitaMovimentoOposto());
         dto.setEditable(conta.isEditable());
         dto.setDeletable(conta.isDeletable());
         dto.setEditableProperties(conta.getEditableProperties());
@@ -82,6 +82,7 @@ public final class ContaMapper {
         Conta conta = new Conta();
         conta.setDescricao(dto.getDescricao());
         conta.setTipo(dto.getTipo());
+        conta.setRedutora(dto.getRedutora());
         conta.setCreatedBySystem(false);
         return conta;
     }
@@ -92,7 +93,7 @@ public final class ContaMapper {
         ContaEditDto dto = new ContaEditDto();
         dto.setDescricao(contaOld.getDescricao());
         dto.setTipo(contaOld.getTipo());
-        dto.setTipoMovimento(contaOld.getTipoMovimento());
+        dto.setRedutora(contaOld.getRedutora());
         return dto;
     }
 }

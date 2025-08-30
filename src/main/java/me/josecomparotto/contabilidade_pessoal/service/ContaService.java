@@ -23,7 +23,6 @@ import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaTreeDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
-import me.josecomparotto.contabilidade_pessoal.model.enums.TipoMovimento;
 import me.josecomparotto.contabilidade_pessoal.repository.ContaRepository;
 
 @Service
@@ -186,17 +185,9 @@ public class ContaService {
             Conta sup = optSup.get();
             conta.setSuperior(sup);
 
-            // Herdar tipo de movimento da raiz se não estiver definido
-            if (contaDto.getTipoMovimento() == null) {
-                contaDto.setTipoMovimento(sup.getTipoMovimento());
-            }
-            
-            // Definir tipo de movimento
-            conta.setTipoMovimento(contaDto.getTipoMovimento());
-
-            // Validar tipo de movimento
-            if (!TipoMovimento.MISTO.equals(sup.getTipoMovimento()) && !Objects.equals(conta.getTipoMovimento(), sup.getTipoMovimento())) {
-                throw new IllegalArgumentException("Tipo de movimento da conta superior não permite que contas inferiores tenham tipo diferente de: " + sup.getTipoMovimento());
+            // Se a conta superior for redutora, a nova conta também deve ser redutora
+            if (sup.isRedutora()) {
+                contaDto.setRedutora(true);
             }
 
             // Definir sequencia como o próximo número disponível entre os inferiores
@@ -224,7 +215,7 @@ public class ContaService {
             throw new IllegalArgumentException("Conta não encontrada: " + id);
         }
         Conta conta = opt.get();
-        Conta sup = conta.getSuperior();
+        List<Conta> inferiores = conta.getInferiores();
 
         // Verificar se a conta pode ser editada
         if (!conta.isEditable()) {
@@ -264,26 +255,15 @@ public class ContaService {
         if (contaDto.getTipo() == null) {
             throw new IllegalArgumentException("Tipo da conta é obrigatório");
         }
-        if (contaDto.getTipoMovimento() == null) {
-            throw new IllegalArgumentException("Tipo de movimento da conta é obrigatório");
-        }
-        
-        // Validar tipo de movimento
-        if (!TipoMovimento.MISTO.equals(sup.getTipoMovimento()) && !Objects.equals(contaDto.getTipoMovimento(), sup.getTipoMovimento())) {
-            throw new IllegalArgumentException("Tipo de movimento da conta superior não permite que contas inferiores tenham tipo diferente de: " + sup.getTipoMovimento());
-        }
-
-        // Verificar se existem contas inferiores com tipo de movimento MISTO
-        List<Conta> inferiores = conta.getTodasInferiores();
-        boolean algumaInferiorDiferente = inferiores.stream().anyMatch(c -> !Objects.equals(c.getTipoMovimento(), contaDto.getTipoMovimento()));
-        if (!TipoMovimento.MISTO.equals(contaDto.getTipoMovimento()) && algumaInferiorDiferente) {
-            throw new IllegalArgumentException("Não é possível alterar o tipo de movimento desta conta para o tipo " + contaDto.getTipoMovimento() + ", pois existem contas inferiores com tipo diferente de: " + contaDto.getTipoMovimento());
+        if (contaDto.isRedutora() && !inferiores.stream().allMatch(Conta::isRedutora)) {
+            throw new IllegalArgumentException(
+                    "Conta não pode ser redutora se possuir contas inferiores não redutoras");
         }
 
         // Atualizar descrição e tipo
         conta.setDescricao(contaDto.getDescricao());
         conta.setTipo(contaDto.getTipo());
-        conta.setTipoMovimento(contaDto.getTipoMovimento());
+        conta.setRedutora(contaDto.isRedutora());
 
         // Salvar alterações
         conta = contaRepository.save(conta);

@@ -14,13 +14,13 @@
 
         <div class="form-card">
             <!-- Create mode uses ContaNewDto; Edit mode uses ContaFlatDto -->
-                                    <form th:action="${mode} == 'edit' ? @{'/contas/' + ${conta.id} + '/edit'} : @{/contas}" method="post"
-                                                th:with="
-                                                    canEditDescricao=${mode == 'edit' ? conta.editableProperties.contains('descricao') : true},
-                                                    isSelectDisabled=${mode == 'edit'},
-                                                    canEditTipo=${mode == 'edit' ? conta.editableProperties.contains('tipo') : true},
-                                                    canEditTipoMovimento=${mode == 'edit' ? conta.editableProperties.contains('tipoMovimento') : true}
-                                                ">
+            <form th:action="${mode} == 'edit' ? @{'/contas/' + ${conta.id} + '/edit'} : @{/contas}" method="post"
+                th:with="
+                    canEditDescricao=${mode == 'edit' ? conta.editableProperties.contains('descricao') : true},
+                    isSelectDisabled=${mode == 'edit'},
+                    canEditTipo=${mode == 'edit' ? conta.editableProperties.contains('tipo') : true},
+                    canEditRedutora=${mode == 'edit' ? conta.editableProperties.contains('redutora') : true}
+                ">
                 <div class="form-grid">
 
                     <!-- Código (somente edição, read-only) -->
@@ -47,9 +47,11 @@
                         true, ${not canEditTipo}, 'Dica: contas sintéticas podem ter contas filhas; contas analíticas podem receber lançamentos diretos.', true)
                     }"></div>
 
-                    <!-- Tipo de Movimento (Segmentado) -->
-                    <div th:replace="~{fragments/form-controls :: segmentedEnum(
-                        'tipoMovimento', 'Tipo de Movimento', ${tiposMovimento}, ${conta.tipoMovimento != null ? conta.tipoMovimento.name() : null}, 'TipoMovimento.', false, ${not canEditTipoMovimento}, 'Como a conta aceita lançamentos em relação à natureza da raiz do grupo.', true)
+                    <!-- Redutora (checkbox) -->
+                    <!-- Spring MVC field marker to coerce unchecked -> false -->
+                    <input type="hidden" name="_redutora" value="on" />
+                    <div th:replace="~{fragments/form-controls :: checkboxField(
+                        'redutora', 'Redutora', ${conta.redutora != null ? conta.redutora : false}, ${not canEditRedutora}, 'Indica se a natureza da conta é oposta à raiz do grupo.', true)
                     }"></div>
                 </div>
 

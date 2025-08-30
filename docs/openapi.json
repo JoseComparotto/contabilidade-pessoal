@@ -382,15 +382,6 @@
           "SINTETICA"
         ]
       },
-      "TipoMovimento": {
-        "type": "string",
-        "description": "Como a conta aceita lançamentos em relação à natureza da raiz",
-        "enum": [
-          "NATURAL",
-          "REDUTOR",
-          "MISTO"
-        ]
-      },
       "ContaNewDto": {
         "type": "object",
         "description": "DTO para criação de nova conta",
@@ -407,8 +398,9 @@
           "tipo": {
             "$ref": "#/components/schemas/TipoConta"
           },
-          "tipoMovimento": {
-            "$ref": "#/components/schemas/TipoMovimento"
+          "redutora": {
+            "type": "boolean",
+            "default":false
           }
         },
         "required": [
@@ -427,8 +419,9 @@
           "tipo": {
             "$ref": "#/components/schemas/TipoConta"
           },
-          "tipoMovimento": {
-            "$ref": "#/components/schemas/TipoMovimento"
+          "redutora": {
+            "type": "boolean",
+            "default":false
           }
         },
         "required": [
@@ -460,21 +453,19 @@
             "format": "int32",
             "nullable": true
           },
-          "tipoMovimento": {
-            "$ref": "#/components/schemas/TipoMovimento"
-          },
-          "tiposMovimentoPossiveis": {
-            "type": "array",
-            "description": "Conjunto de tipos de movimento permitidos para a conta conforme as regras de negócio",
-            "items": {
-              "$ref": "#/components/schemas/TipoMovimento"
-            }
+          "redutora": {
+            "type": "boolean",
+            "description": "Indica se a natureza da conta é oposta a de sua raiz."
           },
           "saldoAtual": {
             "type": "number",
             "format": "double",
             "description": "Saldo atual da conta (pode ser nulo se não calculado)",
             "nullable": true
+          },
+          "aceitaMovimentoOposto": {
+            "type": "boolean",
+            "description": "Indica se a conta aceita movimentos contrários à sua natureza."
           },
           "deletable": {
             "type": "boolean",
@@ -531,22 +522,20 @@
           "tipo": {
             "$ref": "#/components/schemas/TipoConta"
           },
+          "redutora": {
+            "type": "boolean",
+            "description": "Indica se a natureza da conta é oposta a de sua raiz."
+          },
+          "aceitaMovimentoOposto": {
+            "type": "boolean",
+            "description": "Indica se a conta aceita movimentos contrários à sua natureza."
+          },
           "inferiores": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ContaTreeDto"
             },
             "description": "Contas filhas"
-          },
-          "tipoMovimento": {
-            "$ref": "#/components/schemas/TipoMovimento"
-          },
-          "tiposMovimentoPossiveis": {
-            "type": "array",
-            "description": "Conjunto de tipos de movimento permitidos para a conta conforme as regras de negócio",
-            "items": {
-              "$ref": "#/components/schemas/TipoMovimento"
-            }
           },
           "saldoAtual": {
             "type": "number",

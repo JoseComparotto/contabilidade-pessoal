@@ -13,7 +13,6 @@ import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
-import me.josecomparotto.contabilidade_pessoal.model.enums.TipoMovimento;
 
 public class ContaFlatDto implements IDto<Conta> {
     private Integer id;
@@ -23,8 +22,8 @@ public class ContaFlatDto implements IDto<Conta> {
     private Integer superiorId;
     private Natureza natureza;
     private TipoConta tipo;
-    private TipoMovimento tipoMovimento;
-    private Set<TipoMovimento> tiposMovimentoPossiveis;
+    private Boolean redutora;
+    private Boolean aceitaMovimentoOposto;
     private boolean editable;
     private boolean deletable;
     private Set<String> editableProperties;
@@ -119,35 +118,19 @@ public class ContaFlatDto implements IDto<Conta> {
         return nf.format(saldoAtual);
     }
 
-    public TipoMovimento getTipoMovimento() {
-        return tipoMovimento;
-    }
-    
-    public void setTipoMovimento(TipoMovimento tipoMovimento) {
-        this.tipoMovimento = tipoMovimento;
-    }
-
-    public Set<TipoMovimento> getTiposMovimentoPossiveis() {
-        return tiposMovimentoPossiveis;
-    }
-
-    public void setTiposMovimentoPossiveis(Set<TipoMovimento> tiposMovimentoPossiveis) {
-        this.tiposMovimentoPossiveis = tiposMovimentoPossiveis;
-    }
-
-    public Boolean isEditable() {
+    public boolean isEditable() {
         return editable;
     }
 
-    public void setEditable(Boolean editable) {
+    public void setEditable(boolean editable) {
         this.editable = editable;
     }
 
-    public Boolean isDeletable() {
+    public boolean isDeletable() {
         return deletable;
     }
 
-    public void setDeletable(Boolean deletable) {
+    public void setDeletable(boolean deletable) {
         this.deletable = deletable;
     }
 
@@ -157,5 +140,21 @@ public class ContaFlatDto implements IDto<Conta> {
     
     public void setEditableProperties(Set<String> editableProperties) {
         this.editableProperties = editableProperties;
+    }
+
+    public Boolean getRedutora() {
+        return redutora;
+    }
+
+    public void setRedutora(Boolean redutora) {
+        this.redutora = redutora;
+    }
+
+    public Boolean getAceitaMovimentoOposto() {
+        return aceitaMovimentoOposto;
+    }
+
+    public void setAceitaMovimentoOposto(Boolean aceitaMovimentoOposto) {
+        this.aceitaMovimentoOposto = aceitaMovimentoOposto;
     }
 }

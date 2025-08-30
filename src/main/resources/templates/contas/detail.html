@@ -20,9 +20,9 @@
                     <input type="text" th:value="${conta.tipo != null ? conta.tipo.name() : ''}" disabled />
                 </div>
                 <div class="field">
-                    <label>Tipo de Movimento</label>
-                    <input type="text" th:value="${conta.tipoMovimento != null ? conta.tipoMovimento.name() : ''}"
-                        disabled />
+                    <label>Redutora</label>
+                    <input type="text"
+                        th:value="${conta.redutora != null ? (conta.redutora ? 'Sim' : 'Não') : '—'}" disabled />
                 </div>
                 <div class="field">
                     <label>Saldo Atual</label>
