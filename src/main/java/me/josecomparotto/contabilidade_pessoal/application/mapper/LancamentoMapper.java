@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
+import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoOperacao;
 
 public class LancamentoMapper {
 
@@ -46,6 +48,36 @@ public class LancamentoMapper {
         return all.stream()
                 .map(LancamentoMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    public static LancamentoPartidaDto toPartidaDebito(Lancamento l) {
+        if (l == null) return null;
+        LancamentoPartidaDto dto = new LancamentoPartidaDto();
+        dto.setId(l.getId());
+        dto.setDescricao(l.getDescricao());
+        dto.setDataCompetencia(l.getDataCompetencia());
+        dto.setContaPartida(ContaMapper.toFlatDto(l.getContaDebito()));
+        dto.setContaContrapartida(ContaMapper.toFlatDto(l.getContaCredito()));
+        dto.setSentido(SentidoOperacao.DEBITO);
+        dto.setValorMatematico(l.getValor() == null ? null : l.getValor().negate());
+        return dto;
+    }
+
+    public static LancamentoPartidaDto toPartidaCredito(Lancamento l) {
+        if (l == null) return null;
+        LancamentoPartidaDto dto = new LancamentoPartidaDto();
+        dto.setId(l.getId());
+        dto.setDescricao(l.getDescricao());
+        dto.setDataCompetencia(l.getDataCompetencia());
+        dto.setContaPartida(ContaMapper.toFlatDto(l.getContaCredito()));
+        dto.setContaContrapartida(ContaMapper.toFlatDto(l.getContaDebito()));
+        dto.setSentido(SentidoOperacao.CREDITO);
+        dto.setValorMatematico(l.getValor());
+        return dto;
+    }
+
+    public static List<LancamentoPartidaDto> toPartidas(Lancamento l) {
+        return List.of(toPartidaDebito(l), toPartidaCredito(l));
     }
 
 }
