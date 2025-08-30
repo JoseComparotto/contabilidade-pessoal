@@ -9,7 +9,7 @@ env:
   PROJECT_ID: contabilidade-pessoal-470215
   SERVICE_NAME: contabilidade-pessoal
   REGION: southamerica-east1
-  IMAGE_NAME: contabilidade-pessoal
+  IMAGE_NAME: cloud-run-source-deploy
 
 jobs:
   deploy:
