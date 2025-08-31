@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: commonHead(${conta.displayText})}"></head>
+
+<body>
+    <div th:replace="~{fragments/toast :: toasts}"></div>
+    <main class="container">
+        <h1>Detalhes da Conta</h1>
+
+        <div class="controls" style="margin-bottom:1rem">
+            <a href="/contas">← Voltar</a>
+        </div>
+
+        <div class="form-card">
+            <div class="card-header">
+                <h2 th:text="${conta.displayText}"></h2>
+                <div class="actions">
+                    <a class="btn edit icon" th:href="${conta.editable} ? @{'/contas/' + ${conta.id} + '/edit'} : ''"
+                        th:classappend="${conta.editable} ? '' : ' disabled'"
+                        th:attr="aria-disabled=${!conta.editable}, tabindex=${conta.editable} ? 0 : -1"
+                        aria-label="Editar conta" title="Editar conta">
+                        <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                        <span class="sr-only">Editar</span>
+                    </a>
+
+                    <form th:action="@{'/contas/' + ${conta.id} + '/delete'}" method="post"
+                        th:onsubmit="${conta.deletable} ? 'return confirm(\'Deseja excluir essa conta?\')' : 'return false;'"
+                        style="display:inline">
+                        <input type="hidden" name="_method" value="delete" />
+                        <button type="submit" class="btn delete icon"
+                            th:classappend="${conta.deletable} ? '' : ' disabled'" th:disabled="${!conta.deletable}"
+                            aria-label="Excluir conta" title="Excluir conta">
+                            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                            <span class="sr-only">Excluir</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="field">
+                    <label>Conta superior</label>
+                    <div class="input-link" th:if="${conta.superior != null}">
+                        <input type="text" disabled th:value="${conta.superior.displayText}" />
+                        <a class="cover" th:href="@{/contas/{id}(id=${conta.superior.id})}">
+                            <span class="sr-only">Abrir detalhes da conta superior</span>
+                        </a>
+                    </div>
+                    <div class="input-link" th:if="${conta.superior == null}">
+                        <input type="text" disabled value="Plano de Contas" />
+                        <a class="cover" th:href="@{/contas}">
+                            <span class="sr-only">Abrir o plano de caontas</span>
+                        </a>
+                    </div>                </div>
+                <div class="field">
+                    <label>Saldo Atual</label>
+                    <input type="text" th:value="${conta.saldoAtualFormatado}" disabled />
+                </div>
+            </div>
+            <div class="card-section" th:if="${conta.tipo.name() == 'SINTETICA'}">
+                <div class="card-header">
+                    <h2>Contas inferiores</h2>
+                    <div class="actions">
+                        <a class="btn details icon" th:href="@{/contas/new(superiorId=${conta.id})}"
+                           aria-label="Criar nova conta inferior" title="Criar nova conta inferior">
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                            <span class="sr-only">Criar nova conta inferior</span>
+                        </a>
+                    </div>
+                </div>
+                <div th:replace="~{fragments/contas/list :: contaTable(${conta.inferiores}, null)}"></div>
+            </div>
+            <div class="card-section" th:if="${conta.tipo.name() == 'ANALITICA'}">
+                <div class="card-header">
+                    <h2>Lançamentos</h2>
+                    <div class="actions">
+                        <!-- <a class="btn details icon" th:href="@{/lancamentos/new(contaPartidaId=${conta.id})}"
+                           aria-label="Novo lançamento" title="Novo lançamento">
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                            <span class="sr-only">Novo lançamento</span>
+                        </a> -->
+                    </div>
+                </div>
+                <div th:replace="~{fragments/lancamentos/list :: lancamentoTable(${conta.lancamentos}, null)}"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/toast.js"></script>
+</body>
+
+</html>

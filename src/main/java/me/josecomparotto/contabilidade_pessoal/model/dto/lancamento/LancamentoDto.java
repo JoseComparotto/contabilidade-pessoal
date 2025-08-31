@@ -3,8 +3,10 @@ package me.josecomparotto.contabilidade_pessoal.model.dto.lancamento;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 
 public class LancamentoDto implements IDto<Lancamento> {
@@ -14,8 +16,11 @@ public class LancamentoDto implements IDto<Lancamento> {
     private BigDecimal valor;
     private LocalDate dataCompetencia;
 
-    private ContaFlatDto contaDebito;
-    private ContaFlatDto contaCredito;
+    @JsonIgnoreProperties({"superior", "inferiores", "lancamentos"})
+    private ContaViewDto contaDebito;
+
+    @JsonIgnoreProperties({"superior", "inferiores", "lancamentos"})
+    private ContaViewDto contaCredito;
 
     public Long getId() {
         return id;
@@ -49,19 +54,19 @@ public class LancamentoDto implements IDto<Lancamento> {
         this.dataCompetencia = dataCompetencia;
     }
 
-    public ContaFlatDto getContaDebito() {
+    public ContaViewDto getContaDebito() {
         return contaDebito;
     }
 
-    public void setContaDebito(ContaFlatDto contaDebito) {
+    public void setContaDebito(ContaViewDto contaDebito) {
         this.contaDebito = contaDebito;
     }
 
-    public ContaFlatDto getContaCredito() {
+    public ContaViewDto getContaCredito() {
         return contaCredito;
     }
 
-    public void setContaCredito(ContaFlatDto contaCredito) {
+    public void setContaCredito(ContaViewDto contaCredito) {
         this.contaCredito = contaCredito;
     }
 }

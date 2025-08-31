@@ -1,57 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/head :: commonHead('Contas')}"></head>
+<head th:replace="~{fragments/head :: commonHead('Plano de Contas')}"></head>
 
 <body>
     <div th:replace="~{fragments/toast :: toasts}"></div>
     <main class="container">
-        <h1>Contas</h1>
-        <div class="controls">
-            <a href="/contas/new">+ Nova conta</a>
+        <div class="page-header">
+            <h1>Plano de Contas</h1>
+            <div class="actions">
+                <a class="btn details icon" href="/contas/new" aria-label="Nova conta" title="Nova conta">
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                    <span class="sr-only">Nova conta</span>
+                </a>
+            </div>
         </div>
 
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Descrição</th>
-                        <th>Saldo Atual</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Flattened view renders a list of ContaFlatDto which has id, codigo, descricao, natureza, tipo -->
-                    <tr th:each="c : ${contas}" th:object="${c}" th:classappend="(${c.tipo.name() == 'SINTETICA'} ? 'sintetica ' : '') 
-                   + (${c.tipoMovimento.name() == 'REDUTOR'} ? 'redutora' : '')">
-                        <td th:text="*{codigo != null ? codigo : (id != null ? id : '')}">1</td>
-                        <td th:text="*{ (tipoMovimento.name() == 'REDUTOR' ? '(-) ' : '') + descricao}">Descrição</td>
-                        <td th:text="*{saldoAtualFormatado}">R$ 0,00</td>
-                        <td style="white-space:nowrap; display:flex; gap:.4rem">
-                            <a class="btn edit icon" th:href="*{editable} ? @{/contas/{id}/edit(id=*{id})} : ''"
-                                th:classappend="*{editable} ? '' : ' disabled'"
-                                th:attr="aria-disabled=*{not editable}, tabindex=*{editable} ? 0 : -1"
-                                aria-label="Editar">
-                                <i class="fa-solid fa-pen"></i>
-                                <span class="sr-only">Editar</span>
-                            </a>
-                            <form th:action="@{/contas/{id}/delete(id=*{id})}" method="post"
-                                th:onsubmit="*{deletable} ? 'return confirm(\'Deseja excluir essa conta?\')' : 'return false;'"
-                                style="display:inline">
-                                <!-- Spring MVC common pattern: use hidden _method if your app expects HTTP DELETE via method override -->
-                                <input type="hidden" name="_method" value="delete" />
-                                <button type="submit" class="btn delete icon" aria-label="Excluir"
-                                    th:classappend="*{deletable} ? '' : ' disabled'" th:disabled="*{not deletable}">
-                                    <i class="fa-solid fa-trash"></i>
-                                    <span class="sr-only">Excluir</span>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <div th:replace="~{fragments/contas/list :: contaTable(${contas}, null)}"></div>
 
     </main>
     <script src="/js/toast.js"></script>

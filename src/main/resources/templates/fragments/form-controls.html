@@ -49,13 +49,14 @@
         <div class="hint" th:if="${hint}" th:text="${hint}"></div>
     </div>
 
-    <!-- Checkbox field -->
+    <!-- Switch (styled checkbox) -->
     <div class="field"
-        th:fragment="checkboxField(name, label, checked, isDisabled=false, hint, preserveWhenDisabled)">
-        <label>
+        th:fragment="checkboxField(name, label, checked, isDisabled, hint, preserveWhenDisabled)">
+        <label class="switch">
             <input type="checkbox" th:name="${name}" th:checked="${checked?:false}"
                 th:attr="disabled=${isDisabled} ? 'disabled' : null" />
-            <span th:text="${label}">Label</span>
+            <span class="slider" aria-hidden="true"></span>
+            <span class="switch-text" th:text="${label}">Label</span>
         </label>
         <!-- Preserve boolean value when disabled -->
         <input type="hidden" th:if="${(isDisabled?:false) and (preserveWhenDisabled?:false)}" th:name="${name}"

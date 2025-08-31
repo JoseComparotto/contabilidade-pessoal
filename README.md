@@ -5,7 +5,7 @@ Aplicação Spring Boot para gestão de plano de contas contábeis, com API REST
 ## Visão geral
 
 - Gestão hierárquica de contas (sintéticas e analíticas) com natureza (credora/devedora) e suporte a contas redutoras.
-- API REST para CRUD de contas e listagem em dois formatos: flat e tree.
+- API REST para CRUD de contas (flat/tree) e leitura de lançamentos.
 - UI web simples para listar, criar, editar e excluir contas.
 - PostgreSQL com migrações Flyway, RLS (Row Level Security) e gatilhos de integridade (constraint triggers).
 - Swagger UI em /api/docs servindo um OpenAPI estático versionado em docs/openapi.json.
@@ -112,6 +112,8 @@ Observação: a aplicação usa dois contextos de credenciais no Flyway e no JPA
   - POST /contas
   - PUT /contas/{id}
   - DELETE /contas/{id}
+  - GET /lancamentos
+  - GET /lancamentos/{id}
 
 Swagger UI: /api/docs. O arquivo docs/openapi.json é copiado para static/api/openapi.json durante o build (plugin maven-resources), e servido em /api/openapi.json.
 
@@ -136,7 +138,6 @@ Esta seção consolida as regras vigentes no domínio (banco + backend). Onde ap
   - Uma conta redutora não pode ter inferiores não-redutoras (validação tanto do lado do pai quanto do filho imediato).
 
 - Aceita movimento oposto (aceita_movimento_oposto)
-  - Contas redutoras nunca podem aceitar movimento oposto.
   - Uma conta só pode aceitar movimento oposto se a superior também aceitar.
   - Não é permitido definir aceita_movimento_oposto = false enquanto existir qualquer descendente que aceite.
   - Provisionamento inicial: raízes com sequencia 1, 2 e 3 e todos os seus descendentes não-redutoras iniciam aceitando movimento oposto.
@@ -199,7 +200,7 @@ Esta seção consolida as regras vigentes no domínio (banco + backend). Onde ap
 - Movimento oposto: débito em conta credora ou crédito em conta devedora; só permitido quando a conta aceitar.
 - Data de competência: data em que o efeito econômico do lançamento ocorre.
 - Saldo natural: saldo calculado respeitando a natureza da conta.
-- Saldo matemático: diferença algébrica de débitos e créditos sem considerar a natureza.
+- Saldo contábil: diferença algébrica de débitos e créditos sem considerar a natureza.
 - Conta ativa/inativa: contas inativas não podem ter saldo líquido diferente de zero para serem inativadas; lançamentos associados a contas inativas tornam-se imutáveis.
 - created_by_system: flag que indica contas provisionadas pelo sistema; impede edição e exclusão.
 

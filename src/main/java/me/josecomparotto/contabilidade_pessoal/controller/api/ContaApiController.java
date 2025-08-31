@@ -12,11 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.service.ContaService;
 
@@ -27,17 +26,16 @@ public class ContaApiController {
     @Autowired
     private ContaService contasService;
 
-    // GET /api/contas?view=tree|flat (default=flat)
+    // GET /api/contas
     @GetMapping
-    public List<?> listarContas(@RequestParam(defaultValue = "flat") String view) {
-        return contasService.listarContasPorView(view);
+    public List<?> listarContas() {
+        return contasService.listarContas();
     }
 
-    // GET /api/contas/{id}?view=tree|flat (default=flat)
+    // GET /api/contas/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<?> obterConta(@PathVariable Integer id,
-            @RequestParam(defaultValue = "flat") String view) {
-        Object body = contasService.obterContaPorIdPorView(id, view);
+    public ResponseEntity<?> obterConta(@PathVariable Integer id) {
+        Object body = contasService.obterContaPorId(id);
         if (body == null)
             return ResponseEntity.notFound().build();
         return ResponseEntity.ok(body);
@@ -46,20 +44,28 @@ public class ContaApiController {
     // POST /api/contas
     @PostMapping
     public ResponseEntity<?> criarConta(@RequestBody ContaNewDto contaDto) {
-        ContaFlatDto novaConta = contasService.criarConta(contaDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(novaConta);
+        try {
+            ContaViewDto novaConta = contasService.criarConta(contaDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(novaConta);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     // PUT /api/contas/{id}
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizarConta(@PathVariable Integer id, @RequestBody ContaEditDto contaDto) {
         try {
-            ContaFlatDto contaAtualizada = contasService.atualizarConta(id, contaDto);
-            if (contaAtualizada == null)
-                return ResponseEntity.notFound().build();
+            ContaViewDto contaAtualizada = contasService.atualizarConta(id, contaDto);
             return ResponseEntity.ok(contaAtualizada);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            String msg = e.getMessage() == null ? "" : e.getMessage();
+            if (msg.toLowerCase().contains("não encontrada")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg);
+            }
+            return ResponseEntity.badRequest().body(msg);
         }
     }
 

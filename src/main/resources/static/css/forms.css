@@ -1,0 +1,50 @@
+/* Form card and general fields */
+.form-card { background: #fff; border: 1px solid #e3e6ee; border-radius: 6px; padding: 1rem }
+.card-header { display: flex; align-items: center; gap: .75rem; margin-bottom: .75rem }
+.card-header h2 { margin: 0; font-size: 1.25rem; font-weight: 700; color: #111; flex: 1 }
+.card-header .actions { margin: 0; display: inline-flex; gap: .5rem }
+.card-section { margin-top: 1rem }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem }
+.field { display: flex; flex-direction: column; gap: .25rem }
+label { font-weight: 600; font-size: .9rem; color: #333 }
+input[type="text"], select, input[type="number"], input[type="checkbox"] { padding: .45rem .55rem; border: 1px solid #d9dce4; border-radius: 4px; background: #fff }
+.as-input { display: inline-block; padding: .45rem .55rem; border: 1px solid #d9dce4; border-radius: 4px; background: #fff; color: #0a66c2; text-decoration: none }
+.as-input:hover { background: #f6faff; text-decoration: none }
+
+/* Input with clickable overlay link */
+.input-link { position: relative; display: inline-block; width: 100%; display: flex; }
+.input-link > input[type="text"] { flex: 1; }
+.input-link > a.cover { position: absolute; inset: 0; border-radius: 4px; text-decoration: none }
+.input-link > a.cover:focus-visible { outline: 2px solid #0a66c2; outline-offset: 2px }
+.actions { margin-top: 1rem; display: flex; gap: .5rem }
+.hint { color: #666; font-size: .85rem }
+
+/* Segmented radio buttons */
+.segmented-group { display: inline-flex; gap: .35rem; flex-wrap: wrap }
+.segmented-group.disabled { opacity: 0.6; pointer-events: none }
+.segmented-group .btn.segmented { background: #fff; border: 1px solid #d9dce4; color: #222; padding: .4rem .7rem; border-radius: 6px; cursor: pointer; user-select: none }
+.segmented-group .btn.segmented:hover { background: #f6faff }
+.segmented-group input[type="radio"]:focus-visible + .btn.segmented { outline: 2px solid #0a66c2; outline-offset: 2px }
+.segmented-group input[type="radio"]:checked + .btn.segmented { background: #0a66c2; color: #fff; border-color: #0a66c2 }
+.segmented-group input[type="radio"]:disabled + .btn.segmented { cursor: default }
+
+/* Switch (toggle) */
+.switch { display: inline-flex; align-items: center; gap: .5rem; cursor: pointer; user-select: none }
+.switch input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0 }
+.switch .slider { position: relative; width: 44px; height: 24px; background: #d1d5db; border-radius: 999px; transition: background .2s ease; border: 1px solid #cfd3da; box-sizing: border-box }
+.switch .slider::after { content: ""; position: absolute; top: 50%; left: 2px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transform: translate(0, -50%); box-shadow: 0 1px 2px rgba(0,0,0,0.2); transition: transform .2s ease }
+.switch input[type="checkbox"]:checked + .slider { background: #0a66c2; border-color: #0a66c2 }
+.switch input[type="checkbox"]:checked + .slider::after { transform: translate(20px, -50%) }
+.switch input[type="checkbox"]:focus-visible + .slider { outline: 2px solid #0a66c2; outline-offset: 2px }
+.switch-text { font-weight: 600; color: #333 }
+.switch input[type="checkbox"][disabled] + .slider { opacity: .6; cursor: not-allowed }
+.switch input[type="checkbox"][disabled] ~ .switch-text { opacity: .7 }
+
+/* Responsive */
+@media (max-width: 640px) {
+	.form-grid { grid-template-columns: 1fr; gap: .6rem }
+	.form-card { padding: .75rem }
+	.actions { flex-direction: column; align-items: stretch }
+	.actions .btn { display: block; width: 100%; box-sizing: border-box; justify-content: center; text-align: center; white-space: normal; overflow-wrap: anywhere }
+	.btn.icon { width: 40px; height: 40px }
+}

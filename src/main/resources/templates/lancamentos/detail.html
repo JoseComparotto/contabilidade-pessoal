@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: commonHead('Lançamento')} "></head>
+
+<body>
+    <div th:replace="~{fragments/toast :: toasts}"></div>
+    <main class="container">
+        <div class="page-header">
+            <h1>Detalhes do Lançamento</h1>
+            <div class="actions">
+            </div>
+        </div>
+
+        <div class="controls" style="margin-bottom:1rem">
+            <a th:href="@{/contas/{id}(id=${lancamento.contaPartida.id})}">← Voltar</a>
+        </div>
+
+        <div class="form-card">
+            <div class="form-grid">
+                <div class="field">
+                    <label>Conta (partida)</label>
+                    <div class="input-link">
+                        <input type="text" th:value="${lancamento.contaPartida.displayText}" disabled />
+                        <a class="cover" th:href="@{/contas/{id}(id=${lancamento.contaPartida.id})}"><span class="sr-only">Abrir conta</span></a>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Sentido</label>
+                    <input type="text" th:value="#{'SenditoNatural.' + ${lancamento.sentidoNatural.name()}}" disabled />
+                </div>
+                <div class="field">
+                    <label>Data</label>
+                    <input type="text" th:value="${lancamento.dataCompetenciaFormatada}" disabled />
+                </div>
+                <div class="field">
+                    <label>Descrição</label>
+                    <input type="text" th:value="${lancamento.descricao}" disabled />
+                </div>
+                <div class="field">
+                    <label>Valor</label>
+                    <input type="text" th:value="${lancamento.valorNaturalFormatado}" disabled />
+                </div>
+                <div class="field">
+                    <label>Conta (contrapartida)</label>
+                    <div class="input-link">
+                        <input type="text" th:value="${lancamento.contaContrapartida.displayText}" disabled />
+                        <a class="cover" th:href="@{/contas/{id}(id=${lancamento.contaContrapartida.id})}"><span class="sr-only">Abrir conta</span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/toast.js"></script>
+</body>
+
+</html>

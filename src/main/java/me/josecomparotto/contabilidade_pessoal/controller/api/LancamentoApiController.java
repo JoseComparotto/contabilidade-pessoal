@@ -32,11 +32,12 @@ public class LancamentoApiController {
     // GET /api/lancamentos/{id}
     @GetMapping("/{id}")
     public ResponseEntity<LancamentoDto> obterLancamento(@PathVariable Long id) {
-        LancamentoDto lancamento = lancamentoService.obterLancamentoPorId(id);
-        if (lancamento == null) {
+        try {
+            LancamentoDto lancamento = lancamentoService.obterLancamentoPorId(id);
+            return ResponseEntity.ok(lancamento);
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(lancamento);
     }
 
 }

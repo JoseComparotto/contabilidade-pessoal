@@ -1,12 +1,13 @@
 package me.josecomparotto.contabilidade_pessoal.application.mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaTreeDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 
 public final class ContaMapper {
@@ -14,65 +15,67 @@ public final class ContaMapper {
     private ContaMapper() {
     }
 
-    public static ContaFlatDto toFlatDto(Conta conta) {
+    public static ContaViewDto toViewDto(Conta conta) {
         if (conta == null)
             return null;
-        ContaFlatDto dto = new ContaFlatDto();
-        dto.setId(conta.getId());
-        dto.setCodigo(conta.getCodigo());
-        dto.setDescricao(conta.getDescricao());
-        dto.setDisplayText(conta.getDisplayText());
-        dto.setNatureza(conta.getNatureza());
-        dto.setTipo(conta.getTipo());
-        dto.setSuperiorId(conta.getSuperior() != null ? conta.getSuperior().getId() : null);
-        dto.setPath(conta.getPath());
-        dto.setSaldoAtual(conta.getSaldoNatural());
-        dto.setTipoMovimento(conta.getTipoMovimento());
-        dto.setTiposMovimentoPossiveis(conta.getTiposMovimentoPossiveis());
-        dto.setEditable(conta.isEditable());
-        dto.setDeletable(conta.isDeletable());
-        dto.setEditableProperties(conta.getEditableProperties());
-        return dto;
-    }
 
-    public static List<ContaFlatDto> toFlatList(List<Conta> contas) {
-        if (contas == null)
-            return null;
-        return contas.stream()
-                .map(ContaMapper::toFlatDto)
-                .collect(Collectors.toList());
-    }
+        ContaViewDto dto = toViewDtoWithoutPopulate(conta);
 
-    public static ContaTreeDto toTreeDto(Conta conta) {
-        if (conta == null)
-            return null;
-        ContaTreeDto dto = new ContaTreeDto();
-        dto.setId(conta.getId());
-        dto.setCodigo(conta.getCodigo());
-        dto.setDescricao(conta.getDescricao());
-        dto.setDisplayText(conta.getDisplayText());
-        dto.setNatureza(conta.getNatureza());
-        dto.setTipo(conta.getTipo());
-        dto.setSaldoAtual(conta.getSaldoNatural());
-        dto.setTipoMovimento(conta.getTipoMovimento());
-        dto.setTiposMovimentoPossiveis(conta.getTiposMovimentoPossiveis());
-        dto.setEditable(conta.isEditable());
-        dto.setDeletable(conta.isDeletable());
-        dto.setEditableProperties(conta.getEditableProperties());
-        if (conta.getInferiores() != null && !conta.getInferiores().isEmpty()) {
-            dto.getInferiores().addAll(
+        if (conta.getSuperior() != null) {
+            dto.setSuperior(toViewDtoWithoutPopulate(conta.getSuperior()));
+        }
+
+        if (conta.getInferiores() != null) {
+            dto.setInferiores(
                     conta.getInferiores().stream()
-                            .map(ContaMapper::toTreeDto)
+                            .map(ContaMapper::toViewDtoWithoutPopulate)
                             .collect(Collectors.toList()));
         }
+
+        if (conta.getLancamentosCredito() != null || conta.getLancamentosDebito() != null) {
+
+            List<LancamentoPartidaDto> lancamentos = new ArrayList<>();
+            lancamentos.addAll(
+                    conta.getLancamentosCredito().stream()
+                            .map(LancamentoMapper::toPartidaCredito)
+                            .collect(Collectors.toList()));
+            lancamentos.addAll(
+                    conta.getLancamentosDebito().stream()
+                            .map(LancamentoMapper::toPartidaDebito)
+                            .collect(Collectors.toList()));
+            
+            lancamentos.sort((l1, l2) -> l2.getDataCompetencia().compareTo(l1.getDataCompetencia())); // mais recentes primeiro
+            dto.setLancamentos(lancamentos);
+        }
+
+        return dto;
+
+    }
+
+    public static ContaViewDto toViewDtoWithoutPopulate(Conta conta) {
+        if (conta == null)
+            return null;
+        ContaViewDto dto = new ContaViewDto();
+        dto.setId(conta.getId());
+        dto.setCodigo(conta.getCodigo());
+        dto.setDescricao(conta.getDescricao());
+        dto.setDisplayText(conta.getDisplayText());
+        dto.setNatureza(conta.getNatureza());
+        dto.setTipo(conta.getTipo());
+        dto.setSaldoAtual(conta.getSaldoNatural());
+        dto.setRedutora(conta.isRedutora());
+        dto.setAceitaMovimentoOposto(conta.getAceitaMovimentoOposto());
+        dto.setEditable(conta.isEditable());
+        dto.setDeletable(conta.isDeletable());
+        dto.setEditableProperties(conta.getEditableProperties());
         return dto;
     }
 
-    public static List<ContaTreeDto> toTreeList(List<Conta> contas) {
+    public static List<ContaViewDto> toViewList(List<Conta> contas) {
         if (contas == null)
             return null;
         return contas.stream()
-                .map(ContaMapper::toTreeDto)
+                .map(ContaMapper::toViewDto)
                 .collect(Collectors.toList());
     }
 
@@ -86,13 +89,13 @@ public final class ContaMapper {
         return conta;
     }
 
-    public static ContaEditDto toEditDto(ContaFlatDto contaOld) {
+    public static ContaEditDto toEditDto(ContaViewDto contaOld) {
         if (contaOld == null)
             return null;
         ContaEditDto dto = new ContaEditDto();
         dto.setDescricao(contaOld.getDescricao());
         dto.setTipo(contaOld.getTipo());
-        dto.setTipoMovimento(contaOld.getTipoMovimento());
+        dto.setRedutora(contaOld.isRedutora());
         return dto;
     }
 }

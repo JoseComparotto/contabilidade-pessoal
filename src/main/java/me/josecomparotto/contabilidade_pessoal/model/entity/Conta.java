@@ -5,10 +5,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +22,6 @@ import me.josecomparotto.contabilidade_pessoal.application.converter.NaturezaCon
 import me.josecomparotto.contabilidade_pessoal.application.converter.TipoContaConverter;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
-import me.josecomparotto.contabilidade_pessoal.model.enums.TipoMovimento;
 
 @Entity
 @Table(name = "tb_contas", schema = "public")
@@ -38,7 +33,6 @@ public class Conta {
 
     @ManyToOne(optional = true)
     @JoinColumn(name = "id_superior")
-    @JsonIgnoreProperties("inferiores")
     private Conta superior;
 
     @Column(name = "sequencia")
@@ -56,7 +50,6 @@ public class Conta {
     private TipoConta tipo;
 
     @OneToMany(mappedBy = "superior")
-    @JsonIgnoreProperties("superior")
     private final List<Conta> inferiores = new ArrayList<>();
 
     @Column(name = "aceita_movimento_oposto")
@@ -65,11 +58,9 @@ public class Conta {
     @Column(name = "created_by_system")
     private Boolean createdBySystem;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "contaDebito")
     private final List<Lancamento> lancamentosDebito = new ArrayList<>();
 
-    @JsonIgnore
     @OneToMany(mappedBy = "contaCredito")
     private final List<Lancamento> lancamentosCredito = new ArrayList<>();
 
@@ -99,12 +90,12 @@ public class Conta {
         if (isEditable()) {
             editableProperties.add("descricao");
 
-            if (canEditTipoMovimento()) {
-                editableProperties.add("tipoMovimento");
-            }
-
             if (canEditTipo()) {
                 editableProperties.add("tipo");
+            }
+
+            if (canEditRedutora()) {
+                editableProperties.add("redutora");
             }
         }
 
@@ -119,106 +110,14 @@ public class Conta {
         return inferiores.isEmpty() && lancamentosDebito.isEmpty() && lancamentosCredito.isEmpty();
     }
 
-    private boolean canEditTipoMovimento() {
-        return getTiposMovimentoPossiveis().size() > 1;
-    }
-
-    @Transient
-    public Set<TipoMovimento> getTiposMovimentoPossiveis() {
-        // Regras consideradas:
-        // - MISTO é permitido se, e somente se, a superior também for MISTO.
-        // - NATURAL só pode ser definido se todos os descendentes forem NATURAL,
-        // o superior NÃO for REDUTOR e só houver lançamentos naturais.
-        // - REDUTOR só pode ser definido se todos os descendentes forem REDUTOR,
-        // o superior NÃO for NATURAL e só houver lançamentos redutores.
-
-        Set<TipoMovimento> tiposPossiveis = new HashSet<>();
-        tiposPossiveis.add(getTipoMovimento()); // Sempre pode manter o tipo atual
-
-        final TipoMovimento atual = getTipoMovimento();
-
-        final TipoMovimento tipoSuperior = (superior == null) ? null : superior.getTipoMovimento();
-        final boolean superiorEhMisto = TipoMovimento.MISTO.equals(tipoSuperior);
-        final boolean superiorEhRedutor = TipoMovimento.REDUTOR.equals(tipoSuperior);
-        final boolean superiorEhNatural = TipoMovimento.NATURAL.equals(tipoSuperior);
-
-        // Descendentes
-        final List<Conta> descendentes = getTodasInferiores();
-        final boolean todosDescNat = descendentes.stream()
-                .allMatch(c -> TipoMovimento.NATURAL.equals(c.getTipoMovimento()));
-        final boolean todosDescRed = descendentes.stream()
-                .allMatch(c -> TipoMovimento.REDUTOR.equals(c.getTipoMovimento()));
-
-        // Lançamentos da própria conta ou de descendentes
-        final boolean temMovimentoNatural = !getTodosLancamentosPorNaturezaRelativa(true).isEmpty();
-        final boolean temMovimentoRedutor = !getTodosLancamentosPorNaturezaRelativa(false).isEmpty();
-
-        // Possibilidades de transição a partir do estado atual
-        boolean podeVirarMisto = !TipoMovimento.MISTO.equals(atual) && superiorEhMisto;
-        boolean podeVirarNatural = !TipoMovimento.NATURAL.equals(atual) && todosDescNat && !superiorEhRedutor
-                && !temMovimentoRedutor;
-        boolean podeVirarRedutor = !TipoMovimento.REDUTOR.equals(atual) && todosDescRed && !superiorEhNatural
-                && !temMovimentoNatural;
-
-        if (podeVirarMisto) {
-            tiposPossiveis.add(TipoMovimento.MISTO);
-        }
-        if (podeVirarNatural) {
-            tiposPossiveis.add(TipoMovimento.NATURAL);
-        }
-        if (podeVirarRedutor) {
-            tiposPossiveis.add(TipoMovimento.REDUTOR);
-        }
-
-        return tiposPossiveis;
-    }
-
-    private List<Lancamento> getTodosLancamentosPorNaturezaRelativa(boolean naturais) {
-        // Natureza relativa: classifica "natural" ou "redutor" em relação à NATUREZA
-        // desta conta
-        // (credora -> crédito natural; devedora -> débito natural), independentemente
-        // das naturezas das contas intermediárias. Para contas sintéticas, agregamos
-        // os lançamentos das inferiores e aplicamos esta mesma regra da conta atual.
-
-        Natureza nat = getNatureza();
-        if (nat == null) {
-            return List.of();
-        }
-
-        boolean naturalEhCredito = Natureza.CREDORA.equals(nat);
-        List<Lancamento> creditos = getTodosLancamentosCredito();
-        List<Lancamento> debitos = getTodosLancamentosDebito();
-
-        if (naturais) {
-            return naturalEhCredito ? creditos : debitos;
+    private boolean canEditRedutora(){
+        if(isRedutora()){
+            // Pode deixar de ser redutora se a superior não for redutora
+            return superior == null || !superior.isRedutora();
         } else {
-            return naturalEhCredito ? debitos : creditos;
+            // Pode se tornar redutora se todas as inferiores forem redutoras
+            return inferiores.stream().allMatch(Conta::isRedutora);
         }
-    }
-
-    private List<Lancamento> getTodosLancamentosCredito() {
-
-        if (TipoConta.SINTETICA.equals(getTipo())) {
-            // Se for sintética, retorna os lançamentos das contas inferiores
-            return getTodasInferiores().stream()
-                    .map(Conta::getTodosLancamentosCredito)
-                    .flatMap(List::stream)
-                    .collect(Collectors.toList());
-        }
-
-        return lancamentosCredito.stream().toList();
-    }
-
-    private List<Lancamento> getTodosLancamentosDebito() {
-        if (TipoConta.SINTETICA.equals(getTipo())) {
-            // Se for sintética, retorna os lançamentos das contas inferiores
-            return getTodasInferiores().stream()
-                    .map(Conta::getTodosLancamentosDebito)
-                    .flatMap(List::stream)
-                    .collect(Collectors.toList());
-        }
-
-        return lancamentosDebito.stream().toList();
     }
 
     @Transient
@@ -237,7 +136,6 @@ public class Conta {
     }
 
     @Transient
-    @JsonIgnore
     public Conta getRaiz() {
         Conta current = this;
         while (current.getSuperior() != null) {
@@ -247,7 +145,6 @@ public class Conta {
     }
 
     @Transient
-    @JsonIgnore
     public List<Conta> getTodasInferiores() {
         List<Conta> todasInferiores = new ArrayList<>();
         List<Conta> stack = new ArrayList<>();
@@ -272,7 +169,8 @@ public class Conta {
         return todasInferiores;
     }
 
-    private boolean isRedutora() {
+    @Transient
+    public boolean isRedutora() {
         Natureza raiz = getRaiz() != null ? getRaiz().getNatureza() : null;
         Natureza atual = this.natureza;
         // Redutora quando a natureza difere da raiz; nulls tratados como não redutora
@@ -280,35 +178,12 @@ public class Conta {
     }
 
     @Transient
-    public TipoMovimento getTipoMovimento() {
-        if (isRedutora()) {
-            return TipoMovimento.REDUTOR;
-        } else if (Boolean.TRUE.equals(aceitaMovimentoOposto)) {
-            return TipoMovimento.MISTO;
-        } else {
-            return TipoMovimento.NATURAL;
+    public void setRedutora(boolean redu) {
+        Natureza raiz = getRaiz() != null ? getRaiz().getNatureza() : null;
+        if (raiz == null) {
+            throw new IllegalStateException("Não é possível definir a natureza redutora.");
         }
-    }
-
-    @Transient
-    public void setTipoMovimento(TipoMovimento tipoMovimento) {
-        switch (tipoMovimento) {
-            case REDUTOR:
-                this.natureza = naturezaOposta(getRaiz().getNatureza());
-                this.aceitaMovimentoOposto = false;
-                break;
-            case MISTO:
-                this.natureza = getRaiz().getNatureza();
-                this.aceitaMovimentoOposto = true;
-                break;
-            case NATURAL:
-                this.natureza = getRaiz().getNatureza();
-                this.aceitaMovimentoOposto = false;
-                break;
-            default:
-                // No-op
-                break;
-        }
+        this.natureza = redu ? naturezaOposta(raiz) : raiz;
     }
 
     @Transient
@@ -319,16 +194,16 @@ public class Conta {
         }
         switch (n) {
             case CREDORA:
-                return getSaldoMatematico();
+                return getSaldoContabil();
             case DEVEDORA:
-                return getSaldoMatematico().multiply(BigDecimal.valueOf(-1));
+                return getSaldoContabil().multiply(BigDecimal.valueOf(-1));
             default:
                 return BigDecimal.ZERO;
         }
     }
 
     @Transient
-    public BigDecimal getSaldoMatematico() {
+    public BigDecimal getSaldoContabil() {
 
         switch (getTipo()) {
             // Se for analítica, o saldo é o somatório líquido dos lançamentos
@@ -346,7 +221,7 @@ public class Conta {
             case SINTETICA:
                 return getTodasInferiores().stream()
                         .filter(c -> TipoConta.ANALITICA.equals(c.getTipo()))
-                        .map(Conta::getSaldoMatematico)
+                        .map(Conta::getSaldoContabil)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
             default:
                 break;
@@ -384,6 +259,11 @@ public class Conta {
 
     public void setSuperior(Conta superior) {
         this.superior = superior;
+
+        // Propagar aceitação de movimento oposto
+        if(superior != null){
+            this.aceitaMovimentoOposto = superior.getAceitaMovimentoOposto();
+        }
     }
 
     public Integer getSequencia() {
@@ -436,6 +316,14 @@ public class Conta {
 
     public List<Lancamento> getLancamentosCredito() {
         return lancamentosCredito;
+    }
+
+    public Boolean getAceitaMovimentoOposto() {
+        return aceitaMovimentoOposto;
+    }
+
+    public void setAceitaMovimentoOposto(Boolean aceitaMovimentoOposto) {
+        this.aceitaMovimentoOposto = aceitaMovimentoOposto;
     }
 
 }

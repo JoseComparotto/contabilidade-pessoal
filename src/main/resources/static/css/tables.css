@@ -1,0 +1,26 @@
+/* Tables and table containers */
+.table-wrap { background: #fff; border: 1px solid #e3e6ee; border-radius: 6px; padding: .5rem }
+table { width: 100%; border-collapse: collapse }
+thead th { text-align: left; padding: .6rem .8rem; border-bottom: 1px solid #eee; color: #333 }
+tbody td { padding: .6rem .8rem; border-bottom: 1px solid #f1f3f7 }
+
+/* Row semantic states */
+.sintetica td { font-weight: 700 }
+.redutora td { font-style: italic; }
+
+/* Clickable row pattern */
+.clickable-rows tbody tr { cursor: pointer; }
+.clickable-rows tbody tr:hover { background: #f8fafc; }
+.clickable-rows tbody td a {
+	display: block;
+	color: inherit;
+	text-decoration: none;
+	/* Expand the anchor to cover the cell padding area */
+	margin: -.6rem -.8rem;
+	padding: .6rem .8rem;
+}
+.clickable-rows tbody td a:focus {
+	outline: 2px solid #2563eb; /* accessible focus */
+	outline-offset: 2px;
+	border-radius: 4px;
+}
