@@ -55,6 +55,9 @@ public class Conta {
     @Column(name = "aceita_movimento_oposto")
     private Boolean aceitaMovimentoOposto;
 
+    @Column(name = "ativa")
+    private Boolean ativa;
+
     @Column(name = "created_by_system")
     private Boolean createdBySystem;
 
@@ -333,6 +336,19 @@ public class Conta {
 
     public void setAceitaMovimentoOposto(Boolean aceitaMovimentoOposto) {
         this.aceitaMovimentoOposto = aceitaMovimentoOposto;
+    }
+
+    public Boolean isAtiva() {
+        return ativa;
+    }
+
+    public void setAtiva(Boolean ativa) {
+        this.ativa = ativa;
+    }
+
+    @Override
+    public String toString() {
+        return getDisplayText();
     }
 
 }

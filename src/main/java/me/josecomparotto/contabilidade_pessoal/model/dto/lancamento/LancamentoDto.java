@@ -19,6 +19,10 @@ public class LancamentoDto implements IDto<Lancamento> {
     private ContaViewDto contaDebito;
     private ContaViewDto contaCredito;
 
+    private boolean deletable;
+
+    private String displayText;
+
     public Long getId() {
         return id;
     }
@@ -65,5 +69,26 @@ public class LancamentoDto implements IDto<Lancamento> {
 
     public void setContaCredito(ContaViewDto contaCredito) {
         this.contaCredito = contaCredito;
+    }
+
+    public boolean isDeletable() {
+        return deletable;
+    }
+
+    public void setDeletable(boolean deletable) {
+        this.deletable = deletable;
+    }
+
+    public String getDisplayText() {
+        return displayText;
+    }
+
+    public void setDisplayText(String displayText) {
+        this.displayText = displayText;
+    }
+
+    @Override
+    public String toString() {
+        return getDisplayText();
     }
 }

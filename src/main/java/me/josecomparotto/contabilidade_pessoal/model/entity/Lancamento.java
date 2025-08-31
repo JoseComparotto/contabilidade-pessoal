@@ -1,5 +1,6 @@
 package me.josecomparotto.contabilidade_pessoal.model.entity;
 
+import java.beans.Transient;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -83,6 +84,26 @@ public class Lancamento {
 
     public void setContaDebito(Conta contaDebito) {
         this.contaDebito = contaDebito;
+    }
+
+    @Transient
+    public String getDisplayText() {
+        return String.format("%s", descricao);
+    }
+
+    @Transient
+    public boolean isDeletable() {
+        // Regras consideradas:
+        // - Nem a conta de débito nem a conta de crédito podem estar inativas
+        if (contaDebito == null || contaCredito == null) {
+            return false;
+        }
+        return contaDebito.isAtiva() && contaCredito.isAtiva();
+    }
+
+    @Override
+    public String toString() {
+        return getDisplayText();
     }
 
 }

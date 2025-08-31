@@ -73,7 +73,7 @@ public class ContaWebController {
     // POST /contas[?redirect={redirectUrl}] (create)
     @PostMapping("/contas")
     public String criarConta(ContaNewDto contaDto, RedirectAttributes redirectAttrs,
-                              @RequestParam(name = "redirect", required = false) String redirectUrl) {
+            @RequestParam(name = "redirect", required = false, defaultValue = "/contas") String redirectUrl) {
         try {
             ContaViewDto criada = contasService.criarConta(contaDto);
             redirectAttrs.addFlashAttribute("success", "Conta criada com sucesso: " + criada.getCodigo());
@@ -85,7 +85,8 @@ public class ContaWebController {
     }
 
     private String sanitizeRedirect(String redirectUrl) {
-        if (redirectUrl == null || redirectUrl.isBlank()) return "/contas";
+        if (redirectUrl == null || redirectUrl.isBlank())
+            return "/contas";
         // Only allow relative paths within the app to avoid open redirects
         if (redirectUrl.startsWith("/") && !redirectUrl.startsWith("//")) {
             return redirectUrl;

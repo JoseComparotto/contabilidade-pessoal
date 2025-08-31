@@ -27,6 +27,8 @@ public class LancamentoMapper {
         dto.setDataCompetencia(lancamento.getDataCompetencia());
         dto.setContaCredito(ContaMapper.toViewDto(lancamento.getContaCredito()));
         dto.setContaDebito(ContaMapper.toViewDto(lancamento.getContaDebito()));
+        dto.setDeletable(lancamento.isDeletable());
+        dto.setDisplayText(lancamento.getDisplayText());
 
         return dto;
     }
@@ -83,6 +85,8 @@ public class LancamentoMapper {
         dto.setSentidoNatural(sentidoNatural);
         dto.setValorContabil(valorContabil);
         dto.setValorNatural(valorNatural);
+        dto.setDeletable(l.isDeletable());
+        dto.setDisplayText(l.getDisplayText());
         return dto;
     }
 }

@@ -17,12 +17,36 @@
         </div>
 
         <div class="form-card">
+            <div class="card-header">
+                <h2 th:text="${lancamento.displayText}"></h2>
+                <div class="actions">
+                    <form th:action="@{/lancamentos/{id}/delete(id=${lancamento.id})}" method="post"
+                        th:onsubmit="${lancamento.deletable} ? 'return confirm(\'Deseja excluir essa lancamento?\')' : 'return false;'"
+                        style="display:inline">
+                        <input type="hidden" name="_method" value="delete" />
+                        <input type="hidden" name="redirect" th:value="@{/contas/{id}(id=${lancamento.contaPartida.id})}" />
+                        <button type="submit" class="btn delete icon"
+                            th:classappend="${lancamento.deletable} ? '' : ' disabled'" th:disabled="${!lancamento.deletable}"
+                            aria-label="Excluir lancamento" title="Excluir lancamento">
+                            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                            <span class="sr-only">Excluir</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
             <div class="form-grid">
                 <div class="field">
                     <label>Conta (partida)</label>
                     <div class="input-link">
                         <input type="text" th:value="${lancamento.contaPartida.displayText}" disabled />
                         <a class="cover" th:href="@{/contas/{id}(id=${lancamento.contaPartida.id})}"><span class="sr-only">Abrir conta</span></a>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Conta (contrapartida)</label>
+                    <div class="input-link">
+                        <input type="text" th:value="${lancamento.contaContrapartida.displayText}" disabled />
+                        <a class="cover" th:href="@{/contas/{id}(id=${lancamento.contaContrapartida.id})}"><span class="sr-only">Abrir conta</span></a>
                     </div>
                 </div>
                 <div class="field">
@@ -40,13 +64,6 @@
                 <div class="field">
                     <label>Valor</label>
                     <input type="text" th:value="${lancamento.valorNaturalFormatado}" disabled />
-                </div>
-                <div class="field">
-                    <label>Conta (contrapartida)</label>
-                    <div class="input-link">
-                        <input type="text" th:value="${lancamento.contaContrapartida.displayText}" disabled />
-                        <a class="cover" th:href="@{/contas/{id}(id=${lancamento.contaContrapartida.id})}"><span class="sr-only">Abrir conta</span></a>
-                    </div>
                 </div>
             </div>
         </div>

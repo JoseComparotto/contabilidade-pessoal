@@ -2,6 +2,7 @@ package me.josecomparotto.contabilidade_pessoal.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,20 @@ public class LancamentoService {
 
         return partidas;
 
+    }
+
+    public boolean deletarLancamento(Long id) {
+        Optional<Lancamento> opt = lancamentoRepository.findById(id);
+        if (opt.isEmpty())
+            return false;
+        Lancamento l = opt.get();
+
+        if (!l.isDeletable()) {
+            throw new IllegalStateException("Lançamento não pode ser deletado");
+        }
+
+        lancamentoRepository.delete(l);
+        return true;
     }
 
 }

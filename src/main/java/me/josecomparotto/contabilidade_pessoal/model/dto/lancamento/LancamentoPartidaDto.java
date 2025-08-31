@@ -31,6 +31,10 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
     private BigDecimal valorContabil; // negativo quando sentidoContabil = DEBITO
     private BigDecimal valorNatural; // negativo quando o sentidoContabil for contra a natureza da conta de partida
 
+    private boolean deletable;
+
+    private String displayText;
+
     public Long getId() {
         return id;
     }
@@ -119,4 +123,24 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
         return dataCompetencia.format(fmt);
     }
 
+    public boolean isDeletable() {
+        return deletable;
+    }
+
+    public void setDeletable(boolean deletable) {
+        this.deletable = deletable;
+    }
+
+    public String getDisplayText() {
+        return displayText;
+    }
+
+    public void setDisplayText(String displayText) {
+        this.displayText = displayText;
+    }
+
+    @Override
+    public String toString() {
+        return getDisplayText();
+    }
 }
