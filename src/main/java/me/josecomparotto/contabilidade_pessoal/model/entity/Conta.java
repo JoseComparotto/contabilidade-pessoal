@@ -257,6 +257,15 @@ public class Conta {
         return superior;
     }
 
+    /**
+     * Define a conta superior.
+     * <p>
+     * Atenção: Este método propaga automaticamente o valor da propriedade
+     * aceitaMovimentoOposto da conta superior para esta conta, caso a conta superior não seja nula.
+     * Esse efeito colateral pode impactar regras de negócio e deve ser considerado ao utilizar este setter.
+     *
+     * @param superior a conta superior a ser definida
+     */
     public void setSuperior(Conta superior) {
         this.superior = superior;
 
