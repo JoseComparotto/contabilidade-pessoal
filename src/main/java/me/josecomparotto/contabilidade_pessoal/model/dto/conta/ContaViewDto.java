@@ -1,40 +1,38 @@
 package me.josecomparotto.contabilidade_pessoal.model.dto.conta;
 
-import java.util.List;
-import java.beans.Transient;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 
-public class ContaFlatDto implements IDto<Conta> {
+public class ContaViewDto implements IDto<Conta> {
     private Integer id;
     private String codigo;
     private String descricao;
     private String displayText;
-    private Integer superiorId;
+    private BigDecimal saldoAtual;
     private Natureza natureza;
     private TipoConta tipo;
-    private Boolean redutora;
-    private Boolean aceitaMovimentoOposto;
+    private boolean redutora;
+    private boolean aceitaMovimentoOposto;
     private boolean editable;
     private boolean deletable;
     private Set<String> editableProperties;
 
-    // saldo atual (pode ser nulo se não calculado/populado)
-    private BigDecimal saldoAtual;
+    @JsonIgnoreProperties({ "superior", "inferiores" })
+    private ContaViewDto superior;
 
-    @JsonIgnore
-    private List<Integer> path;
-
-    public ContaFlatDto() {}
+    @JsonIgnoreProperties({ "superior", "inferiores" })
+    private List<ContaViewDto> inferiores;
 
     public Integer getId() {
         return id;
@@ -68,20 +66,21 @@ public class ContaFlatDto implements IDto<Conta> {
         this.displayText = displayText;
     }
 
-    public Integer getSuperiorId() {
-        return superiorId;
+    public BigDecimal getSaldoAtual() {
+        return saldoAtual;
     }
 
-    public void setSuperiorId(Integer superiorId) {
-        this.superiorId = superiorId;
+    @JsonIgnore
+    public String getSaldoAtualFormatado() {
+        if (saldoAtual == null || BigDecimal.ZERO.compareTo(saldoAtual) == 0) {
+            return "R$ 0,00";
+        }
+        NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
+        return nf.format(saldoAtual);
     }
 
-    public List<Integer> getPath() {
-        return path;
-    }
-
-    public void setPath(List<Integer> path) {
-        this.path = path;
+    public void setSaldoAtual(BigDecimal saldoAtual) {
+        this.saldoAtual = saldoAtual;
     }
 
     public Natureza getNatureza() {
@@ -100,22 +99,20 @@ public class ContaFlatDto implements IDto<Conta> {
         this.tipo = tipo;
     }
 
-    public BigDecimal getSaldoAtual() {
-        return saldoAtual;
+    public boolean isRedutora() {
+        return redutora;
     }
 
-    public void setSaldoAtual(BigDecimal saldoAtual) {
-        this.saldoAtual = saldoAtual;
+    public void setRedutora(boolean redutora) {
+        this.redutora = redutora;
     }
 
-    @Transient
-    @JsonIgnore
-    public String getSaldoAtualFormatado() {
-        if (saldoAtual == null) {
-            return "R$ 0,00";
-        }
-    NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
-        return nf.format(saldoAtual);
+    public boolean isAceitaMovimentoOposto() {
+        return aceitaMovimentoOposto;
+    }
+
+    public void setAceitaMovimentoOposto(boolean aceitaMovimentoOposto) {
+        this.aceitaMovimentoOposto = aceitaMovimentoOposto;
     }
 
     public boolean isEditable() {
@@ -137,24 +134,24 @@ public class ContaFlatDto implements IDto<Conta> {
     public Set<String> getEditableProperties() {
         return editableProperties;
     }
-    
+
     public void setEditableProperties(Set<String> editableProperties) {
         this.editableProperties = editableProperties;
     }
 
-    public Boolean getRedutora() {
-        return redutora;
+    public ContaViewDto getSuperior() {
+        return superior;
     }
 
-    public void setRedutora(Boolean redutora) {
-        this.redutora = redutora;
+    public void setSuperior(ContaViewDto superior) {
+        this.superior = superior;
     }
 
-    public Boolean getAceitaMovimentoOposto() {
-        return aceitaMovimentoOposto;
+    public List<ContaViewDto> getInferiores() {
+        return inferiores;
     }
 
-    public void setAceitaMovimentoOposto(Boolean aceitaMovimentoOposto) {
-        this.aceitaMovimentoOposto = aceitaMovimentoOposto;
+    public void setInferiores(List<ContaViewDto> inferiores) {
+        this.inferiores = inferiores;
     }
 }

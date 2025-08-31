@@ -3,7 +3,7 @@
   "info": {
     "title": "Contabilidade Pessoal API",
     "version": "0.1.0",
-    "description": "API para gerenciamento e consulta de contas contábeis.\n\nObservações:\n- O parâmetro de consulta `view` controla a forma de retorno: `flat` (padrão) ou `tree`.\n- Em `flat`, os itens seguem a estrutura de `ContaFlatDto`.\n- Em `tree`, os itens seguem a estrutura de `ContaTreeDto` (recursiva via `inferiores`)."
+    "description": "API para gerenciamento e consulta de contas contábeis."
   },
   "servers": [
     {
@@ -89,42 +89,16 @@
         ],
         "summary": "Listar contas",
         "operationId": "listarContas",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "view",
-            "description": "Define a forma de visualização dos dados",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "flat",
-                "tree"
-              ],
-              "default": "flat"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Lista de contas",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/ContaFlatDto"
-                      }
-                    },
-                    {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/ContaTreeDto"
-                      }
-                    }
-                  ]
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContaViewDto"
+                  }
                 }
               }
             }
@@ -153,7 +127,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ContaFlatDto"
+                  "$ref": "#/components/schemas/ContaViewDto"
                 }
               }
             }
@@ -178,20 +152,6 @@
               "type": "integer",
               "format": "int32"
             }
-          },
-          {
-            "name": "view",
-            "in": "query",
-            "description": "Define a forma de visualização do retorno",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "flat",
-                "tree"
-              ],
-              "default": "flat"
-            }
           }
         ],
         "responses": {
@@ -200,14 +160,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ContaFlatDto"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ContaTreeDto"
-                    }
-                  ]
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContaViewDto"
+                  }
                 }
               }
             }
@@ -251,7 +207,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ContaFlatDto"
+                  "$ref": "#/components/schemas/ContaViewDto"
                 }
               }
             }
@@ -315,21 +271,50 @@
       "SentidoOperacao": {
         "type": "string",
         "description": "Sentido da operação em relação à conta de partida",
-        "enum": ["DEBITO", "CREDITO"]
+        "enum": [
+          "DEBITO",
+          "CREDITO"
+        ]
       },
       "LancamentoPartidaDto": {
         "type": "object",
         "description": "Representação de um lançamento a partir da perspectiva de uma conta de partida (gerando duas visões por lançamento)",
         "properties": {
-          "id": { "type": "integer", "format": "int64" },
-          "descricao": { "type": "string" },
-          "dataCompetencia": { "type": "string", "format": "date" },
-          "contaPartida": { "$ref": "#/components/schemas/ContaFlatDto" },
-          "contaContrapartida": { "$ref": "#/components/schemas/ContaFlatDto" },
-          "sentido": { "$ref": "#/components/schemas/SentidoOperacao" },
-          "valorMatematico": { "type": "number", "format": "double", "description": "Negativo quando sentido = DEBITO" }
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "descricao": {
+            "type": "string"
+          },
+          "dataCompetencia": {
+            "type": "string",
+            "format": "date"
+          },
+          "contaPartida": {
+            "$ref": "#/components/schemas/ContaViewDto"
+          },
+          "contaContrapartida": {
+            "$ref": "#/components/schemas/ContaViewDto"
+          },
+          "sentido": {
+            "$ref": "#/components/schemas/SentidoOperacao"
+          },
+          "valorMatematico": {
+            "type": "number",
+            "format": "double",
+            "description": "Negativo quando sentido = DEBITO"
+          }
         },
-        "required": ["id", "descricao", "dataCompetencia", "contaPartida", "contaContrapartida", "sentido", "valorMatematico"]
+        "required": [
+          "id",
+          "descricao",
+          "dataCompetencia",
+          "contaPartida",
+          "contaContrapartida",
+          "sentido",
+          "valorMatematico"
+        ]
       },
       "LancamentoDto": {
         "type": "object",
@@ -351,10 +336,10 @@
             "format": "date"
           },
           "contaDebito": {
-            "$ref": "#/components/schemas/ContaFlatDto"
+            "$ref": "#/components/schemas/ContaViewDto"
           },
           "contaCredito": {
-            "$ref": "#/components/schemas/ContaFlatDto"
+            "$ref": "#/components/schemas/ContaViewDto"
           }
         },
         "required": [
@@ -400,7 +385,7 @@
           },
           "redutora": {
             "type": "boolean",
-            "default":false
+            "default": false
           }
         },
         "required": [
@@ -421,7 +406,7 @@
           },
           "redutora": {
             "type": "boolean",
-            "default":false
+            "default": false
           }
         },
         "required": [
@@ -429,7 +414,7 @@
           "tipo"
         ]
       },
-      "ContaFlatDto": {
+      "ContaViewDto": {
         "type": "object",
         "description": "Representação plana de uma conta",
         "properties": {
@@ -487,76 +472,16 @@
           },
           "tipo": {
             "$ref": "#/components/schemas/TipoConta"
-          }
-        },
-        "required": [
-          "id",
-          "codigo",
-          "descricao",
-          "natureza",
-          "tipo"
-        ]
-      },
-      "ContaTreeDto": {
-        "type": "object",
-        "description": "Representação hierárquica de uma conta com seus filhos",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
           },
-          "codigo": {
-            "type": "string",
-            "description": "Código calculado a partir do caminho (ex. \"1.2.3\")"
-          },
-          "descricao": {
-            "type": "string"
-          },
-          "displayText": {
-            "type": "string",
-            "description": "Texto de exibição combinado (ex.: código + descrição)"
-          },
-          "natureza": {
-            "$ref": "#/components/schemas/Natureza"
-          },
-          "tipo": {
-            "$ref": "#/components/schemas/TipoConta"
-          },
-          "redutora": {
-            "type": "boolean",
-            "description": "Indica se a natureza da conta é oposta a de sua raiz."
-          },
-          "aceitaMovimentoOposto": {
-            "type": "boolean",
-            "description": "Indica se a conta aceita movimentos contrários à sua natureza."
+          "superior": {
+            "$ref": "#/components/schemas/ContaViewDto"
           },
           "inferiores": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ContaTreeDto"
+              "$ref": "#/components/schemas/ContaViewDto"
             },
             "description": "Contas filhas"
-          },
-          "saldoAtual": {
-            "type": "number",
-            "format": "double",
-            "description": "Saldo atual da conta (pode ser nulo se não calculado)",
-            "nullable": true
-          },
-          "editable": {
-            "type": "boolean",
-            "description": "Indica se a conta pode ser editada"
-          },
-          "deletable": {
-            "type": "boolean",
-            "description": "Indica se a conta pode ser deletada"
-          },
-          "editableProperties": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Lista de propriedades que podem ser editadas"
           }
         },
         "required": [

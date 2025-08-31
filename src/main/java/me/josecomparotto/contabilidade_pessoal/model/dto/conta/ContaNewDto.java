@@ -37,7 +37,7 @@ public class ContaNewDto implements IDto<Conta> {
         this.tipo = tipo;
     }
 
-    public Boolean getRedutora() {
+    public Boolean isRedutora() {
         return redutora;
     }
 

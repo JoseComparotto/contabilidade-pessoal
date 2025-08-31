@@ -10,7 +10,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import me.josecomparotto.contabilidade_pessoal.application.mapper.ContaMapper;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 import me.josecomparotto.contabilidade_pessoal.service.ContaService;
@@ -24,14 +24,14 @@ public class ContaWebController {
     // GET /contas
     @GetMapping("/contas")
     public String listarContas(Model model) {
-        model.addAttribute("contas", contasService.listarContasFlat());
+        model.addAttribute("contas", contasService.listarContas());
         return "contas/list";
     }
 
     // GET /contas/{id}
     @GetMapping("/contas/{id}")
     public String detalhesConta(@PathVariable Integer id, Model model, RedirectAttributes redirectAttrs) {
-        ContaFlatDto dto = contasService.obterContaFlat(id);
+        ContaViewDto dto = contasService.obterContaPorId(id);
         if (dto == null) {
             redirectAttrs.addFlashAttribute("error", "Conta não encontrada.");
             return "redirect:/contas";
@@ -54,7 +54,7 @@ public class ContaWebController {
     @PostMapping("/contas")
     public String criarConta(ContaNewDto contaDto, RedirectAttributes redirectAttrs) {
         try {
-            ContaFlatDto criada = contasService.criarConta(contaDto);
+            ContaViewDto criada = contasService.criarConta(contaDto);
             redirectAttrs.addFlashAttribute("success", "Conta criada com sucesso: " + criada.getCodigo());
             return "redirect:/contas";
         } catch (Exception e) {
@@ -66,7 +66,7 @@ public class ContaWebController {
     // GET /contas/{id}/edit
     @GetMapping("/contas/{id}/edit")
     public String editarConta(@PathVariable Integer id, Model model, RedirectAttributes redirectAttrs) {
-        ContaFlatDto dto = contasService.obterContaFlat(id);
+        ContaViewDto dto = contasService.obterContaPorId(id);
         if (dto == null) {
             redirectAttrs.addFlashAttribute("error", "Conta não encontrada.");
             return "redirect:/contas";
@@ -80,7 +80,7 @@ public class ContaWebController {
 
     // POST /contas/{id}/edit
     @PostMapping("/contas/{id}/edit")
-    public String salvarEdicao(@PathVariable Integer id, ContaFlatDto contaDto, RedirectAttributes redirectAttrs) {
+    public String salvarEdicao(@PathVariable Integer id, ContaViewDto contaDto, RedirectAttributes redirectAttrs) {
         try {
             ContaEditDto editDto = ContaMapper.toEditDto(contaDto);
             contasService.atualizarConta(id, editDto);

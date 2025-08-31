@@ -22,7 +22,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Flattened view renders a list of ContaFlatDto which has id, codigo, descricao, natureza, tipo -->
+                    <!-- Flattened view renders a list of ContaViewDto which has id, codigo, descricao, natureza, tipo -->
                     <tr th:each="c : ${contas}" th:object="${c}" th:classappend="(${c.tipo.name() == 'SINTETICA'} ? 'sintetica ' : '') 
                    + (${c.redutora} ? 'redutora' : '')">
                         <td th:text="*{codigo != null ? codigo : (id != null ? id : '')}">1</td>

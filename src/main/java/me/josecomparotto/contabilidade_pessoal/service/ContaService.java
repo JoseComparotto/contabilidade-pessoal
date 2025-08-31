@@ -1,8 +1,6 @@
 package me.josecomparotto.contabilidade_pessoal.service;
 
 import java.beans.PropertyDescriptor;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,11 +14,9 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.stereotype.Service;
 
 import me.josecomparotto.contabilidade_pessoal.application.mapper.ContaMapper;
-import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaTreeDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 import me.josecomparotto.contabilidade_pessoal.repository.ContaRepository;
@@ -31,43 +27,9 @@ public class ContaService {
     @Autowired
     private ContaRepository contaRepository;
 
-    public List<Conta> listarContas() {
-        return contaRepository.findAll();
-    }
-
-    public List<? extends IDto<Conta>> listarContasPorView(String view) {
-        if (view == null || "flat".equalsIgnoreCase(view)) {
-            return listarContasFlat();
-        } else if ("tree".equalsIgnoreCase(view)) {
-            return listarContasTree();
-        } else {
-            throw new IllegalArgumentException("Visualização não suportada: " + view);
-        }
-    }
-
-    public List<ContaTreeDto> listarContasTree() {
+    public List<ContaViewDto> listarContas() {
         List<Conta> all = contaRepository.findAllWithSuperior();
-
-        Map<Integer, Integer> seqMap = new HashMap<>();
-        for (Conta c : all) {
-            seqMap.put(c.getId(), c.getSequencia());
-        }
-
-        List<ContaTreeDto> roots = new ArrayList<>();
-        for (Conta c : all) {
-            if (c.getSuperior() == null) {
-                roots.add(ContaMapper.toTreeDto(c));
-            }
-        }
-
-        // Ordenar raízes e filhos por sequencia
-        ordenarArvore(roots, seqMap);
-        return roots;
-    }
-
-    public List<ContaFlatDto> listarContasFlat() {
-        List<Conta> all = contaRepository.findAllWithSuperior();
-        List<ContaFlatDto> list = ContaMapper.toFlatList(all);
+        List<ContaViewDto> list = ContaMapper.toViewList(all);
 
         // Map para navegar a cadeia de superiores sem novas consultas
         Map<Integer, Conta> byId = new HashMap<>();
@@ -75,49 +37,33 @@ public class ContaService {
             byId.put(c.getId(), c);
         }
 
+        // Preencher o campo 'path' de cada conta
+        Map<Integer, List<Integer>> pathMap = new HashMap<>();
+        for (Conta c : all) {
+            pathMap.put(c.getId(), c.getPath());
+        }
+
         // Ordenar lexicograficamente por caminho de sequencias (ex.: [1], [1,1], [1,2],
         // [2])
         list.sort((a, b) -> comparePaths(
-                a.getPath(),
-                b.getPath()));
+                pathMap.get(a.getId()),
+                pathMap.get(b.getId())));
         return list;
     }
 
-    public List<ContaFlatDto> listarContasSinteticas() {
-        return listarContasFlat().stream()
+    public List<ContaViewDto> listarContasSinteticas() {
+        return listarContas().stream()
                 .filter(c -> c.getTipo() == TipoConta.SINTETICA)
                 .toList();
     }
 
-    public IDto<Conta> obterContaPorIdPorView(Integer id, String view) {
-        if ("tree".equalsIgnoreCase(view)) {
-            return obterContaTree(id);
-        }
-        return obterContaFlat(id);
-    }
-
-    public ContaFlatDto obterContaFlat(Integer id) {
+    public ContaViewDto obterContaPorId(Integer id) {
         Optional<Conta> opt = contaRepository.findByIdWithSuperior(id);
         if (opt.isEmpty())
             return null;
         Conta c = opt.get();
-        ContaFlatDto dto = ContaMapper.toFlatDto(c);
+        ContaViewDto dto = ContaMapper.toViewDto(c);
         return dto;
-    }
-
-    public ContaTreeDto obterContaTree(Integer id) {
-        // Para uma conta específica em árvore, retornamos o nó com filhos montados.
-        // Estratégia simples: carregar todos e montar árvore, então pegar o nó pelo id.
-        List<ContaTreeDto> arvore = listarContasTree();
-        // indexar por id
-        Map<Integer, ContaTreeDto> index = new HashMap<>();
-        List<ContaTreeDto> stack = new ArrayList<>(arvore);
-        while (!stack.isEmpty()) {
-            ContaTreeDto node = stack.remove(stack.size() - 1);
-            index.put(node.getId(), node);
-            stack.addAll(node.getInferiores());
-        }
-        return index.get(id);
     }
 
     // Compara dois caminhos lexicograficamente
@@ -137,15 +83,6 @@ public class ContaService {
         return Integer.compare(a.size(), b.size());
     }
 
-    private void ordenarArvore(List<ContaTreeDto> nodes, Map<Integer, Integer> seqMap) {
-        nodes.sort(Comparator
-                .comparing((ContaTreeDto n) -> seqMap.getOrDefault(n.getId(), Integer.MAX_VALUE))
-                .thenComparing(ContaTreeDto::getId));
-        for (ContaTreeDto n : nodes) {
-            ordenarArvore(n.getInferiores(), seqMap);
-        }
-    }
-
     public boolean deletarContaPorId(Integer id) {
         Optional<Conta> opt = contaRepository.findById(id);
         if (opt.isEmpty())
@@ -160,7 +97,7 @@ public class ContaService {
         return true;
     }
 
-    public ContaFlatDto criarConta(ContaNewDto contaDto) {
+    public ContaViewDto criarConta(ContaNewDto contaDto) {
 
         // Validar dados iniciais da conta
         if(contaDto.getDescricao() == null || contaDto.getDescricao().trim().isEmpty()) {
@@ -190,6 +127,9 @@ public class ContaService {
                 contaDto.setRedutora(true);
             }
 
+            // Definir se a conta é redutora
+            conta.setRedutora(contaDto.isRedutora());
+
             // Definir sequencia como o próximo número disponível entre os inferiores
             int nextSeq = 1;
             for (Conta inf : sup.getInferiores()) {
@@ -206,10 +146,10 @@ public class ContaService {
         // Salvar para gerar ID e código
         conta = contaRepository.save(conta);
 
-        return ContaMapper.toFlatDto(conta);
+        return ContaMapper.toViewDto(conta);
     }
 
-    public ContaFlatDto atualizarConta(Integer id, ContaEditDto contaDto) {
+    public ContaViewDto atualizarConta(Integer id, ContaEditDto contaDto) {
         Optional<Conta> opt = contaRepository.findById(id);
         if (opt.isEmpty()) {
             throw new IllegalArgumentException("Conta não encontrada: " + id);
@@ -267,7 +207,7 @@ public class ContaService {
 
         // Salvar alterações
         conta = contaRepository.save(conta);
-        return ContaMapper.toFlatDto(conta);
+        return ContaMapper.toViewDto(conta);
     }
 
 }

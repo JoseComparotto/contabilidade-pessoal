@@ -30,13 +30,13 @@
                 </div>
                 <div class="field">
                     <label>Conta superior</label>
-                    <div class="input-link" th:if="${conta.superiorId != null}">
-                        <input type="text" disabled value="Conta Superior" />
-                        <a class="cover" th:href="@{/contas/{id}(id=${conta.superiorId})}">
+                    <div class="input-link" th:if="${conta.superior != null}">
+                        <input type="text" disabled th:value="${conta.superior.displayText}" />
+                        <a class="cover" th:href="@{/contas/{id}(id=${conta.superior.id})}">
                             <span class="sr-only">Abrir detalhes da conta superior</span>
                         </a>
                     </div>
-                    <input th:if="${conta.superiorId == null}" type="text" value="—" disabled />
+                    <input th:if="${conta.superior == null}" type="text" value="—" disabled />
                 </div>
             </div>
 

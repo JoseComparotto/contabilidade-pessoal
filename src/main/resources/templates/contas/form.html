@@ -13,7 +13,7 @@
         </div>
 
         <div class="form-card">
-            <!-- Create mode uses ContaNewDto; Edit mode uses ContaFlatDto -->
+            <!-- Create mode uses ContaNewDto; Edit mode uses ContaViewDto -->
             <form th:action="${mode} == 'edit' ? @{'/contas/' + ${conta.id} + '/edit'} : @{/contas}" method="post"
                 th:with="
                     canEditDescricao=${mode == 'edit' ? conta.editableProperties.contains('descricao') : true},
@@ -37,7 +37,7 @@
 
                     <!-- Conta superior -->
                     <div th:replace="~{fragments/form-controls :: selectField(
-                        'superiorId', 'superiorId', 'Conta superior', ${contas}, ${conta.superiorId},
+                        'superior.id', 'superior.id', 'Conta superior', ${contas}, ${mode == 'edit' ? conta.superior.id : null},
                         true, ${isSelectDisabled}, 'Selecione…', 'A nova conta será criada como filha da conta selecionada.', true)
                     }"></div>
 

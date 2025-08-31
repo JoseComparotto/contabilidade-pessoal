@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaFlatDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoOperacao;
 
@@ -14,8 +14,8 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
     private String descricao;
     private LocalDate dataCompetencia;
 
-    private ContaFlatDto contaPartida;
-    private ContaFlatDto contaContrapartida;
+    private ContaViewDto contaPartida;
+    private ContaViewDto contaContrapartida;
 
     private SentidoOperacao sentido;
     private BigDecimal valorMatematico; // negativo quando sentido = DEBITO
@@ -44,19 +44,19 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
         this.dataCompetencia = dataCompetencia;
     }
 
-    public ContaFlatDto getContaPartida() {
+    public ContaViewDto getContaPartida() {
         return contaPartida;
     }
 
-    public void setContaPartida(ContaFlatDto contaPartida) {
+    public void setContaPartida(ContaViewDto contaPartida) {
         this.contaPartida = contaPartida;
     }
 
-    public ContaFlatDto getContaContrapartida() {
+    public ContaViewDto getContaContrapartida() {
         return contaContrapartida;
     }
 
-    public void setContaContrapartida(ContaFlatDto contaContrapartida) {
+    public void setContaContrapartida(ContaViewDto contaContrapartida) {
         this.contaContrapartida = contaContrapartida;
     }
 
