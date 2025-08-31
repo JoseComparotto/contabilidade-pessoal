@@ -9,7 +9,7 @@ import me.josecomparotto.contabilidade_pessoal.application.mapper.LancamentoMapp
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoDto;
 import me.josecomparotto.contabilidade_pessoal.repository.LancamentoRepository;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
-import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoOperacao;
+import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 
 @Service
 public class LancamentoService {
@@ -25,9 +25,9 @@ public class LancamentoService {
         return LancamentoMapper.toDtoList(lancamentoRepository.findAll());
     }
 
-    public List<LancamentoPartidaDto> listarLancamentosPartidas(SentidoOperacao sentido) {
+    public List<LancamentoPartidaDto> listarLancamentosPartidas(SentidoContabil sentidoContabil) {
     return lancamentoRepository.findAll().stream()
-        .map(l -> sentido == SentidoOperacao.DEBITO
+        .map(l -> sentidoContabil == SentidoContabil.DEBITO
             ? LancamentoMapper.toPartidaDebito(l)
             : LancamentoMapper.toPartidaCredito(l))
         .toList();
@@ -38,9 +38,9 @@ public class LancamentoService {
                 .orElseThrow(() -> new IllegalArgumentException("Lançamento não encontrado")));
     }
 
-    public LancamentoPartidaDto obterLancamentoPartidaPorId(Long id, SentidoOperacao sentido) {
+    public LancamentoPartidaDto obterLancamentoPartidaPorId(Long id, SentidoContabil sentidoContabil) {
     return lancamentoRepository.findById(id)
-        .map(l -> sentido == SentidoOperacao.DEBITO
+        .map(l -> sentidoContabil == SentidoContabil.DEBITO
             ? LancamentoMapper.toPartidaDebito(l)
             : LancamentoMapper.toPartidaCredito(l))
         .orElseThrow(() -> new IllegalArgumentException("Lançamento não encontrado"));

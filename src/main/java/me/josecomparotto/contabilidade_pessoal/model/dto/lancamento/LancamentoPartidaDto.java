@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
-import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoOperacao;
+import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 
 public class LancamentoPartidaDto implements IDto<Lancamento> {
 
@@ -26,9 +26,9 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
     @JsonIgnoreProperties({ "superior", "inferiores", "lancamentos" })
     private ContaViewDto contaContrapartida;
 
-    private SentidoOperacao sentido;
-    private BigDecimal valorContabil; // negativo quando sentido = DEBITO
-    private BigDecimal valorNatural; // negativo quando o sentido for contra a natureza da conta de partida
+    private SentidoContabil sentidoContabil;    
+    private BigDecimal valorContabil; // negativo quando sentidoContabil = DEBITO
+    private BigDecimal valorNatural; // negativo quando o sentidoContabil for contra a natureza da conta de partida
 
     public Long getId() {
         return id;
@@ -70,12 +70,12 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
         this.contaContrapartida = contaContrapartida;
     }
 
-    public SentidoOperacao getSentido() {
-        return sentido;
+    public SentidoContabil getSentidoContabil() {
+        return sentidoContabil;
     }
 
-    public void setSentido(SentidoOperacao sentido) {
-        this.sentido = sentido;
+    public void setSentidoContabil(SentidoContabil sentidoContabil) {
+        this.sentidoContabil = sentidoContabil;
     }
 
     public BigDecimal getValorContabil() {

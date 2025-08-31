@@ -7,7 +7,7 @@ import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoDt
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
-import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoOperacao;
+import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 
 public class LancamentoMapper {
 
@@ -45,7 +45,7 @@ public class LancamentoMapper {
         dto.setDataCompetencia(l.getDataCompetencia());
         dto.setContaPartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaDebito()));
         dto.setContaContrapartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaCredito()));
-        dto.setSentido(SentidoOperacao.DEBITO);
+        dto.setSentidoContabil(SentidoContabil.DEBITO);
         dto.setValorContabil(l.getValor() == null ? null : l.getValor().negate());
         dto.setValorNatural(Natureza.DEVEDORA.equals(l.getContaDebito().getNatureza()) ? l.getValor() : l.getValor() == null ? null : l.getValor().negate());
         return dto;
@@ -59,7 +59,7 @@ public class LancamentoMapper {
         dto.setDataCompetencia(l.getDataCompetencia());
         dto.setContaPartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaCredito()));
         dto.setContaContrapartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaDebito()));
-        dto.setSentido(SentidoOperacao.CREDITO);
+        dto.setSentidoContabil(SentidoContabil.CREDITO);
         dto.setValorContabil(l.getValor());
         dto.setValorNatural(Natureza.CREDORA.equals(l.getContaCredito().getNatureza()) ? l.getValor() : l.getValor() == null ? null : l.getValor().negate());
         return dto;

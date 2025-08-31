@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoOperacao;
+import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 import me.josecomparotto.contabilidade_pessoal.service.LancamentoService;
 
 @Controller
@@ -16,24 +16,24 @@ public class LancamentoWebController {
     @Autowired
     private LancamentoService lancamentoService;
 
-    // GET /lancamentos?sentido=DEBITO|CREDITO (default: CREDITO)
+    // GET /lancamentos?sentidoContabil=DEBITO|CREDITO (default: CREDITO)
     @GetMapping("/lancamentos")
     public String listarLancamentos(
             Model model,
-            @RequestParam(name = "sentido", required = false, defaultValue = "CREDITO") SentidoOperacao sentido) {
-        model.addAttribute("sentido", sentido);
-        model.addAttribute("lancamentos", lancamentoService.listarLancamentosPartidas(sentido));
+            @RequestParam(name = "sentidoContabil", required = false, defaultValue = "CREDITO") SentidoContabil sentidoContabil) {
+        model.addAttribute("sentidoContabil", sentidoContabil);
+        model.addAttribute("lancamentos", lancamentoService.listarLancamentosPartidas(sentidoContabil));
         return "lancamentos/list";
     }
 
-    // GET /lancamentos/{id}?sentido=DEBITO|CREDITO
+    // GET /lancamentos/{id}?sentidoContabil=DEBITO|CREDITO
     @GetMapping("/lancamentos/{id}")
     public String detalhesLancamento(
             @PathVariable Long id,
-            @RequestParam(name = "sentido", required = false, defaultValue = "CREDITO") SentidoOperacao sentido,
+            @RequestParam(name = "sentidoContabil", required = false, defaultValue = "CREDITO") SentidoContabil sentidoContabil,
             Model model) {
-        model.addAttribute("sentido", sentido);
-        model.addAttribute("lancamento", lancamentoService.obterLancamentoPartidaPorId(id, sentido));
+        model.addAttribute("sentidoContabil", sentidoContabil);
+        model.addAttribute("lancamento", lancamentoService.obterLancamentoPartidaPorId(id, sentidoContabil));
         return "lancamentos/detail";
     }
 }

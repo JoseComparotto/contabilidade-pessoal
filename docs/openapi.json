@@ -268,7 +268,7 @@
   },
   "components": {
     "schemas": {
-      "SentidoOperacao": {
+      "SentidoContabil": {
         "type": "string",
         "description": "Sentido da operação em relação à conta de partida",
         "enum": [
@@ -297,13 +297,13 @@
           "contaContrapartida": {
             "$ref": "#/components/schemas/ContaViewDto"
           },
-          "sentido": {
-            "$ref": "#/components/schemas/SentidoOperacao"
+          "sentidoContabil": {
+            "$ref": "#/components/schemas/SentidoContabil"
           },
           "valorContabil": {
             "type": "number",
             "format": "double",
-            "description": "Negativo quando sentido = DEBITO"
+            "description": "Negativo quando sentidoContabil = DEBITO"
           }
         },
         "required": [
@@ -312,7 +312,7 @@
           "dataCompetencia",
           "contaPartida",
           "contaContrapartida",
-          "sentido",
+          "sentidoContabil",
           "valorContabil"
         ]
       },

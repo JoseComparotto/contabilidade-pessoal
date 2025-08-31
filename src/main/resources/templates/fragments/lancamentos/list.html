@@ -13,13 +13,13 @@
             <tbody>
                 <tr th:each="l : ${items}" th:object="${l}">
                     <td>
-                        <a th:href="@{/lancamentos/{id}(id=*{id},sentido=*{sentido})}" th:text="*{dataCompetenciaFormatada}">01/01/2024</a>
+                        <a th:href="@{/lancamentos/{id}(id=*{id},sentidoContabil=*{sentidoContabil})}" th:text="*{dataCompetenciaFormatada}">01/01/2024</a>
                     </td>
                     <td>
-                        <a th:href="@{/lancamentos/{id}(id=*{id},sentido=*{sentido})}" th:text="*{descricao}">Descrição</a>
+                        <a th:href="@{/lancamentos/{id}(id=*{id},sentidoContabil=*{sentidoContabil})}" th:text="*{descricao}">Descrição</a>
                     </td>
                     <td>
-                        <a th:href="@{/lancamentos/{id}(id=*{id},sentido=*{sentido})}" th:text="*{valorNaturalFormatado}">R$ 0,00</a>
+                        <a th:href="@{/lancamentos/{id}(id=*{id},sentidoContabil=*{sentidoContabil})}" th:text="*{valorNaturalFormatado}">R$ 0,00</a>
                     </td>
                     <td>
                         <a th:href="@{/contas/{id}(id=*{contaContrapartida.id})}" th:text="*{contaContrapartida.displayText}">Contrapartida</a>

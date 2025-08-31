@@ -10,8 +10,8 @@
             <h1>Lançamentos</h1>
             <div class="actions">
                 <div class="segmented-group">
-                    <a class="btn segmented" th:classappend="${sentido.name() == 'DEBITO'} ? ' primary' : ''" th:href="@{/lancamentos(sentido='DEBITO')}">Débitos</a>
-                    <a class="btn segmented" th:classappend="${sentido.name() == 'CREDITO'} ? ' primary' : ''" th:href="@{/lancamentos(sentido='CREDITO')}">Créditos</a>
+                    <a class="btn segmented" th:classappend="${sentidoContabil.name() == 'DEBITO'} ? ' primary' : ''" th:href="@{/lancamentos(sentidoContabil='DEBITO')}">Débitos</a>
+                    <a class="btn segmented" th:classappend="${sentidoContabil.name() == 'CREDITO'} ? ' primary' : ''" th:href="@{/lancamentos(sentidoContabil='CREDITO')}">Créditos</a>
                 </div>
             </div>
         </div>
