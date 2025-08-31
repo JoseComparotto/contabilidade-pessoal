@@ -6,87 +6,16 @@
     "description": "API para gerenciamento e consulta de contas contábeis."
   },
   "servers": [
-    {
-      "url": "/api",
-      "description": "Servidor local"
-    }
+    { "url": "/api", "description": "Servidor local" }
   ],
   "tags": [
-    {
-      "name": "Contas",
-      "description": "Endpoints de consulta de contas"
-    },
-    {
-      "name": "Lançamentos",
-      "description": "Endpoints de leitura de lançamentos"
-    }
+    { "name": "Contas", "description": "Endpoints de consulta e manutenção de contas" },
+    { "name": "Lançamentos", "description": "Endpoints de leitura de lançamentos" }
   ],
   "paths": {
-    "/lancamentos": {
-      "get": {
-        "tags": [
-          "Lançamentos"
-        ],
-        "summary": "Listar lançamentos",
-        "operationId": "listarLancamentos",
-        "responses": {
-          "200": {
-            "description": "Lista de lançamentos",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LancamentoDto"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/lancamentos/{id}": {
-      "get": {
-        "tags": [
-          "Lançamentos"
-        ],
-        "summary": "Obter lançamento por ID",
-        "operationId": "obterLancamentoPorId",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "Identificador do lançamento",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Lançamento encontrado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LancamentoDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Lançamento não encontrado"
-          }
-        }
-      }
-    },
     "/contas": {
       "get": {
-        "tags": [
-          "Contas"
-        ],
+        "tags": ["Contas"],
         "summary": "Listar contas",
         "operationId": "listarContas",
         "responses": {
@@ -96,9 +25,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ContaViewDto"
-                  }
+                  "items": { "$ref": "#/components/schemas/ContaViewDto" }
                 }
               }
             }
@@ -106,18 +33,14 @@
         }
       },
       "post": {
-        "tags": [
-          "Contas"
-        ],
+        "tags": ["Contas"],
         "summary": "Criar nova conta",
         "operationId": "criarConta",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ContaNewDto"
-              }
+              "schema": { "$ref": "#/components/schemas/ContaNewDto" }
             }
           }
         },
@@ -126,78 +49,46 @@
             "description": "Conta criada",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ContaViewDto"
-                }
+                "schema": { "$ref": "#/components/schemas/ContaViewDto" }
               }
             }
-          }
+          },
+          "400": { "description": "Requisição inválida" }
         }
       }
     },
     "/contas/{id}": {
       "get": {
-        "tags": [
-          "Contas"
-        ],
+        "tags": ["Contas"],
         "summary": "Obter conta por ID",
         "operationId": "obterContaPorId",
         "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "Identificador da conta",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int32" } }
         ],
         "responses": {
           "200": {
             "description": "Conta encontrada",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ContaViewDto"
-                  }
-                }
+                "schema": { "$ref": "#/components/schemas/ContaViewDto" }
               }
             }
           },
-          "404": {
-            "description": "Conta não encontrada"
-          }
+          "404": { "description": "Conta não encontrada" }
         }
       },
       "put": {
-        "tags": [
-          "Contas"
-        ],
+        "tags": ["Contas"],
         "summary": "Atualizar conta por ID",
         "operationId": "atualizarConta",
         "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "Identificador da conta",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int32" } }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ContaEditDto"
-              }
+              "schema": { "$ref": "#/components/schemas/ContaEditDto" }
             }
           }
         },
@@ -206,291 +97,162 @@
             "description": "Conta atualizada",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ContaViewDto"
-                }
+                "schema": { "$ref": "#/components/schemas/ContaViewDto" }
               }
             }
           },
-          "404": {
-            "description": "Conta não encontrada"
-          },
-          "400": {
-            "description": "Requisição inválida (dados inválidos ou campo não editável)",
+          "400": { "description": "Requisição inválida ou regra de negócio violada" },
+          "404": { "description": "Conta não encontrada" }
+        }
+      },
+      "delete": {
+        "tags": ["Contas"],
+        "summary": "Deletar conta por ID",
+        "operationId": "deletarConta",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int32" } }
+        ],
+        "responses": {
+          "204": { "description": "Conta removida (sem conteúdo)" },
+          "400": { "description": "Regra de negócio violada" },
+          "404": { "description": "Conta não encontrada" }
+        }
+      }
+    },
+    "/lancamentos": {
+      "get": {
+        "tags": ["Lançamentos"],
+        "summary": "Listar lançamentos",
+        "operationId": "listarLancamentos",
+        "responses": {
+          "200": {
+            "description": "Lista de lançamentos",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/LancamentoDto" }
                 }
               }
             }
           }
         }
-      },
-      "delete": {
-        "tags": [
-          "Contas"
-        ],
-        "summary": "Deletar conta por ID",
-        "operationId": "deletarConta",
+      }
+    },
+    "/lancamentos/{id}": {
+      "get": {
+        "tags": ["Lançamentos"],
+        "summary": "Obter lançamento por ID",
+        "operationId": "obterLancamentoPorId",
         "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "Identificador da conta a ser removida",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
         ],
         "responses": {
-          "204": {
-            "description": "Conta removida com sucesso (sem conteúdo)"
-          },
-          "400": {
-            "description": "Requisição inválida (conta não pode ser deletada)",
+          "200": {
+            "description": "Lançamento encontrado",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LancamentoDto" }
               }
             }
           },
-          "404": {
-            "description": "Conta não encontrada"
-          }
+          "404": { "description": "Lançamento não encontrado" }
         }
       }
     }
   },
   "components": {
     "schemas": {
-      "SentidoContabil": {
+      "TipoConta": {
         "type": "string",
-        "description": "Sentido da operação em relação à conta de partida",
-        "enum": [
-          "DEBITO",
-          "CREDITO"
-        ]
-      },
-      "LancamentoPartidaDto": {
-        "type": "object",
-        "description": "Representação de um lançamento a partir da perspectiva de uma conta de partida (gerando duas visões por lançamento)",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "descricao": {
-            "type": "string"
-          },
-          "dataCompetencia": {
-            "type": "string",
-            "format": "date"
-          },
-          "contaPartida": {
-            "$ref": "#/components/schemas/ContaViewDto"
-          },
-          "contaContrapartida": {
-            "$ref": "#/components/schemas/ContaViewDto"
-          },
-          "sentidoContabil": {
-            "$ref": "#/components/schemas/SentidoContabil"
-          },
-          "valorContabil": {
-            "type": "number",
-            "format": "double",
-            "description": "Negativo quando sentidoContabil = DEBITO"
-          }
-        },
-        "required": [
-          "id",
-          "descricao",
-          "dataCompetencia",
-          "contaPartida",
-          "contaContrapartida",
-          "sentidoContabil",
-          "valorContabil"
-        ]
-      },
-      "LancamentoDto": {
-        "type": "object",
-        "description": "Representação de um lançamento contábil",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "descricao": {
-            "type": "string"
-          },
-          "valor": {
-            "type": "number",
-            "format": "double"
-          },
-          "dataCompetencia": {
-            "type": "string",
-            "format": "date"
-          },
-          "contaDebito": {
-            "$ref": "#/components/schemas/ContaViewDto"
-          },
-          "contaCredito": {
-            "$ref": "#/components/schemas/ContaViewDto"
-          }
-        },
-        "required": [
-          "id",
-          "descricao",
-          "valor",
-          "dataCompetencia",
-          "contaDebito",
-          "contaCredito"
-        ]
+        "description": "Tipo da conta",
+        "enum": ["ANALITICA", "SINTETICA"]
       },
       "Natureza": {
         "type": "string",
         "description": "Natureza da conta",
-        "enum": [
-          "CREDORA",
-          "DEVEDORA"
-        ]
+        "enum": ["CREDORA", "DEVEDORA"]
       },
-      "TipoConta": {
+      "SentidoContabil": {
         "type": "string",
-        "description": "Tipo da conta",
-        "enum": [
-          "ANALITICA",
-          "SINTETICA"
-        ]
+        "description": "Sentido em relação à conta de partida",
+        "enum": ["DEBITO", "CREDITO"]
+      },
+      "SentidoNatural": {
+        "type": "string",
+        "description": "Sentido natural considerando a natureza da conta",
+        "enum": ["ENTRADA", "SAIDA"]
       },
       "ContaNewDto": {
         "type": "object",
         "description": "DTO para criação de nova conta",
         "properties": {
-          "superiorId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": false,
-            "description": "ID da conta superior (obrigatório)"
-          },
-          "descricao": {
-            "type": "string"
-          },
-          "tipo": {
-            "$ref": "#/components/schemas/TipoConta"
-          },
-          "redutora": {
-            "type": "boolean",
-            "default": false
-          }
+          "superiorId": { "type": "integer", "format": "int32", "description": "ID da conta superior" },
+          "descricao": { "type": "string" },
+          "tipo": { "$ref": "#/components/schemas/TipoConta" },
+          "redutora": { "type": "boolean", "description": "Indica se a conta é redutora" }
         },
-        "required": [
-          "superiorId",
-          "descricao",
-          "tipo"
-        ]
+        "required": ["superiorId", "descricao", "tipo"]
       },
       "ContaEditDto": {
         "type": "object",
         "description": "DTO para edição de conta",
         "properties": {
-          "descricao": {
-            "type": "string"
-          },
-          "tipo": {
-            "$ref": "#/components/schemas/TipoConta"
-          },
-          "redutora": {
-            "type": "boolean",
-            "default": false
-          }
+          "descricao": { "type": "string" },
+          "tipo": { "$ref": "#/components/schemas/TipoConta" },
+          "redutora": { "type": "boolean" }
         },
-        "required": [
-          "descricao",
-          "tipo"
-        ]
+        "required": ["descricao", "tipo"]
       },
       "ContaViewDto": {
         "type": "object",
-        "description": "Representação plana de uma conta",
+        "description": "Representação de uma conta",
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "codigo": {
-            "type": "string",
-            "description": "Código calculado a partir do caminho (ex. \"1.2.3\")"
-          },
-          "descricao": {
-            "type": "string"
-          },
-          "displayText": {
-            "type": "string",
-            "description": "Texto de exibição combinado (ex.: código + descrição)"
-          },
-          "superiorId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "redutora": {
-            "type": "boolean",
-            "description": "Indica se a natureza da conta é oposta a de sua raiz."
-          },
-          "saldoAtual": {
-            "type": "number",
-            "format": "double",
-            "description": "Saldo atual da conta (pode ser nulo se não calculado)",
-            "nullable": true
-          },
-          "aceitaMovimentoOposto": {
-            "type": "boolean",
-            "description": "Indica se a conta aceita movimentos contrários à sua natureza."
-          },
-          "deletable": {
-            "type": "boolean",
-            "description": "Indica se a conta pode ser deletada"
-          },
-          "editable": {
-            "type": "boolean",
-            "description": "Indica se a conta pode ser editada"
-          },
-          "editableProperties": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Lista de propriedades que podem ser editadas"
-          },
-          "natureza": {
-            "$ref": "#/components/schemas/Natureza"
-          },
-          "tipo": {
-            "$ref": "#/components/schemas/TipoConta"
-          },
-          "superior": {
-            "$ref": "#/components/schemas/ContaViewDto"
-          },
-          "inferiores": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ContaViewDto"
-            },
-            "description": "Contas filhas"
-          }
+          "id": { "type": "integer", "format": "int32" },
+          "codigo": { "type": "string", "description": "Código calculado a partir do caminho (ex.: 1.2.3)" },
+          "descricao": { "type": "string" },
+          "displayText": { "type": "string", "description": "Texto de exibição (ex.: código + descrição)" },
+          "saldoAtual": { "type": "number", "format": "double" },
+          "natureza": { "$ref": "#/components/schemas/Natureza" },
+          "tipo": { "$ref": "#/components/schemas/TipoConta" },
+          "redutora": { "type": "boolean" },
+          "aceitaMovimentoOposto": { "type": "boolean" },
+          "editable": { "type": "boolean" },
+          "deletable": { "type": "boolean" },
+          "editableProperties": { "type": "array", "items": { "type": "string" } },
+          "superior": { "$ref": "#/components/schemas/ContaViewDto" },
+          "inferiores": { "type": "array", "items": { "$ref": "#/components/schemas/ContaViewDto" } },
+          "lancamentos": { "type": "array", "items": { "$ref": "#/components/schemas/LancamentoPartidaDto" } }
+        }
+      },
+      "LancamentoDto": {
+        "type": "object",
+        "description": "Representação de um lançamento contábil",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "descricao": { "type": "string" },
+          "valor": { "type": "number", "format": "double" },
+          "dataCompetencia": { "type": "string", "format": "date" },
+          "contaDebito": { "$ref": "#/components/schemas/ContaViewDto" },
+          "contaCredito": { "$ref": "#/components/schemas/ContaViewDto" }
         },
-        "required": [
-          "id",
-          "codigo",
-          "descricao",
-          "natureza",
-          "tipo"
-        ]
+        "required": ["id", "descricao", "valor", "dataCompetencia", "contaDebito", "contaCredito"]
+      },
+      "LancamentoPartidaDto": {
+        "type": "object",
+        "description": "Lançamento na perspectiva da conta de partida (geram-se duas visões por lançamento)",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "descricao": { "type": "string" },
+          "dataCompetencia": { "type": "string", "format": "date" },
+          "contaPartida": { "$ref": "#/components/schemas/ContaViewDto" },
+          "contaContrapartida": { "$ref": "#/components/schemas/ContaViewDto" },
+          "sentidoContabil": { "$ref": "#/components/schemas/SentidoContabil" },
+          "sentidoNatural": { "$ref": "#/components/schemas/SentidoNatural" },
+          "valorContabil": { "type": "number", "format": "double", "description": "Negativo quando DEBITO" },
+          "valorNatural": { "type": "number", "format": "double", "description": "Negativo quando contra a natureza da conta de partida" }
+        },
+        "required": ["id", "descricao", "dataCompetencia", "contaPartida", "contaContrapartida", "sentidoContabil", "sentidoNatural", "valorContabil", "valorNatural"]
       }
     }
   }

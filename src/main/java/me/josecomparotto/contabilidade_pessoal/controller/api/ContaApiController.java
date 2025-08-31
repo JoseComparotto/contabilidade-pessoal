@@ -44,8 +44,12 @@ public class ContaApiController {
     // POST /api/contas
     @PostMapping
     public ResponseEntity<?> criarConta(@RequestBody ContaNewDto contaDto) {
-        ContaViewDto novaConta = contasService.criarConta(contaDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(novaConta);
+        try {
+            ContaViewDto novaConta = contasService.criarConta(contaDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(novaConta);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     // PUT /api/contas/{id}
@@ -53,11 +57,15 @@ public class ContaApiController {
     public ResponseEntity<?> atualizarConta(@PathVariable Integer id, @RequestBody ContaEditDto contaDto) {
         try {
             ContaViewDto contaAtualizada = contasService.atualizarConta(id, contaDto);
-            if (contaAtualizada == null)
-                return ResponseEntity.notFound().build();
             return ResponseEntity.ok(contaAtualizada);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            String msg = e.getMessage() == null ? "" : e.getMessage();
+            if (msg.toLowerCase().contains("não encontrada")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg);
+            }
+            return ResponseEntity.badRequest().body(msg);
         }
     }
 
