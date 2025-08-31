@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.service.ContaService;
 
@@ -81,4 +82,35 @@ public class ContaApiController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    // GET /api/contas/{id}/superior
+    @GetMapping("/{id}/superior")
+    public ResponseEntity<?> obterSuperiorPorConta(@PathVariable Integer id) {
+        ContaViewDto superior = contasService.obterSuperiorPorConta(id);
+        if (superior == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(superior);
+    }
+
+    // GET /api/contas/{id}/inferiores
+    @GetMapping("/{id}/inferiores")
+    public ResponseEntity<?> listarInferioresPorConta(@PathVariable Integer id) {
+        List<ContaViewDto> inferiores = contasService.listarInferioresPorConta(id);
+        if (inferiores == null || inferiores.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(inferiores);
+    }
+
+    // GET /api/contas/{id}/lancamentos
+    @GetMapping("/{id}/lancamentos")
+    public ResponseEntity<?> listarLancamentosPorConta(@PathVariable Integer id) {
+        List<LancamentoPartidaDto> lancamentos = contasService.listarLancamentosPorConta(id);
+        if (lancamentos == null || lancamentos.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(lancamentos);
+    }
+
 }

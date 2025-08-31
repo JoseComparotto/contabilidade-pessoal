@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import me.josecomparotto.contabilidade_pessoal.application.mapper.ContaMapper;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
@@ -208,6 +209,36 @@ public class ContaService {
         // Salvar alterações
         conta = contaRepository.save(conta);
         return ContaMapper.toViewDto(conta);
+    }
+
+    public List<LancamentoPartidaDto> listarLancamentosPorConta(Integer id) {
+        Optional<Conta> opt = contaRepository.findById(id);
+        if (opt.isEmpty()) {
+            return List.of();
+        }
+        Conta c = opt.get();
+        ContaViewDto contaViewDto = ContaMapper.toViewDto(c);
+        return contaViewDto.getLancamentos();
+    }
+
+    public List<ContaViewDto> listarInferioresPorConta(Integer id) {
+       Optional<Conta> opt = contaRepository.findById(id);
+        if (opt.isEmpty()) {
+            return List.of();
+        }
+        Conta c = opt.get();
+        ContaViewDto contaViewDto = ContaMapper.toViewDto(c);
+        return contaViewDto.getInferiores();
+    }
+
+    public ContaViewDto obterSuperiorPorConta(Integer id) {
+        Optional<Conta> opt = contaRepository.findById(id);
+        if (opt.isEmpty()) {
+            return null;
+        }
+        Conta c = opt.get();
+        ContaViewDto contaViewDto = ContaMapper.toViewDto(c);
+        return contaViewDto.getSuperior();
     }
 
 }

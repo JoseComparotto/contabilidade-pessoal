@@ -119,6 +119,75 @@
         }
       }
     },
+    "/contas/{id}/superior": {
+      "get": {
+        "tags": ["Contas"],
+        "summary": "Obter superior da conta",
+        "operationId": "obterSuperiorPorConta",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int32" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conta superior encontrada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ContaViewDto" }
+              }
+            }
+          },
+          "404": { "description": "Conta ou superior não encontrada" }
+        }
+      }
+    },
+    "/contas/{id}/inferiores": {
+      "get": {
+        "tags": ["Contas"],
+        "summary": "Listar contas inferiores da conta",
+        "operationId": "listarInferioresPorConta",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int32" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contas inferiores encontradas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ContaViewDto" }
+                }
+              }
+            }
+          },
+          "404": { "description": "Conta não encontrada ou sem inferiores" }
+        }
+      }
+    },
+    "/contas/{id}/lancamentos": {
+      "get": {
+        "tags": ["Contas"],
+        "summary": "Listar lançamentos da conta",
+        "operationId": "listarLancamentosPorConta",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int32" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lançamentos encontrados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/LancamentoPartidaDto" }
+                }
+              }
+            }
+          },
+          "404": { "description": "Conta não encontrada ou sem lançamentos" }
+        }
+      }
+    },
     "/lancamentos": {
       "get": {
         "tags": ["Lançamentos"],
