@@ -13,6 +13,7 @@ import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
+import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoNatural;
 
 public class LancamentoPartidaDto implements IDto<Lancamento> {
 
@@ -26,7 +27,9 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
     @JsonIgnoreProperties({ "superior", "inferiores", "lancamentos" })
     private ContaViewDto contaContrapartida;
 
-    private SentidoContabil sentidoContabil;    
+    private SentidoContabil sentidoContabil;
+    private SentidoNatural sentidoNatural;
+    
     private BigDecimal valorContabil; // negativo quando sentidoContabil = DEBITO
     private BigDecimal valorNatural; // negativo quando o sentidoContabil for contra a natureza da conta de partida
 
@@ -76,6 +79,14 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
 
     public void setSentidoContabil(SentidoContabil sentidoContabil) {
         this.sentidoContabil = sentidoContabil;
+    }
+
+    public SentidoNatural getSentidoNatural() {
+        return sentidoNatural;
+    }
+
+    public void setSentidoNatural(SentidoNatural sentidoNatural) {
+        this.sentidoNatural = sentidoNatural;
     }
 
     public BigDecimal getValorContabil() {

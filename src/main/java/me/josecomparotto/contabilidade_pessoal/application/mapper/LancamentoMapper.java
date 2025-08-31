@@ -1,13 +1,17 @@
 package me.josecomparotto.contabilidade_pessoal.application.mapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
-import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
+import static me.josecomparotto.contabilidade_pessoal.model.enums.Natureza.*;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
+import static me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil.*;
+import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoNatural;
+import static me.josecomparotto.contabilidade_pessoal.model.enums.SentidoNatural.*;
 
 public class LancamentoMapper {
 
@@ -38,31 +42,47 @@ public class LancamentoMapper {
     }
 
     public static LancamentoPartidaDto toPartidaDebito(Lancamento l) {
-        if (l == null) return null;
-        LancamentoPartidaDto dto = new LancamentoPartidaDto();
-        dto.setId(l.getId());
-        dto.setDescricao(l.getDescricao());
-        dto.setDataCompetencia(l.getDataCompetencia());
-        dto.setContaPartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaDebito()));
-        dto.setContaContrapartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaCredito()));
-        dto.setSentidoContabil(SentidoContabil.DEBITO);
-        dto.setValorContabil(l.getValor() == null ? null : l.getValor().negate());
-        dto.setValorNatural(Natureza.DEVEDORA.equals(l.getContaDebito().getNatureza()) ? l.getValor() : l.getValor() == null ? null : l.getValor().negate());
-        return dto;
+        return toPartida(l, DEBITO);
     }
 
     public static LancamentoPartidaDto toPartidaCredito(Lancamento l) {
-        if (l == null) return null;
+        return toPartida(l, CREDITO);
+    }
+
+    public static LancamentoPartidaDto toPartida(Lancamento l, SentidoContabil sentidoContabil) {
+        if (l == null)
+            return null;
+
+        BigDecimal valorAbsoluto = l.getValor();
+        var contaPartida = sentidoContabil == DEBITO ? l.getContaDebito() : l.getContaCredito();
+        var contaContrapartida = sentidoContabil == DEBITO ? l.getContaCredito() : l.getContaDebito();
+
+        if (valorAbsoluto == null || BigDecimal.ZERO.equals(valorAbsoluto))
+            throw new IllegalStateException("Valor do lancamento não pode ser nulo");
+        if(contaPartida == null || contaContrapartida == null)
+            throw new IllegalStateException("Conta partida e contrapartida não podem ser nulas");
+
+        boolean creditoEhEntrada = contaPartida.getNatureza() == CREDORA;
+
+        boolean ehEntrada = creditoEhEntrada
+                ? sentidoContabil == CREDITO
+                : sentidoContabil == DEBITO;
+
+        SentidoNatural sentidoNatural = ehEntrada ? ENTRADA : SAIDA;
+
+        BigDecimal valorContabil = valorAbsoluto;
+        BigDecimal valorNatural = ehEntrada ? valorAbsoluto : valorAbsoluto.negate();
+
         LancamentoPartidaDto dto = new LancamentoPartidaDto();
         dto.setId(l.getId());
         dto.setDescricao(l.getDescricao());
         dto.setDataCompetencia(l.getDataCompetencia());
-        dto.setContaPartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaCredito()));
-        dto.setContaContrapartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaDebito()));
-        dto.setSentidoContabil(SentidoContabil.CREDITO);
-        dto.setValorContabil(l.getValor());
-        dto.setValorNatural(Natureza.CREDORA.equals(l.getContaCredito().getNatureza()) ? l.getValor() : l.getValor() == null ? null : l.getValor().negate());
+        dto.setContaPartida(ContaMapper.toViewDtoWithoutPopulate(contaPartida));
+        dto.setContaContrapartida(ContaMapper.toViewDtoWithoutPopulate(contaContrapartida));
+        dto.setSentidoContabil(sentidoContabil);
+        dto.setSentidoNatural(sentidoNatural);
+        dto.setValorContabil(valorContabil);
+        dto.setValorNatural(valorNatural);
         return dto;
     }
-
 }
