@@ -16,10 +16,10 @@ public class LancamentoDto implements IDto<Lancamento> {
     private BigDecimal valor;
     private LocalDate dataCompetencia;
 
-    @JsonIgnoreProperties({"superior", "inferiores"})
+    @JsonIgnoreProperties({"superior", "inferiores", "lancamentos"})
     private ContaViewDto contaDebito;
 
-    @JsonIgnoreProperties({"superior", "inferiores"})
+    @JsonIgnoreProperties({"superior", "inferiores", "lancamentos"})
     private ContaViewDto contaCredito;
 
     public Long getId() {

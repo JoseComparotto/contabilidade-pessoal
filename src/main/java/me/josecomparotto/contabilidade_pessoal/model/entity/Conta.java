@@ -6,9 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,7 +33,6 @@ public class Conta {
 
     @ManyToOne(optional = true)
     @JoinColumn(name = "id_superior")
-    @JsonIgnoreProperties("inferiores")
     private Conta superior;
 
     @Column(name = "sequencia")
@@ -54,7 +50,6 @@ public class Conta {
     private TipoConta tipo;
 
     @OneToMany(mappedBy = "superior")
-    @JsonIgnoreProperties("superior")
     private final List<Conta> inferiores = new ArrayList<>();
 
     @Column(name = "aceita_movimento_oposto")
@@ -63,11 +58,9 @@ public class Conta {
     @Column(name = "created_by_system")
     private Boolean createdBySystem;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "contaDebito")
     private final List<Lancamento> lancamentosDebito = new ArrayList<>();
 
-    @JsonIgnore
     @OneToMany(mappedBy = "contaCredito")
     private final List<Lancamento> lancamentosCredito = new ArrayList<>();
 
@@ -143,7 +136,6 @@ public class Conta {
     }
 
     @Transient
-    @JsonIgnore
     public Conta getRaiz() {
         Conta current = this;
         while (current.getSuperior() != null) {
@@ -153,7 +145,6 @@ public class Conta {
     }
 
     @Transient
-    @JsonIgnore
     public List<Conta> getTodasInferiores() {
         List<Conta> todasInferiores = new ArrayList<>();
         List<Conta> stack = new ArrayList<>();

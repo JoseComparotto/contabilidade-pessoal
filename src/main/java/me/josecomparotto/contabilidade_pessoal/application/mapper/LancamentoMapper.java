@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
+import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoOperacao;
 
 public class LancamentoMapper {
@@ -20,24 +21,10 @@ public class LancamentoMapper {
         dto.setDescricao(lancamento.getDescricao());
         dto.setValor(lancamento.getValor());
         dto.setDataCompetencia(lancamento.getDataCompetencia());
-        dto.setContaCredito(ContaMapper.toViewDto(lancamento.getContaCredito()));
-        dto.setContaDebito(ContaMapper.toViewDto(lancamento.getContaDebito()));
+        dto.setContaCredito(ContaMapper.toViewDtoWithoutPopulate(lancamento.getContaCredito()));
+        dto.setContaDebito(ContaMapper.toViewDtoWithoutPopulate(lancamento.getContaDebito()));
 
         return dto;
-    }
-
-    public static Lancamento fromDto(LancamentoDto dto) {
-        if (dto == null) {
-            return null;
-        }
-
-        Lancamento lancamento = new Lancamento();
-        lancamento.setId(dto.getId());
-        lancamento.setDescricao(dto.getDescricao());
-        lancamento.setValor(dto.getValor());
-        lancamento.setDataCompetencia(dto.getDataCompetencia());
-
-        return lancamento;
     }
 
     public static List<LancamentoDto> toDtoList(List<Lancamento> all) {
@@ -56,10 +43,11 @@ public class LancamentoMapper {
         dto.setId(l.getId());
         dto.setDescricao(l.getDescricao());
         dto.setDataCompetencia(l.getDataCompetencia());
-        dto.setContaPartida(ContaMapper.toViewDto(l.getContaDebito()));
-        dto.setContaContrapartida(ContaMapper.toViewDto(l.getContaCredito()));
+        dto.setContaPartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaDebito()));
+        dto.setContaContrapartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaCredito()));
         dto.setSentido(SentidoOperacao.DEBITO);
         dto.setValorMatematico(l.getValor() == null ? null : l.getValor().negate());
+        dto.setValorNatural(Natureza.DEVEDORA.equals(l.getContaDebito().getNatureza()) ? l.getValor() : l.getValor() == null ? null : l.getValor().negate());
         return dto;
     }
 
@@ -69,15 +57,12 @@ public class LancamentoMapper {
         dto.setId(l.getId());
         dto.setDescricao(l.getDescricao());
         dto.setDataCompetencia(l.getDataCompetencia());
-        dto.setContaPartida(ContaMapper.toViewDto(l.getContaCredito()));
-        dto.setContaContrapartida(ContaMapper.toViewDto(l.getContaDebito()));
+        dto.setContaPartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaCredito()));
+        dto.setContaContrapartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaDebito()));
         dto.setSentido(SentidoOperacao.CREDITO);
         dto.setValorMatematico(l.getValor());
+        dto.setValorNatural(Natureza.CREDORA.equals(l.getContaCredito().getNatureza()) ? l.getValor() : l.getValor() == null ? null : l.getValor().negate());
         return dto;
-    }
-
-    public static List<LancamentoPartidaDto> toPartidas(Lancamento l) {
-        return List.of(toPartidaDebito(l), toPartidaCredito(l));
     }
 
 }

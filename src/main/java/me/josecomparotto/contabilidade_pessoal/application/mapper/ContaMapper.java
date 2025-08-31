@@ -1,10 +1,12 @@
 package me.josecomparotto.contabilidade_pessoal.application.mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 
@@ -18,7 +20,7 @@ public final class ContaMapper {
             return null;
 
         ContaViewDto dto = toViewDtoWithoutPopulate(conta);
-        
+
         if (conta.getSuperior() != null) {
             dto.setSuperior(toViewDtoWithoutPopulate(conta.getSuperior()));
         }
@@ -30,11 +32,27 @@ public final class ContaMapper {
                             .collect(Collectors.toList()));
         }
 
+        if (conta.getLancamentosCredito() != null || conta.getLancamentosDebito() != null) {
+
+            List<LancamentoPartidaDto> lancamentos = new ArrayList<>();
+            lancamentos.addAll(
+                    conta.getLancamentosCredito().stream()
+                            .map(LancamentoMapper::toPartidaCredito)
+                            .collect(Collectors.toList()));
+            lancamentos.addAll(
+                    conta.getLancamentosDebito().stream()
+                            .map(LancamentoMapper::toPartidaDebito)
+                            .collect(Collectors.toList()));
+            
+            lancamentos.sort((l1, l2) -> l2.getDataCompetencia().compareTo(l1.getDataCompetencia())); // mais recentes primeiro
+            dto.setLancamentos(lancamentos);
+        }
+
         return dto;
 
     }
 
-    private static ContaViewDto toViewDtoWithoutPopulate(Conta conta) {
+    public static ContaViewDto toViewDtoWithoutPopulate(Conta conta) {
         if (conta == null)
             return null;
         ContaViewDto dto = new ContaViewDto();

@@ -3,6 +3,8 @@ package me.josecomparotto.contabilidade_pessoal.model.dto.lancamento;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
@@ -14,11 +16,15 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
     private String descricao;
     private LocalDate dataCompetencia;
 
+    @JsonIgnoreProperties({ "superior", "inferiores", "lancamentos" })
     private ContaViewDto contaPartida;
+
+    @JsonIgnoreProperties({ "superior", "inferiores", "lancamentos" })
     private ContaViewDto contaContrapartida;
 
     private SentidoOperacao sentido;
     private BigDecimal valorMatematico; // negativo quando sentido = DEBITO
+    private BigDecimal valorNatural; // negativo quando o sentido for contra a natureza da conta de partida
 
     public Long getId() {
         return id;
@@ -74,5 +80,13 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
 
     public void setValorMatematico(BigDecimal valorMatematico) {
         this.valorMatematico = valorMatematico;
+    }
+
+    public BigDecimal getValorNatural() {
+        return valorNatural;
+    }
+
+    public void setValorNatural(BigDecimal valorNatural) {
+        this.valorNatural = valorNatural;
     }
 }

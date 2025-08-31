@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
@@ -28,11 +29,14 @@ public class ContaViewDto implements IDto<Conta> {
     private boolean deletable;
     private Set<String> editableProperties;
 
-    @JsonIgnoreProperties({ "superior", "inferiores" })
+    @JsonIgnoreProperties({ "superior", "inferiores", "lancamentos" })
     private ContaViewDto superior;
 
-    @JsonIgnoreProperties({ "superior", "inferiores" })
+    @JsonIgnoreProperties({ "superior", "inferiores", "lancamentos" })
     private List<ContaViewDto> inferiores;
+
+    @JsonIgnoreProperties({ "contaPartida", "inferiores" })
+    private List<LancamentoPartidaDto> lancamentos;
 
     public Integer getId() {
         return id;
@@ -154,4 +158,14 @@ public class ContaViewDto implements IDto<Conta> {
     public void setInferiores(List<ContaViewDto> inferiores) {
         this.inferiores = inferiores;
     }
+
+    public List<LancamentoPartidaDto> getLancamentos() {
+        return lancamentos;
+    }
+
+    public void setLancamentos(List<LancamentoPartidaDto> lancamentos) {
+        this.lancamentos = lancamentos;
+    }
+
+    
 }
