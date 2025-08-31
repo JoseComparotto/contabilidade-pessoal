@@ -6,12 +6,14 @@ import java.util.Locale;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.hateoas.server.core.Relation;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 
+@Relation(collectionRelation = "contas", itemRelation = "conta")
 public class ContaViewDto implements IDto<Conta> {
     private Integer id;
     private String codigo;

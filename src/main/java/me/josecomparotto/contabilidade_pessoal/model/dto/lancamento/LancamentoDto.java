@@ -3,10 +3,13 @@ package me.josecomparotto.contabilidade_pessoal.model.dto.lancamento;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import org.springframework.hateoas.server.core.Relation;
+
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 
+@Relation(collectionRelation = "lancamentos", itemRelation = "lancamento")
 public class LancamentoDto implements IDto<Lancamento> {
 
     private Long id;

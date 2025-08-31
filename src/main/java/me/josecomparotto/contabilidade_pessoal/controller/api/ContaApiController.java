@@ -1,8 +1,14 @@
 package me.josecomparotto.contabilidade_pessoal.controller.api;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.Link;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,17 +39,21 @@ public class ContaApiController {
 
     // GET /api/contas
     @GetMapping
-    public List<?> listarContas() {
-        return contasService.listarContas();
+    public CollectionModel<EntityModel<ContaViewDto>> listarContas() {
+        List<EntityModel<ContaViewDto>> content = contasService.listarContas().stream()
+                .map(this::toModel)
+                .collect(Collectors.toList());
+        Link self = linkTo(methodOn(ContaApiController.class).listarContas()).withSelfRel();
+        return CollectionModel.of(content, self);
     }
 
     // GET /api/contas/{id}
     @GetMapping("/{id}")
     public ResponseEntity<?> obterConta(@PathVariable Integer id) {
-        Object body = contasService.obterContaPorId(id);
+        ContaViewDto body = contasService.obterContaPorId(id);
         if (body == null)
             return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(body);
+        return ResponseEntity.ok(toModel(body));
     }
 
     // POST /api/contas
@@ -51,7 +61,8 @@ public class ContaApiController {
     public ResponseEntity<?> criarConta(@RequestBody ContaNewDto contaDto) {
         try {
             ContaViewDto novaConta = contasService.criarConta(contaDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(novaConta);
+            EntityModel<ContaViewDto> model = toModel(novaConta);
+            return ResponseEntity.created(model.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(model);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -62,7 +73,7 @@ public class ContaApiController {
     public ResponseEntity<?> atualizarConta(@PathVariable Integer id, @RequestBody ContaEditDto contaDto) {
         try {
             ContaViewDto contaAtualizada = contasService.atualizarConta(id, contaDto);
-            return ResponseEntity.ok(contaAtualizada);
+            return ResponseEntity.ok(toModel(contaAtualizada));
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IllegalArgumentException e) {
@@ -94,7 +105,7 @@ public class ContaApiController {
         if (superior == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(superior);
+        return ResponseEntity.ok(toModel(superior));
     }
 
     // GET /api/contas/{id}/inferiores
@@ -104,7 +115,9 @@ public class ContaApiController {
         if (inferiores == null || inferiores.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(inferiores);
+        List<EntityModel<ContaViewDto>> items = inferiores.stream().map(this::toModel).toList();
+        Link self = linkTo(methodOn(ContaApiController.class).listarInferioresPorConta(id)).withSelfRel();
+        return ResponseEntity.ok(CollectionModel.of(items, self));
     }
 
     // GET /api/contas/{id}/lancamentos
@@ -114,7 +127,21 @@ public class ContaApiController {
         if (lancamentos == null || lancamentos.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(lancamentos);
+        // Link self to this collection and link to the owning conta
+        Link self = linkTo(methodOn(ContaApiController.class).listarLancamentosPorConta(id)).withSelfRel();
+        Link conta = linkTo(methodOn(ContaApiController.class).obterConta(id)).withRel("conta");
+        return ResponseEntity.ok(CollectionModel.of(lancamentos, self, conta));
+    }
+
+    private EntityModel<ContaViewDto> toModel(ContaViewDto dto) {
+        Integer id = dto.getId();
+        EntityModel<ContaViewDto> model = EntityModel.of(dto);
+        model.add(linkTo(methodOn(ContaApiController.class).obterConta(id)).withSelfRel());
+        model.add(linkTo(methodOn(ContaApiController.class).listarInferioresPorConta(id)).withRel("inferiores"));
+        model.add(linkTo(methodOn(ContaApiController.class).obterSuperiorPorConta(id)).withRel("superior"));
+        model.add(linkTo(methodOn(ContaApiController.class).listarLancamentosPorConta(id)).withRel("lancamentos"));
+        model.add(linkTo(methodOn(ContaApiController.class).listarContas()).withRel(IanaLinkRelations.COLLECTION));
+        return model;
     }
 
 }
