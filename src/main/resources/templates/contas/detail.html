@@ -40,13 +40,13 @@
             <div class="form-grid">
                 <div class="field">
                     <label>Conta superior</label>
-                    <div class="input-link" th:if="${conta.superior != null}">
-                        <input type="text" disabled th:value="${conta.superior.displayText}" />
-                        <a class="cover" th:href="@{/contas/{id}(id=${conta.superior.id})}">
+                    <div class="input-link" th:if="${superior != null}">
+                        <input type="text" disabled th:value="${superior.displayText}" />
+                        <a class="cover" th:href="@{/contas/{id}(id=${superior.id})}">
                             <span class="sr-only">Abrir detalhes da conta superior</span>
                         </a>
                     </div>
-                    <div class="input-link" th:if="${conta.superior == null}">
+                    <div class="input-link" th:if="${superior == null}">
                         <input type="text" disabled value="Plano de Contas" />
                         <a class="cover" th:href="@{/contas}">
                             <span class="sr-only">Abrir o plano de contas</span>
@@ -68,7 +68,7 @@
                         </a>
                     </div>
                 </div>
-                <div th:replace="~{fragments/contas/list :: contaTable(${conta.inferiores}, null)}"></div>
+                <div th:replace="~{fragments/contas/list :: contaTable(${inferiores}, null)}"></div>
             </div>
             <div class="card-section" th:if="${conta.tipo.name() == 'ANALITICA'}">
                 <div class="card-header">
@@ -81,7 +81,7 @@
                         </a> -->
                     </div>
                 </div>
-                <div th:replace="~{fragments/lancamentos/list :: lancamentoTable(${conta.lancamentos}, null)}"></div>
+                <div th:replace="~{fragments/lancamentos/list :: lancamentoTable(${lancamentos}, null)}"></div>
             </div>
         </div>
     </main>

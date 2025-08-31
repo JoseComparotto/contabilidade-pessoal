@@ -1,5 +1,7 @@
 package me.josecomparotto.contabilidade_pessoal.controller.web;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,15 +14,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import me.josecomparotto.contabilidade_pessoal.application.mapper.ContaMapper;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 import me.josecomparotto.contabilidade_pessoal.service.ContaService;
+import me.josecomparotto.contabilidade_pessoal.service.LancamentoService;
 
 @Controller
 public class ContaWebController {
 
     @Autowired
     private ContaService contasService;
+
+    @Autowired
+    private LancamentoService lancamentoService;
 
     // GET /contas
     @GetMapping("/contas")
@@ -32,12 +39,19 @@ public class ContaWebController {
     // GET /contas/{id}
     @GetMapping("/contas/{id}")
     public String detalhesConta(@PathVariable Integer id, Model model, RedirectAttributes redirectAttrs) {
-        ContaViewDto dto = contasService.obterContaPorId(id);
-        if (dto == null) {
+        ContaViewDto conta = contasService.obterContaPorId(id);
+        if (conta == null) {
             redirectAttrs.addFlashAttribute("error", "Conta não encontrada.");
             return "redirect:/contas";
         }
-        model.addAttribute("conta", dto);
+        ContaViewDto superior = contasService.obterSuperiorPorConta(id);
+        List<ContaViewDto> inferiores = contasService.listarInferioresPorConta(id);
+        List<LancamentoPartidaDto> lancamentos = lancamentoService.listarLancamentosPorConta(id);
+
+        model.addAttribute("conta", conta);
+        model.addAttribute("superior", superior);
+        model.addAttribute("inferiores", inferiores);
+        model.addAttribute("lancamentos", lancamentos);
         return "contas/detail";
     }
 
