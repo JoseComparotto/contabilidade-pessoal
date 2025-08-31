@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Contabilidade Pessoal API",
-    "version": "0.1.0",
+    "version": "0.3.0",
     "description": "API para gerenciamento e consulta de contas contábeis."
   },
   "servers": [
