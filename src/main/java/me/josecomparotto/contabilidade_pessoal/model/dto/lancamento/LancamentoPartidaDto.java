@@ -120,4 +120,5 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return dataCompetencia.format(fmt);
     }
+
 }
