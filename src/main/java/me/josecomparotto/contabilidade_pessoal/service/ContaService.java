@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,10 +101,10 @@ public class ContaService {
     public ContaViewDto criarConta(ContaNewDto contaDto) {
 
         // Validar dados iniciais da conta
-        if(contaDto.getDescricao() == null || contaDto.getDescricao().trim().isEmpty()) {
+        if (contaDto.getDescricao() == null || contaDto.getDescricao().trim().isEmpty()) {
             throw new IllegalArgumentException("Descrição da conta é obrigatória");
         }
-        if(contaDto.getTipo() == null) {
+        if (contaDto.getTipo() == null) {
             throw new IllegalArgumentException("Tipo da conta é obrigatório");
         }
 
@@ -211,13 +212,18 @@ public class ContaService {
     }
 
     public List<ContaViewDto> listarInferioresPorConta(Integer id) {
-       Optional<Conta> opt = contaRepository.findById(id);
+        Optional<Conta> opt = contaRepository.findById(id);
         if (opt.isEmpty()) {
             return List.of();
         }
-        Conta c = opt.get();
-        ContaViewDto contaViewDto = ContaMapper.toViewDto(c);
-        return contaViewDto.getInferiores();
+        Conta conta = opt.get();
+        if (conta.getInferiores() == null) {
+            return List.of();
+        }
+
+        return conta.getInferiores().stream()
+                .map(ContaMapper::toViewDto)
+                .collect(Collectors.toList());
     }
 
     public ContaViewDto obterSuperiorPorConta(Integer id) {
@@ -226,8 +232,10 @@ public class ContaService {
             return null;
         }
         Conta c = opt.get();
-        ContaViewDto contaViewDto = ContaMapper.toViewDto(c);
-        return contaViewDto.getSuperior();
+        Conta sup = c.getSuperior();
+        if (sup == null) return null;
+        
+        return ContaMapper.toViewDto(sup);
     }
 
 }

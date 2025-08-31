@@ -6,7 +6,6 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.time.format.DateTimeFormatter;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
@@ -21,10 +20,7 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
     private String descricao;
     private LocalDate dataCompetencia;
 
-    @JsonIgnoreProperties({ "superior", "inferiores", "lancamentos" })
     private ContaViewDto contaPartida;
-
-    @JsonIgnoreProperties({ "superior", "inferiores", "lancamentos" })
     private ContaViewDto contaContrapartida;
 
     private SentidoContabil sentidoContabil;

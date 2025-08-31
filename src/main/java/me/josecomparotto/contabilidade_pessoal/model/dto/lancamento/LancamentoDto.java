@@ -3,8 +3,6 @@ package me.josecomparotto.contabilidade_pessoal.model.dto.lancamento;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
@@ -15,11 +13,7 @@ public class LancamentoDto implements IDto<Lancamento> {
     private String descricao;
     private BigDecimal valor;
     private LocalDate dataCompetencia;
-
-    @JsonIgnoreProperties({"superior", "inferiores", "lancamentos"})
     private ContaViewDto contaDebito;
-
-    @JsonIgnoreProperties({"superior", "inferiores", "lancamentos"})
     private ContaViewDto contaCredito;
 
     public Long getId() {

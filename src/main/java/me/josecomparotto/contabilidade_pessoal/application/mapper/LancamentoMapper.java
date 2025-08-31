@@ -25,8 +25,8 @@ public class LancamentoMapper {
         dto.setDescricao(lancamento.getDescricao());
         dto.setValor(lancamento.getValor());
         dto.setDataCompetencia(lancamento.getDataCompetencia());
-        dto.setContaCredito(ContaMapper.toViewDtoWithoutPopulate(lancamento.getContaCredito()));
-        dto.setContaDebito(ContaMapper.toViewDtoWithoutPopulate(lancamento.getContaDebito()));
+        dto.setContaCredito(ContaMapper.toViewDto(lancamento.getContaCredito()));
+        dto.setContaDebito(ContaMapper.toViewDto(lancamento.getContaDebito()));
 
         return dto;
     }
@@ -77,8 +77,8 @@ public class LancamentoMapper {
         dto.setId(l.getId());
         dto.setDescricao(l.getDescricao());
         dto.setDataCompetencia(l.getDataCompetencia());
-        dto.setContaPartida(ContaMapper.toViewDtoWithoutPopulate(contaPartida));
-        dto.setContaContrapartida(ContaMapper.toViewDtoWithoutPopulate(contaContrapartida));
+        dto.setContaPartida(ContaMapper.toViewDto(contaPartida));
+        dto.setContaContrapartida(ContaMapper.toViewDto(contaContrapartida));
         dto.setSentidoContabil(sentidoContabil);
         dto.setSentidoNatural(sentidoNatural);
         dto.setValorContabil(valorContabil);
