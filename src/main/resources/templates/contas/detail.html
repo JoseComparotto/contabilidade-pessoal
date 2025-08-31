@@ -46,8 +46,12 @@
                             <span class="sr-only">Abrir detalhes da conta superior</span>
                         </a>
                     </div>
-                    <input th:if="${conta.superior == null}" type="text" value="—" disabled />
-                </div>
+                    <div class="input-link" th:if="${conta.superior == null}">
+                        <input type="text" disabled value="Plano de Contas" />
+                        <a class="cover" th:href="@{/contas}">
+                            <span class="sr-only">Abrir o plano de caontas</span>
+                        </a>
+                    </div>                </div>
                 <div class="field">
                     <label>Saldo Atual</label>
                     <input type="text" th:value="${conta.saldoAtualFormatado}" disabled />
