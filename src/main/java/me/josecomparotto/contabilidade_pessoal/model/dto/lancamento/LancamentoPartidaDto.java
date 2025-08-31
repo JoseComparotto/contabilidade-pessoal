@@ -2,8 +2,12 @@ package me.josecomparotto.contabilidade_pessoal.model.dto.lancamento;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
@@ -88,5 +92,21 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
 
     public void setValorNatural(BigDecimal valorNatural) {
         this.valorNatural = valorNatural;
+    }
+
+    @JsonIgnore
+    public String getValorNaturalFormatado() {
+        if (valorNatural == null || BigDecimal.ZERO.compareTo(valorNatural) == 0) {
+            return "R$ 0,00";
+        }
+        NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
+        return nf.format(valorNatural);
+    }
+
+    @JsonIgnore
+    public String getDataCompetenciaFormatada() {
+        if (dataCompetencia == null) return "—";
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return dataCompetencia.format(fmt);
     }
 }

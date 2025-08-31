@@ -53,7 +53,7 @@
                     <input type="text" th:value="${conta.saldoAtualFormatado}" disabled />
                 </div>
             </div>
-            <div class="card-section" th:if="${conta.tipo.name() == 'SINTETICA' and conta.inferiores != null and #lists.size(conta.inferiores) > 0}">
+            <div class="card-section" th:if="${conta.tipo.name() == 'SINTETICA'}">
                 <div class="card-header">
                     <h2>Contas inferiores</h2>
                     <div class="actions">
@@ -65,6 +65,19 @@
                     </div>
                 </div>
                 <div th:replace="~{fragments/contas/list :: contaTable(${conta.inferiores}, null)}"></div>
+            </div>
+            <div class="card-section" th:if="${conta.tipo.name() == 'ANALITICA'}">
+                <div class="card-header">
+                    <h2>Lançamentos</h2>
+                    <div class="actions">
+                        <!-- <a class="btn details icon" th:href="@{/lancamentos/new(contaPartidaId=${conta.id})}"
+                           aria-label="Novo lançamento" title="Novo lançamento">
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                            <span class="sr-only">Novo lançamento</span>
+                        </a> -->
+                    </div>
+                </div>
+                <div th:replace="~{fragments/lancamentos/list :: lancamentoTable(${conta.lancamentos}, null)}"></div>
             </div>
         </div>
     </main>

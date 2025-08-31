@@ -1,0 +1,31 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="lancamentoTable(items, title)">
+    <h2 th:if="${title != null}" th:text="${title}" style="margin-top:1.5rem">Lançamentos</h2>
+    <div class="table-wrap" th:if="${items != null}">
+        <table class="clickable-rows">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Descrição</th>
+                    <th>Valor</th>
+                    <th>Contrapartida</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="l : ${items}" th:object="${l}">
+                    <td>
+                        <a th:href="@{/lancamentos/{id}(id=*{id},sentido=*{sentido})}" th:text="*{dataCompetenciaFormatada}">01/01/2024</a>
+                    </td>
+                    <td>
+                        <a th:href="@{/lancamentos/{id}(id=*{id},sentido=*{sentido})}" th:text="*{descricao}">Descrição</a>
+                    </td>
+                    <td>
+                        <a th:href="@{/lancamentos/{id}(id=*{id},sentido=*{sentido})}" th:text="*{valorNaturalFormatado}">R$ 0,00</a>
+                    </td>
+                    <td>
+                        <a th:href="@{/contas/{id}(id=*{contaContrapartida.id})}" th:text="*{contaContrapartida.displayText}">Contrapartida</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
