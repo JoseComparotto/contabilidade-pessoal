@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import me.josecomparotto.contabilidade_pessoal.application.mapper.ContaMapper;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
@@ -42,9 +43,13 @@ public class ContaWebController {
 
     // GET /contas/new
     @GetMapping("/contas/new")
-    public String novaConta(Model model) {
+    public String novaConta(Model model, @RequestParam(name = "superiorId", required = false) Integer superiorId) {
         model.addAttribute("mode", "create");
-        model.addAttribute("conta", new ContaNewDto());
+        ContaNewDto nova = new ContaNewDto();
+        if (superiorId != null) {
+            nova.setSuperiorId(superiorId);
+        }
+        model.addAttribute("conta", nova);
         model.addAttribute("tipos", TipoConta.values());
         model.addAttribute("contas", contasService.listarContasSinteticas());
         return "contas/form";

@@ -16,19 +16,6 @@
             <h2 th:text="${conta.displayText}"></h2>
             <div class="form-grid">
                 <div class="field">
-                    <label>Tipo</label>
-                    <input type="text" th:value="${conta.tipo != null ? conta.tipo.name() : ''}" disabled />
-                </div>
-                <div class="field">
-                    <label>Redutora</label>
-                    <input type="text"
-                        th:value="${conta.redutora != null ? (conta.redutora ? 'Sim' : 'Não') : '—'}" disabled />
-                </div>
-                <div class="field">
-                    <label>Saldo Atual</label>
-                    <input type="text" th:value="${conta.saldoAtualFormatado}" disabled />
-                </div>
-                <div class="field">
                     <label>Conta superior</label>
                     <div class="input-link" th:if="${conta.superior != null}">
                         <input type="text" disabled th:value="${conta.superior.displayText}" />
@@ -38,6 +25,19 @@
                     </div>
                     <input th:if="${conta.superior == null}" type="text" value="—" disabled />
                 </div>
+                <div class="field">
+                    <label>Saldo Atual</label>
+                    <input type="text" th:value="${conta.saldoAtualFormatado}" disabled />
+                </div>
+            </div>
+            <div
+                th:if="${conta.tipo.name() == 'SINTETICA' and conta.inferiores != null and #lists.size(conta.inferiores) > 0}">
+                <div th:replace="~{fragments/contas :: contaTable(${conta.inferiores}, 'Contas inferiores')}"></div>
+
+            </div>
+            <div th:if="${conta.tipo != null and conta.tipo.name() == 'SINTETICA'}" class="controls"
+                style="margin-top:1.5rem">
+                <a th:href="@{/contas/new(superiorId=${conta.id})}">+ Nova conta inferior</a>
             </div>
 
             <div class="actions">

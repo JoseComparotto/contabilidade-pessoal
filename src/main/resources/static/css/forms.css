@@ -8,8 +8,8 @@ input[type="text"], select, input[type="number"], input[type="checkbox"] { paddi
 .as-input:hover { background: #f6faff; text-decoration: none }
 
 /* Input with clickable overlay link */
-.input-link { position: relative; display: inline-block; width: 100% }
-.input-link > input[type="text"] { width: 100% }
+.input-link { position: relative; display: inline-block; width: 100%; display: flex; }
+.input-link > input[type="text"] { flex: 1; }
 .input-link > a.cover { position: absolute; inset: 0; border-radius: 4px; text-decoration: none }
 .input-link > a.cover:focus-visible { outline: 2px solid #0a66c2; outline-offset: 2px }
 .actions { margin-top: 1rem; display: flex; gap: .5rem }

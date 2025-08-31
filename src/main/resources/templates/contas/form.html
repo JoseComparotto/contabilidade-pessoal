@@ -37,7 +37,7 @@
 
                     <!-- Conta superior -->
                     <div th:replace="~{fragments/form-controls :: selectField(
-                        'superior.id', 'superior.id', 'Conta superior', ${contas}, ${mode == 'edit' ? conta.superior.id : null},
+                        'superior.id', 'superior.id', 'Conta superior', ${contas}, ${mode == 'edit' ? conta.superior.id : conta.superiorId},
                         true, ${isSelectDisabled}, 'Selecione…', 'A nova conta será criada como filha da conta selecionada.', true)
                     }"></div>
 
