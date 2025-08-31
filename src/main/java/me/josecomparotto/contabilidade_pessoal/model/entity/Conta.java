@@ -194,16 +194,16 @@ public class Conta {
         }
         switch (n) {
             case CREDORA:
-                return getSaldoMatematico();
+                return getSaldoContabil();
             case DEVEDORA:
-                return getSaldoMatematico().multiply(BigDecimal.valueOf(-1));
+                return getSaldoContabil().multiply(BigDecimal.valueOf(-1));
             default:
                 return BigDecimal.ZERO;
         }
     }
 
     @Transient
-    public BigDecimal getSaldoMatematico() {
+    public BigDecimal getSaldoContabil() {
 
         switch (getTipo()) {
             // Se for analítica, o saldo é o somatório líquido dos lançamentos
@@ -221,7 +221,7 @@ public class Conta {
             case SINTETICA:
                 return getTodasInferiores().stream()
                         .filter(c -> TipoConta.ANALITICA.equals(c.getTipo()))
-                        .map(Conta::getSaldoMatematico)
+                        .map(Conta::getSaldoContabil)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
             default:
                 break;

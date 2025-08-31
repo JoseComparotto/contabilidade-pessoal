@@ -200,7 +200,7 @@ Esta seção consolida as regras vigentes no domínio (banco + backend). Onde ap
 - Movimento oposto: débito em conta credora ou crédito em conta devedora; só permitido quando a conta aceitar.
 - Data de competência: data em que o efeito econômico do lançamento ocorre.
 - Saldo natural: saldo calculado respeitando a natureza da conta.
-- Saldo matemático: diferença algébrica de débitos e créditos sem considerar a natureza.
+- Saldo contábil: diferença algébrica de débitos e créditos sem considerar a natureza.
 - Conta ativa/inativa: contas inativas não podem ter saldo líquido diferente de zero para serem inativadas; lançamentos associados a contas inativas tornam-se imutáveis.
 - created_by_system: flag que indica contas provisionadas pelo sistema; impede edição e exclusão.
 

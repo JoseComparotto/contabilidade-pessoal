@@ -46,7 +46,7 @@ public class LancamentoMapper {
         dto.setContaPartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaDebito()));
         dto.setContaContrapartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaCredito()));
         dto.setSentido(SentidoOperacao.DEBITO);
-        dto.setValorMatematico(l.getValor() == null ? null : l.getValor().negate());
+        dto.setValorContabil(l.getValor() == null ? null : l.getValor().negate());
         dto.setValorNatural(Natureza.DEVEDORA.equals(l.getContaDebito().getNatureza()) ? l.getValor() : l.getValor() == null ? null : l.getValor().negate());
         return dto;
     }
@@ -60,7 +60,7 @@ public class LancamentoMapper {
         dto.setContaPartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaCredito()));
         dto.setContaContrapartida(ContaMapper.toViewDtoWithoutPopulate(l.getContaDebito()));
         dto.setSentido(SentidoOperacao.CREDITO);
-        dto.setValorMatematico(l.getValor());
+        dto.setValorContabil(l.getValor());
         dto.setValorNatural(Natureza.CREDORA.equals(l.getContaCredito().getNatureza()) ? l.getValor() : l.getValor() == null ? null : l.getValor().negate());
         return dto;
     }

@@ -300,7 +300,7 @@
           "sentido": {
             "$ref": "#/components/schemas/SentidoOperacao"
           },
-          "valorMatematico": {
+          "valorContabil": {
             "type": "number",
             "format": "double",
             "description": "Negativo quando sentido = DEBITO"
@@ -313,7 +313,7 @@
           "contaPartida",
           "contaContrapartida",
           "sentido",
-          "valorMatematico"
+          "valorContabil"
         ]
       },
       "LancamentoDto": {

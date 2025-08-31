@@ -27,7 +27,7 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
     private ContaViewDto contaContrapartida;
 
     private SentidoOperacao sentido;
-    private BigDecimal valorMatematico; // negativo quando sentido = DEBITO
+    private BigDecimal valorContabil; // negativo quando sentido = DEBITO
     private BigDecimal valorNatural; // negativo quando o sentido for contra a natureza da conta de partida
 
     public Long getId() {
@@ -78,12 +78,12 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
         this.sentido = sentido;
     }
 
-    public BigDecimal getValorMatematico() {
-        return valorMatematico;
+    public BigDecimal getValorContabil() {
+        return valorContabil;
     }
 
-    public void setValorMatematico(BigDecimal valorMatematico) {
-        this.valorMatematico = valorMatematico;
+    public void setValorContabil(BigDecimal valorContabil) {
+        this.valorContabil = valorContabil;
     }
 
     public BigDecimal getValorNatural() {
