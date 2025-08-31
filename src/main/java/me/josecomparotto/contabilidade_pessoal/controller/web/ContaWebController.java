@@ -43,7 +43,8 @@ public class ContaWebController {
 
     // GET /contas/new
     @GetMapping("/contas/new")
-    public String novaConta(Model model, @RequestParam(name = "superiorId", required = false) Integer superiorId) {
+    public String novaConta(Model model,
+            @RequestParam(name = "superiorId", required = false) Integer superiorId) {
         model.addAttribute("mode", "create");
         ContaNewDto nova = new ContaNewDto();
         if (superiorId != null) {
@@ -55,17 +56,27 @@ public class ContaWebController {
         return "contas/form";
     }
 
-    // POST /contas (create)
+    // POST /contas[?redirect={redirectUrl}] (create)
     @PostMapping("/contas")
-    public String criarConta(ContaNewDto contaDto, RedirectAttributes redirectAttrs) {
+    public String criarConta(ContaNewDto contaDto, RedirectAttributes redirectAttrs,
+                              @RequestParam(name = "redirect", required = false) String redirectUrl) {
         try {
             ContaViewDto criada = contasService.criarConta(contaDto);
             redirectAttrs.addFlashAttribute("success", "Conta criada com sucesso: " + criada.getCodigo());
-            return "redirect:/contas";
+            return "redirect:" + sanitizeRedirect(redirectUrl);
         } catch (Exception e) {
             redirectAttrs.addFlashAttribute("error", e.getMessage());
             return "redirect:/contas/new";
         }
+    }
+
+    private String sanitizeRedirect(String redirectUrl) {
+        if (redirectUrl == null || redirectUrl.isBlank()) return "/contas";
+        // Only allow relative paths within the app to avoid open redirects
+        if (redirectUrl.startsWith("/") && !redirectUrl.startsWith("//")) {
+            return redirectUrl;
+        }
+        return "/contas";
     }
 
     // GET /contas/{id}/edit

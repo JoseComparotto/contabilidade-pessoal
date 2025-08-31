@@ -18,7 +18,9 @@
 /* Icon buttons */
 .btn.icon { padding: .35rem; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; box-sizing: border-box }
 .btn.icon svg, .btn.icon i { width: 18px; height: 18px; display: block; font-size: 18px; line-height: 18px }
-.btn.icon .sr-only { display: none }
+/* Keep sr-only text available to screen readers inside icon buttons */
+/* (visual hiding handled by global .sr-only class below) */
+/* .btn.icon .sr-only { display: none } */
 
 /* Variants */
 .btn.edit.icon { color: #0a66c2; border-color: #d8eefd; background: #fff }

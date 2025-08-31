@@ -21,6 +21,7 @@
                     canEditTipo=${mode == 'edit' ? conta.editableProperties.contains('tipo') : true},
                     canEditRedutora=${mode == 'edit' ? conta.editableProperties.contains('redutora') : true}
                 ">
+                <input type="hidden" name="redirect" th:value="${(mode == 'create' and conta.superiorId != null) ? '/contas/' + conta.superiorId : '/contas'}" />
                 <div class="form-grid">
 
                     <!-- Código (somente edição, read-only) -->
@@ -37,7 +38,7 @@
 
                     <!-- Conta superior -->
                     <div th:replace="~{fragments/form-controls :: selectField(
-                        'superior.id', 'superior.id', 'Conta superior', ${contas}, ${mode == 'edit' ? conta.superior.id : conta.superiorId},
+                        'superiorId', 'superiorId', 'Conta superior', ${contas}, ${mode == 'edit' ? conta.superior.id : conta.superiorId},
                         true, ${isSelectDisabled}, 'Selecione…', 'A nova conta será criada como filha da conta selecionada.', true)
                     }"></div>
 
@@ -55,7 +56,7 @@
                     }"></div>
                 </div>
 
-                <div th:replace="~{fragments/form-controls :: formActions(${mode} == 'edit' ? 'Salvar' : 'Criar', ${mode} == 'edit' ? '/contas/' + ${conta.id} : '/contas')}"></div>
+                <div th:replace="~{fragments/form-controls :: formActions(${mode} == 'edit' ? 'Salvar' : 'Criar', ${mode} == 'edit' ? '/contas/' + ${conta.id} : (${conta.superiorId} != null ? '/contas/' + ${conta.superiorId} : '/contas'))}"></div>
             </form>
         </div>
     </main>

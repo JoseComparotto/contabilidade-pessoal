@@ -6,9 +6,14 @@
 <body>
     <div th:replace="~{fragments/toast :: toasts}"></div>
     <main class="container">
-        <h1>Contas</h1>
-        <div class="controls">
-            <a href="/contas/new">+ Nova conta</a>
+        <div class="page-header">
+            <h1>Contas</h1>
+            <div class="actions">
+                <a class="btn details icon" href="/contas/new" aria-label="Nova conta" title="Nova conta">
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                    <span class="sr-only">Nova conta</span>
+                </a>
+            </div>
         </div>
 
         <div th:replace="~{fragments/contas :: contaTable(${contas}, null)}"></div>

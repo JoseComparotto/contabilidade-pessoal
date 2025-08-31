@@ -1,5 +1,9 @@
 /* Form card and general fields */
 .form-card { background: #fff; border: 1px solid #e3e6ee; border-radius: 6px; padding: 1rem }
+.card-header { display: flex; align-items: center; gap: .75rem; margin-bottom: .75rem }
+.card-header h2 { margin: 0; font-size: 1.25rem; font-weight: 700; color: #111; flex: 1 }
+.card-header .actions { margin: 0; display: inline-flex; gap: .5rem }
+.card-section { margin-top: 1rem }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem }
 .field { display: flex; flex-direction: column; gap: .25rem }
 label { font-weight: 600; font-size: .9rem; color: #333 }
