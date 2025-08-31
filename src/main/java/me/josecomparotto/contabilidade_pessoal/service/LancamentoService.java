@@ -25,14 +25,6 @@ public class LancamentoService {
         return LancamentoMapper.toDtoList(lancamentoRepository.findAll());
     }
 
-    public List<LancamentoPartidaDto> listarLancamentosPartidas(SentidoContabil sentidoContabil) {
-    return lancamentoRepository.findAll().stream()
-        .map(l -> sentidoContabil == SentidoContabil.DEBITO
-            ? LancamentoMapper.toPartidaDebito(l)
-            : LancamentoMapper.toPartidaCredito(l))
-        .toList();
-    }
-
     public LancamentoDto obterLancamentoPorId(Long id) {
         return LancamentoMapper.toDto(lancamentoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Lançamento não encontrado")));
