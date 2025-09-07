@@ -11,6 +11,17 @@
         <div class="hint" th:if="${hint}" th:text="${hint}"></div>
     </div>
 
+    <!-- Date input field -->
+    <div class="field"
+        th:fragment="dateField(id, name, label, value, required, isDisabled, hint, preserveWhenDisabled)">
+        <label th:attr="for=${id}" th:text="${label}">Label</label>
+        <input type="date" th:id="${id}" th:name="${name}" th:value="${value}"
+            th:attr="required=${required?:false} ? 'required' : null, disabled=${isDisabled?:false} ? 'disabled' : null" />
+        <input type="hidden" th:if="${(isDisabled?:false) and (preserveWhenDisabled?:false)}" th:name="${name}"
+            th:value="${value}" />
+        <div class="hint" th:if="${hint}" th:text="${hint}"></div>
+    </div>
+
     <!-- Select field with common id/displayText shape -->
     <div class="field"
         th:fragment="selectField(id, name, label, items, selectedValue, required, isDisabled, placeholder, hint, preserveWhenDisabled)">

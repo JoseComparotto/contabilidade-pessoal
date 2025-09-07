@@ -74,11 +74,11 @@
                 <div class="card-header">
                     <h2>Lançamentos</h2>
                     <div class="actions">
-                        <!-- <a class="btn details icon" th:href="@{/lancamentos/new(contaPartidaId=${conta.id})}"
+                        <a class="btn details icon" th:href="@{/lancamentos/new(contaPartidaId=${conta.id})}"
                            aria-label="Novo lançamento" title="Novo lançamento">
                             <i class="fa-solid fa-plus" aria-hidden="true"></i>
                             <span class="sr-only">Novo lançamento</span>
-                        </a> -->
+                        </a>
                     </div>
                 </div>
                 <div th:replace="~{fragments/lancamentos/list :: lancamentoTable(${lancamentos}, null)}"></div>

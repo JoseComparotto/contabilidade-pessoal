@@ -1,5 +1,7 @@
 package me.josecomparotto.contabilidade_pessoal.controller.web;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,8 +10,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
+import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoNatural;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaNewDto;
 import me.josecomparotto.contabilidade_pessoal.service.LancamentoService;
 
 @Controller
@@ -29,6 +35,26 @@ public class LancamentoWebController {
         return "lancamentos/detail";
     }
 
+    // GET /lancamentos/new?contaPartidaId={contaId}
+    @GetMapping("/lancamentos/new")
+    public String novoLancamento(
+            @RequestParam(required = false) Integer contaPartidaId,
+            Model model) {
+
+        LancamentoPartidaNewDto novoLancamento = new LancamentoPartidaNewDto();
+
+        novoLancamento.setContaPartidaId(contaPartidaId);
+
+        List<ContaViewDto> contas = lancamentoService.obterContasDisponiveis();
+        List<SentidoNatural> sentidosNaturais = List.of(SentidoNatural.values());
+        
+        model.addAttribute("mode", "create");
+        model.addAttribute("lancamento", novoLancamento);
+        model.addAttribute("contas", contas);
+        model.addAttribute("sentidosNaturais", sentidosNaturais);
+        return "lancamentos/form";
+    }
+
     // POST /lancamentos/{id}/delete[?redirect={redirectUrl}]
     @PostMapping("/lancamentos/{id}/delete")
     public String deletarLancamento(@PathVariable Long id, RedirectAttributes redirectAttrs,
@@ -44,6 +70,22 @@ public class LancamentoWebController {
             redirectAttrs.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:" + sanitizeRedirect(redirectUrl);
+    }
+
+    // POST /lancamentos
+    @PostMapping("/lancamentos")
+    public String criarLancamento(
+            @ModelAttribute LancamentoPartidaNewDto lancamentoDto,
+            RedirectAttributes redirectAttrs,
+            @RequestParam(name = "redirect", required = false) String redirectUrl) {
+        try {
+            Long id = lancamentoService.criarLancamento(lancamentoDto);
+            redirectAttrs.addFlashAttribute("success", "Lançamento criado com sucesso.");
+            return "redirect:/lancamentos/" + id;
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            redirectAttrs.addFlashAttribute("error", e.getMessage());
+            return "redirect:" + sanitizeRedirect(redirectUrl != null ? redirectUrl : "/lancamentos/new");
+        }
     }
 
     private String sanitizeRedirect(String redirectUrl) {

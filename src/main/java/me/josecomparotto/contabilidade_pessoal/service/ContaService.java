@@ -58,6 +58,12 @@ public class ContaService {
                 .toList();
     }
 
+    public List<ContaViewDto> listarContasAnaliticas() {
+        return listarContas().stream()
+                .filter(c -> c.getTipo() == TipoConta.ANALITICA)
+                .toList();
+    }
+
     public ContaViewDto obterContaPorId(Integer id) {
         Optional<Conta> opt = contaRepository.findByIdWithSuperior(id);
         if (opt.isEmpty())

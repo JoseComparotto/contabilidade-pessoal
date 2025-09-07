@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: commonHead(${mode} == 'edit' ? 'Editar Lancamento' : 'Nova Lancamento')}"></head>
+
+<body>
+    <div th:replace="~{fragments/toast :: toasts}"></div>
+    <main class="container">
+        <h1 th:text="${mode} == 'edit' ? 'Editar Lancamento' : 'Novo Lancamento'"></h1>
+
+        <div class="controls" style="margin-bottom:1rem">
+            <a th:href="@{/contas/{id}(id=${lancamento.contaPartidaId})}">← Voltar</a>
+        </div>
+
+        <div class="form-card">
+            <!-- Create mode uses ContaNewDto; Edit mode uses ContaViewDto -->
+            <form th:action="${mode} == 'edit' ? @{'/lancamentos/{id}/edit(id=lancamento.id)} : @{/lancamentos}"
+                method="post" th:with="
+                    canEditDescricao=${mode == 'edit' ? lancamento.editableProperties.contains('descricao') : true},
+                    canEditDataCompetencia=${mode == 'edit' ? lancamento.editableProperties.contains('dataCompetencia') : true},
+                    canEditSentidoNatural=${mode == 'edit' ? lancamento.editableProperties.contains('sentidoNatural') : true},
+                    canEditValorAbsoluto=${mode == 'edit' ? lancamento.editableProperties.contains('valorAbsoluto') : true},
+                    canEditContaPartida=${mode == 'edit' ? lancamento.editableProperties.contains('contaPartida') : true},
+                    canEditContaContraPartida=${mode == 'edit' ? lancamento.editableProperties.contains('contaContraPartida') : true}
+                ">
+                <input type="hidden" name="redirect"
+                    th:value="${mode == 'create' ? '/contas/' + lancamento.contaPartidaId : '/lancamentos/' + lancamento.id}" />
+                <div class="form-grid">
+
+                    <!-- Conta de Partida -->
+                    <div th:replace="~{fragments/form-controls :: selectField(
+                        'contaPartidaId', 'contaPartidaId', 'Conta (partida)', ${contas}, ${lancamento.contaPartidaId},
+                        true, ${not canEditContaPartida}, 'Selecione…', null, true)
+                    }"></div>
+
+                    <!-- Sentido Natural (Segmentado) -->
+                    <div th:replace="~{fragments/form-controls :: segmentedEnum(
+                        'sentidoNatural', 'Sentido', ${sentidosNaturais}, ${lancamento.sentidoNatural != null ? lancamento.sentidoNatural.name() : null}, 'SentidoNatural.',
+                        true, ${not canEditSentidoNatural}, null, true)
+                    }"></div>
+
+                    <!-- Descrição -->
+                    <div th:replace="~{fragments/form-controls :: textField(
+                        'descricao', 'descricao', 'Descrição', ${lancamento.descricao},
+                        true, ${not canEditDescricao}, null, true)
+                    }"></div>
+
+                    <!-- Data de Competência -->
+                    <div th:replace="~{fragments/form-controls :: dateField(
+                        'dataCompetencia', 'dataCompetencia', 'Data', ${lancamento.dataCompetencia},
+                        true, ${not canEditDataCompetencia}, null, true)
+                    }"></div>
+
+                    <!-- Conta de Contrapartida -->
+                    <div th:replace="~{fragments/form-controls :: selectField(
+                        'contaContrapartidaId', 'contaContrapartidaId', 'Conta (contrapartida)', ${contas}, ${lancamento.contaContrapartidaId},
+                        true, ${not canEditContaContraPartida}, 'Selecione…', null, true)
+                    }"></div>
+
+                    <!-- Valor -->
+                    <div th:replace="~{fragments/form-controls :: textField(
+                        'valorAbsoluto', 'valorAbsoluto', 'Valor', ${lancamento.valorAbsoluto},
+                        true, ${not canEditValorAbsoluto}, null, true)
+                    }"></div>
+
+
+                </div>
+
+                <div
+                    th:replace="~{fragments/form-controls :: formActions(${mode} == 'edit' ? 'Salvar' : 'Criar', ${mode} == 'edit' ? '/lancamentos/' + ${lancamento.id} : '/contas/' + ${lancamento.contaPartidaId})}">
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="/js/toast.js"></script>
+</body>
+
+</html>

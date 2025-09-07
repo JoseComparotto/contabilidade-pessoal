@@ -97,13 +97,15 @@ public class ContaWebController {
     // GET /contas/{id}/edit
     @GetMapping("/contas/{id}/edit")
     public String editarConta(@PathVariable Integer id, Model model, RedirectAttributes redirectAttrs) {
-        ContaViewDto dto = contasService.obterContaPorId(id);
-        if (dto == null) {
+        ContaViewDto conta = contasService.obterContaPorId(id);
+        ContaViewDto superior = contasService.obterSuperiorPorConta(id);
+        if (conta == null) {
             redirectAttrs.addFlashAttribute("error", "Conta não encontrada.");
             return "redirect:/contas";
         }
         model.addAttribute("mode", "edit");
-        model.addAttribute("conta", dto);
+        model.addAttribute("conta", conta);
+        model.addAttribute("superior", superior);
         model.addAttribute("tipos", TipoConta.values());
         model.addAttribute("contas", contasService.listarContasSinteticas());
         return "contas/form";

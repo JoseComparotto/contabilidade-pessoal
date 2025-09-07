@@ -7,7 +7,7 @@
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem }
 .field { display: flex; flex-direction: column; gap: .25rem }
 label { font-weight: 600; font-size: .9rem; color: #333 }
-input[type="text"], select, input[type="number"], input[type="checkbox"] { padding: .45rem .55rem; border: 1px solid #d9dce4; border-radius: 4px; background: #fff }
+input[type="text"], select, input[type="number"], input[type="checkbox"], input[type="date"] { padding: .45rem .55rem; border: 1px solid #d9dce4; border-radius: 4px; background: #fff }
 .as-input { display: inline-block; padding: .45rem .55rem; border: 1px solid #d9dce4; border-radius: 4px; background: #fff; color: #0a66c2; text-decoration: none }
 .as-input:hover { background: #f6faff; text-decoration: none }
 
