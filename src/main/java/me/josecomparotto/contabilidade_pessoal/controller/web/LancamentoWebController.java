@@ -76,15 +76,14 @@ public class LancamentoWebController {
     @PostMapping("/lancamentos")
     public String criarLancamento(
             @ModelAttribute LancamentoPartidaNewDto lancamentoDto,
-            RedirectAttributes redirectAttrs,
-            @RequestParam(name = "redirect", required = false) String redirectUrl) {
+            RedirectAttributes redirectAttrs) {
         try {
-            Long id = lancamentoService.criarLancamento(lancamentoDto);
+            lancamentoService.criarLancamento(lancamentoDto);
             redirectAttrs.addFlashAttribute("success", "Lançamento criado com sucesso.");
-            return "redirect:/lancamentos/" + id;
+            return "redirect:/contas/" + lancamentoDto.getContaPartidaId();
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirectAttrs.addFlashAttribute("error", e.getMessage());
-            return "redirect:" + sanitizeRedirect(redirectUrl != null ? redirectUrl : "/lancamentos/new");
+            return "redirect:/lancamentos/new";
         }
     }
 
