@@ -47,6 +47,7 @@ public final class ContaMapper {
         conta.setDescricao(dto.getDescricao());
         conta.setTipo(dto.getTipo());
         conta.setCreatedBySystem(false);
+        conta.setAtiva(true); // Nova conta é ativa por padrão
         return conta;
     }
 
