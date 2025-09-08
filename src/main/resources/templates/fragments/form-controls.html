@@ -27,14 +27,14 @@
         <label th:attr="for=${id}" th:text="${label}">Valor</label>
         <div class="currency-input">
             <span class="prefix" th:text="${currencySymbol?:'R$'}">R$</span>
-            <input type="text" inputmode="decimal" th:id="${id}" th:name="${name}" class="money"
-                   th:value="${value}" data-enhance="money" th:attr="data-scale=${scale?:2}"
-                   th:attrappend=" required=${required?:false} ? 'required' : null, disabled=${isDisabled?:false} ? 'disabled' : null" />
+         <!-- Visível (sem name) apenas para digitação/formatacao -->
+         <input type="text" inputmode="decimal" th:id="${id}" class="money"
+             th:value="${value}" data-enhance="money" th:attr="data-scale=${scale?:2}"
+             th:attrappend=" required=${required?:false} ? 'required' : null, disabled=${isDisabled?:false} ? 'disabled' : null" />
         </div>
-        <!-- Hidden raw numeric value (unformatted) -->
-        <input type="hidden" th:id="${id + '_raw'}" th:name="${name + '_raw'}" th:value="${value}" />
-        <input type="hidden" th:if="${(isDisabled?:false) and (preserveWhenDisabled?:false)}" th:name="${name}"
-               th:value="${value}" />
+     <!-- Hidden raw numeric value (unformatted) enviado no POST com o nome original -->
+     <input type="hidden" th:id="${id + '_raw'}" th:name="${name}" th:value="${value}" />
+     <!-- Nenhum hidden extra necessário para modo disabled: este já garante submissão -->
         <div class="hint" th:if="${hint}" th:text="${hint}"></div>
     </div>
 

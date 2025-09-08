@@ -12,6 +12,7 @@
     if(!cleaned) return '';
     const num = Number(cleaned);
     if(Number.isNaN(num)) return '';
+    // Keep raw numeric with fixed scale for consistency (server expects decimal string)
     return num.toFixed(scale);
   }
 
@@ -29,8 +30,8 @@
     // initialize formatting if value present
     if(input.value){
       const numeric = parseToNumber(input.value, scale);
-      if(hiddenRaw) hiddenRaw.value = numeric;
-      input.value = format(numeric, scale);
+      if(hiddenRaw) hiddenRaw.value = numeric; // numeric string with dot decimal
+      input.value = format(numeric, scale); // formatted for display
     }
 
     input.addEventListener('focus', () => {
