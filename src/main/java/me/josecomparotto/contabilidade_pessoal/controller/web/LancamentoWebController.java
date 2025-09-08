@@ -83,7 +83,7 @@ public class LancamentoWebController {
             return "redirect:/contas/" + lancamentoDto.getContaPartidaId();
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirectAttrs.addFlashAttribute("error", e.getMessage());
-            return "redirect:/lancamentos/new";
+            return "redirect:/lancamentos/new?contaPartidaId=" + lancamentoDto.getContaPartidaId();
         }
     }
 

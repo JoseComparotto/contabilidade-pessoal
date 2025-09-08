@@ -21,6 +21,7 @@ import jakarta.persistence.Transient;
 import me.josecomparotto.contabilidade_pessoal.application.converter.NaturezaConverter;
 import me.josecomparotto.contabilidade_pessoal.application.converter.TipoContaConverter;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
+import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 
 @Entity
@@ -104,6 +105,20 @@ public class Conta {
 
         // Retorna uma cópia imutável do conjunto de propriedades editáveis
         return Set.copyOf(editableProperties);
+    }
+
+    @Transient
+    public boolean isAceitaSentido(SentidoContabil sentido) {
+        if (sentido == null) {
+            return false;
+        }
+        if (Natureza.CREDORA.equals(natureza) && SentidoContabil.CREDITO.equals(sentido)) {
+            return true;
+        }
+        if (Natureza.DEVEDORA.equals(natureza) && SentidoContabil.DEBITO.equals(sentido)) {
+            return true;
+        }
+        return aceitaMovimentoOposto;
     }
 
     private boolean canEditTipo() {

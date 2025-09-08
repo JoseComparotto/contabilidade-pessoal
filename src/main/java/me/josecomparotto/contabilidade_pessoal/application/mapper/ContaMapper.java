@@ -26,6 +26,7 @@ public final class ContaMapper {
         dto.setSaldoAtual(conta.getSaldoNatural());
         dto.setRedutora(conta.isRedutora());
         dto.setAceitaMovimentoOposto(conta.getAceitaMovimentoOposto());
+        dto.setAtiva(conta.isAtiva());
         dto.setEditable(conta.isEditable());
         dto.setDeletable(conta.isDeletable());
         dto.setEditableProperties(conta.getEditableProperties());

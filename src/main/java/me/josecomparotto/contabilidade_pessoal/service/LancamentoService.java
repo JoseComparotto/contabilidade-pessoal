@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 
 import me.josecomparotto.contabilidade_pessoal.application.mapper.LancamentoMapper;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
-import me.josecomparotto.contabilidade_pessoal.application.mapper.ContaMapper;
-import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 import me.josecomparotto.contabilidade_pessoal.repository.ContaRepository;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoDto;
 import me.josecomparotto.contabilidade_pessoal.repository.LancamentoRepository;
@@ -20,14 +18,22 @@ import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPa
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
-import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoNatural;
+import static me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta.*;
+import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
+import static me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil.*;
 
 @Service
 public class LancamentoService {
 
     @Autowired
     private LancamentoRepository lancamentoRepository;
+
+    @Autowired
+    private ContaRepository contaRepository;
+
+    @Autowired
+    private ContaService contaService;
 
     public List<LancamentoDto> listarLancamentos() {
         return LancamentoMapper.toDtoList(lancamentoRepository.findAll());
@@ -40,7 +46,7 @@ public class LancamentoService {
 
     public LancamentoPartidaDto obterLancamentoPartidaPorId(Long id, SentidoContabil sentidoContabil) {
         return lancamentoRepository.findById(id)
-                .map(l -> sentidoContabil == SentidoContabil.DEBITO
+                .map(l -> sentidoContabil == DEBITO
                         ? LancamentoMapper.toPartidaDebito(l)
                         : LancamentoMapper.toPartidaCredito(l))
                 .orElseThrow(() -> new IllegalArgumentException("Lançamento não encontrado"));
@@ -81,42 +87,57 @@ public class LancamentoService {
         return true;
     }
 
-    @Autowired
-    private ContaRepository contaRepository;
-
     public List<ContaViewDto> obterContasDisponiveis() {
-    return contaRepository.findAll().stream()
-        .filter(c -> c.getTipo() == TipoConta.ANALITICA && c.isAtiva())
-        .map(ContaMapper::toViewDto)
-        .toList();
+        return contaService.listarContasAnaliticas().stream()
+                .filter(ContaViewDto::isAtiva) // Filtra apenas contas ativas
+                .collect(Collectors.toList());
     }
 
     public Long criarLancamento(LancamentoPartidaNewDto dto) {
-        if (dto == null) throw new IllegalArgumentException("DTO não pode ser nulo");
-        if (dto.getDataCompetencia() == null) throw new IllegalArgumentException("Data de competência obrigatória");
-        if (dto.getContaPartidaId() == null) throw new IllegalArgumentException("Conta partida obrigatória");
-        if (dto.getContaContrapartidaId() == null) throw new IllegalArgumentException("Conta contrapartida obrigatória");
-        if (dto.getContaPartidaId().equals(dto.getContaContrapartidaId())) throw new IllegalArgumentException("Conta partida e contrapartida devem ser diferentes");
-        if (dto.getValorAbsoluto() == null || BigDecimal.ZERO.equals(dto.getValorAbsoluto())) throw new IllegalArgumentException("Valor deve ser diferente de zero");
+        if (dto == null)
+            throw new IllegalArgumentException("DTO não pode ser nulo");
+        if (dto.getDataCompetencia() == null)
+            throw new IllegalArgumentException("Data de competência obrigatória");
+        if (dto.getContaPartidaId() == null)
+            throw new IllegalArgumentException("Conta partida obrigatória");
+        if (dto.getContaContrapartidaId() == null)
+            throw new IllegalArgumentException("Conta contrapartida obrigatória");
+        if (dto.getContaPartidaId().equals(dto.getContaContrapartidaId()))
+            throw new IllegalArgumentException("Conta partida e contrapartida devem ser diferentes");
+        if (dto.getValorAbsoluto() == null || BigDecimal.ZERO.equals(dto.getValorAbsoluto()))
+            throw new IllegalArgumentException("Valor deve ser diferente de zero");
 
         var contaPartida = contaRepository.findById(dto.getContaPartidaId())
-            .orElseThrow(() -> new IllegalArgumentException("Conta partida não encontrada"));
+                .orElseThrow(() -> new IllegalArgumentException("Conta partida não encontrada"));
         var contaContrapartida = contaRepository.findById(dto.getContaContrapartidaId())
-            .orElseThrow(() -> new IllegalArgumentException("Conta contrapartida não encontrada"));
+                .orElseThrow(() -> new IllegalArgumentException("Conta contrapartida não encontrada"));
 
-        if (contaPartida.getTipo() != TipoConta.ANALITICA || contaContrapartida.getTipo() != TipoConta.ANALITICA) {
+        if (contaPartida.getTipo() != ANALITICA || contaContrapartida.getTipo() != ANALITICA) {
             throw new IllegalArgumentException("Apenas contas analíticas podem receber lançamentos");
         }
         if (!contaPartida.isAtiva() || !contaContrapartida.isAtiva()) {
             throw new IllegalArgumentException("Contas inativas não podem receber lançamentos");
         }
 
-        // Determinar sentido contábil a partir do sentido natural informado em relação à conta partida
-        // Regra inversa da usada no mapper: se conta partida é credora, entrada = crédito; se devedora, entrada = débito.
+        // Determinar sentido contábil a partir do sentido natural informado em relação
+        // à conta partida
+        // Regra inversa da usada no mapper: se conta partida é credora, entrada =
+        // crédito; se devedora, entrada = débito.
         boolean partidaEhCredora = contaPartida.getNatureza() == Natureza.CREDORA;
         boolean entrada = dto.getSentidoNatural() == SentidoNatural.ENTRADA;
 
-        boolean usaCreditoComoPartida = partidaEhCredora ? entrada : !entrada; // true => partida é crédito; false => partida é débito
+        boolean usaCreditoComoPartida = partidaEhCredora ? entrada : !entrada; // true => partida é crédito; false =>
+                                                                               // partida é débito
+
+        SentidoContabil sentidoPartida = usaCreditoComoPartida ? CREDITO : DEBITO;
+        SentidoContabil sentidoContrapartida = usaCreditoComoPartida ? DEBITO : CREDITO;
+
+        if (!contaPartida.isAceitaSentido(sentidoPartida)) {
+            throw new IllegalArgumentException("Conta partida não aceita lançamentos neste sentido");
+        }
+        if (!contaContrapartida.isAceitaSentido(sentidoContrapartida)) {
+            throw new IllegalArgumentException("Conta contrapartida não aceita lançamentos neste sentido");
+        }
 
         var lanc = new Lancamento();
         lanc.setDescricao(dto.getDescricao());

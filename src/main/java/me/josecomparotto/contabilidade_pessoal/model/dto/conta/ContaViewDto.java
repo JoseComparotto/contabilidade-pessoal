@@ -22,6 +22,7 @@ public class ContaViewDto implements IDto<Conta> {
     private BigDecimal saldoAtual;
     private Natureza natureza;
     private TipoConta tipo;
+    private boolean ativa;
     private boolean redutora;
     private boolean aceitaMovimentoOposto;
     private boolean editable;
@@ -109,6 +110,14 @@ public class ContaViewDto implements IDto<Conta> {
         this.aceitaMovimentoOposto = aceitaMovimentoOposto;
     }
 
+    public boolean isAtiva() {
+        return ativa;
+    }
+
+    public void setAtiva(boolean ativa) {
+        this.ativa = ativa;
+    }
+
     public boolean isEditable() {
         return editable;
     }
@@ -132,5 +141,5 @@ public class ContaViewDto implements IDto<Conta> {
     public void setEditableProperties(Set<String> editableProperties) {
         this.editableProperties = editableProperties;
     }
-    
+
 }
