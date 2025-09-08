@@ -26,8 +26,10 @@
     <div class="field"
         th:fragment="selectField(id, name, label, items, selectedValue, required, isDisabled, placeholder, hint, preserveWhenDisabled)">
         <label th:attr="for=${id}" th:text="${label}">Label</label>
+        <!-- Native select kept for form submission & no-JS fallback. JS will enhance into a searchable typeahead. -->
         <select th:id="${id}" th:name="${name}"
-            th:attr="required=${required?:false} ? 'required' : null, disabled=${isDisabled?:false} ? 'disabled' : null">
+            data-enhance="searchable-select"
+            th:attr="required=${required?:false} ? 'required' : null, disabled=${isDisabled?:false} ? 'disabled' : null, data-placeholder=${placeholder}">
             <option th:if="${placeholder}" value="" disabled th:selected="${selectedValue == null}"
                 th:text="${placeholder}">Selecione…</option>
             <option th:each="item : ${items}" th:value="${item.id}" th:text="${item.displayText}"
