@@ -22,6 +22,22 @@
         <div class="hint" th:if="${hint}" th:text="${hint}"></div>
     </div>
 
+    <!-- Monetary (currency) input field -->
+    <div class="field" th:fragment="moneyField(id, name, label, value, currencySymbol, required, isDisabled, hint, preserveWhenDisabled, scale)">
+        <label th:attr="for=${id}" th:text="${label}">Valor</label>
+        <div class="currency-input">
+            <span class="prefix" th:text="${currencySymbol?:'R$'}">R$</span>
+            <input type="text" inputmode="decimal" th:id="${id}" th:name="${name}" class="money"
+                   th:value="${value}" data-enhance="money" th:attr="data-scale=${scale?:2}"
+                   th:attrappend=" required=${required?:false} ? 'required' : null, disabled=${isDisabled?:false} ? 'disabled' : null" />
+        </div>
+        <!-- Hidden raw numeric value (unformatted) -->
+        <input type="hidden" th:id="${id + '_raw'}" th:name="${name + '_raw'}" th:value="${value}" />
+        <input type="hidden" th:if="${(isDisabled?:false) and (preserveWhenDisabled?:false)}" th:name="${name}"
+               th:value="${value}" />
+        <div class="hint" th:if="${hint}" th:text="${hint}"></div>
+    </div>
+
     <!-- Select field with common id/displayText shape -->
     <div class="field"
         th:fragment="selectField(id, name, label, items, selectedValue, required, isDisabled, placeholder, hint, preserveWhenDisabled)">

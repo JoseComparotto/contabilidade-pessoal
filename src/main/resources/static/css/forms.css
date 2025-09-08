@@ -8,6 +8,10 @@
 .field { display: flex; flex-direction: column; gap: .25rem }
 label { font-weight: 600; font-size: .9rem; color: #333 }
 input[type="text"], select, input[type="number"], input[type="checkbox"], input[type="date"] { padding: .45rem .55rem; border: 1px solid #d9dce4; border-radius: 4px; background: #fff }
+.currency-input { display: flex; align-items: stretch; gap: .4rem }
+.currency-input .prefix { display:inline-flex; align-items:center; background:#f5f7fa; border:1px solid #d9dce4; border-radius:4px; padding:.45rem .6rem; font-weight:600; font-size:.9rem; color:#333; }
+.currency-input input.money { flex:1; }
+.currency-input input.money:focus { outline:2px solid #0a66c2; outline-offset:2px }
 .as-input { display: inline-block; padding: .45rem .55rem; border: 1px solid #d9dce4; border-radius: 4px; background: #fff; color: #0a66c2; text-decoration: none }
 .as-input:hover { background: #f6faff; text-decoration: none }
 

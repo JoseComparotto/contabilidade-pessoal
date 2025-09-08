@@ -58,11 +58,10 @@
                     }"></div>
 
                     <!-- Valor -->
-                    <div th:replace="~{fragments/form-controls :: textField(
-                        'valorAbsoluto', 'valorAbsoluto', 'Valor', ${lancamento.valorAbsoluto},
-                        true, ${not canEditValorAbsoluto}, null, true)
+                    <div th:replace="~{fragments/form-controls :: moneyField(
+                        'valorAbsoluto', 'valorAbsoluto', 'Valor', ${lancamento.valorAbsoluto}, 'R$',
+                        true, ${not canEditValorAbsoluto}, null, true, 2)
                     }"></div>
-
 
                 </div>
 
@@ -74,6 +73,7 @@
     </main>
 
     <script src="/js/toast.js"></script>
+    <script src="/js/money.js"></script>
 </body>
 
 </html>
