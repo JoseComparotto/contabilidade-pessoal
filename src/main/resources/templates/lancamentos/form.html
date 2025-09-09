@@ -14,14 +14,14 @@
 
         <div class="form-card">
             <!-- Create mode uses ContaNewDto; Edit mode uses ContaViewDto -->
-            <form th:action="${mode} == 'edit' ? @{'/lancamentos/{id}/edit(id=lancamento.id)} : @{/lancamentos}"
+            <form th:action="${mode} == 'edit' ? @{/lancamentos/{id}/edit(id=${lancamento.id})} : @{/lancamentos}"
                 method="post" th:with="
-                    canEditDescricao=${mode == 'edit' ? lancamento.editableProperties.contains('descricao') : true},
-                    canEditDataCompetencia=${mode == 'edit' ? lancamento.editableProperties.contains('dataCompetencia') : true},
-                    canEditSentidoNatural=${mode == 'edit' ? lancamento.editableProperties.contains('sentidoNatural') : true},
-                    canEditValorAbsoluto=${mode == 'edit' ? lancamento.editableProperties.contains('valorAbsoluto') : true},
-                    canEditContaPartida=${mode == 'edit' ? lancamento.editableProperties.contains('contaPartida') : true},
-                    canEditContaContraPartida=${mode == 'edit' ? lancamento.editableProperties.contains('contaContraPartida') : true}
+                    canEditDescricao=${mode == 'edit' ? lancamento.editable : true},
+                    canEditDataCompetencia=${mode == 'edit' ? lancamento.editable : true},
+                    canEditSentidoNatural=${mode == 'edit' ? lancamento.editable : true},
+                    canEditValorAbsoluto=${mode == 'edit' ? lancamento.editable : true},
+                    canEditContaPartida=${mode == 'edit' ? lancamento.editable : true},
+                    canEditContaContraPartida=${mode == 'edit' ? lancamento.editable : true}
                 ">
                 <input type="hidden" name="redirect"
                     th:value="${mode == 'create' ? '/contas/' + lancamento.contaPartidaId : '/lancamentos/' + lancamento.id}" />

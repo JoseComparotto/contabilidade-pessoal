@@ -8,8 +8,6 @@
     <main class="container">
         <div class="page-header">
             <h1>Detalhes do Lançamento</h1>
-            <div class="actions">
-            </div>
         </div>
 
         <div class="controls" style="margin-bottom:1rem">
@@ -20,6 +18,14 @@
             <div class="card-header">
                 <h2 th:text="${lancamento.displayText}"></h2>
                 <div class="actions">
+                    <a class="btn edit icon" th:href="${lancamento.editable} ? @{'/lancamentos/' + ${lancamento.id} + '/edit?sentidoContabil=' + ${lancamento.sentidoContabil.name()} } : ''"
+                        th:classappend="${lancamento.editable} ? '' : ' disabled'"
+                        th:attr="aria-disabled=${!lancamento.editable}, tabindex=${lancamento.editable} ? 0 : -1"
+                        aria-label="Editar lançamento" title="Editar lançamento">
+                        <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                        <span class="sr-only">Editar</span>
+                    </a>
+
                     <form th:action="@{/lancamentos/{id}/delete(id=${lancamento.id})}" method="post"
                         th:onsubmit="${lancamento.deletable} ? 'return confirm(\'Deseja excluir essa lancamento?\')' : 'return false;'"
                         style="display:inline">

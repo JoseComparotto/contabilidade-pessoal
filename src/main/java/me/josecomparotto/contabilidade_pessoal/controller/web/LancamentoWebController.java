@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoNatural;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaNewDto;
 import me.josecomparotto.contabilidade_pessoal.service.LancamentoService;
 
@@ -84,6 +86,37 @@ public class LancamentoWebController {
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirectAttrs.addFlashAttribute("error", e.getMessage());
             return "redirect:/lancamentos/new?contaPartidaId=" + lancamentoDto.getContaPartidaId();
+        }
+    }
+    
+    // GET /lancamentos/{id}/edit?sentidoContabil=DEBITO|CREDITO
+    @GetMapping("/lancamentos/{id}/edit")
+    public String editarLancamento(@PathVariable Long id, Model model, RedirectAttributes redirectAttrs,
+            @RequestParam(required = false, defaultValue = "CREDITO") SentidoContabil sentidoContabil) {
+        model.addAttribute("sentidoContabil", sentidoContabil);
+        LancamentoPartidaDto lancamento = lancamentoService.obterLancamentoPartidaPorId(id, sentidoContabil);
+        if (lancamento == null) {
+            redirectAttrs.addFlashAttribute("error", "Lançamento não encontrado.");
+            return "redirect:/lancamentos";
+        }
+        model.addAttribute("mode", "edit");
+        model.addAttribute("lancamento", lancamento);
+        model.addAttribute("contas", lancamentoService.obterContasDisponiveis());
+        model.addAttribute("sentidosNaturais", List.of(SentidoNatural.values()));
+        return "lancamentos/form";
+    }
+
+    
+    // POST /lancamentos/{id}/edit
+    @PostMapping("/lancamentos/{id}/edit")
+    public String salvarEdicao(@PathVariable Long id, LancamentoPartidaEditDto lancamentoDto, RedirectAttributes redirectAttrs) {
+        try {
+            lancamentoService.atualizarLancamento(id, lancamentoDto);
+            redirectAttrs.addFlashAttribute("success", "Lançamento atualizado com sucesso.");
+            return "redirect:/lancamentos/" + id;
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("error", e.getMessage());
+            return "redirect:/lancamentos/" + id + "/edit";
         }
     }
 

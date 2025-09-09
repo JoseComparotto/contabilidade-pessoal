@@ -92,6 +92,16 @@ public class Lancamento {
     }
 
     @Transient
+    public boolean isEditable() {
+        // Regras consideradas:
+        // - Nem a conta de débito nem a conta de crédito podem estar inativas
+        if (contaDebito == null || contaCredito == null) {
+            return false;
+        }
+        return contaDebito.isAtiva() && contaCredito.isAtiva();
+    }
+
+    @Transient
     public boolean isDeletable() {
         // Regras consideradas:
         // - Nem a conta de débito nem a conta de crédito podem estar inativas

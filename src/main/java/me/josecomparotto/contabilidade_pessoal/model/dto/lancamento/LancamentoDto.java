@@ -1,6 +1,5 @@
 package me.josecomparotto.contabilidade_pessoal.model.dto.lancamento;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import org.springframework.hateoas.server.core.Relation;
@@ -14,11 +13,12 @@ public class LancamentoDto implements IDto<Lancamento> {
 
     private Long id;
     private String descricao;
-    private BigDecimal valor;
+    private Double valor;
     private LocalDate dataCompetencia;
     private ContaViewDto contaDebito;
     private ContaViewDto contaCredito;
 
+    private boolean editable;
     private boolean deletable;
 
     private String displayText;
@@ -39,11 +39,11 @@ public class LancamentoDto implements IDto<Lancamento> {
         this.descricao = descricao;
     }
 
-    public BigDecimal getValor() {
+    public Double getValor() {
         return valor;
     }
 
-    public void setValor(BigDecimal valor) {
+    public void setValor(Double valor) {
         this.valor = valor;
     }
 
@@ -69,6 +69,14 @@ public class LancamentoDto implements IDto<Lancamento> {
 
     public void setContaCredito(ContaViewDto contaCredito) {
         this.contaCredito = contaCredito;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
 
     public boolean isDeletable() {

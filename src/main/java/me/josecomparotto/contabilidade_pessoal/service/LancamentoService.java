@@ -15,6 +15,7 @@ import me.josecomparotto.contabilidade_pessoal.repository.ContaRepository;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoDto;
 import me.josecomparotto.contabilidade_pessoal.repository.LancamentoRepository;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
@@ -156,4 +157,67 @@ public class LancamentoService {
         return saved.getId();
     }
 
+    public void atualizarLancamento(Long id, LancamentoPartidaEditDto editDto) {
+        if (editDto == null)
+            throw new IllegalArgumentException("DTO não pode ser nulo");
+        if (editDto.getDataCompetencia() == null)
+            throw new IllegalArgumentException("Data de competência obrigatória");
+        if (editDto.getContaPartidaId() == null)
+            throw new IllegalArgumentException("Conta partida obrigatória");
+        if (editDto.getContaContrapartidaId() == null)
+            throw new IllegalArgumentException("Conta contrapartida obrigatória");
+        if (editDto.getContaPartidaId().equals(editDto.getContaContrapartidaId()))
+            throw new IllegalArgumentException("Conta partida e contrapartida devem ser diferentes");
+        if (editDto.getValorAbsoluto() == null || BigDecimal.ZERO.equals(editDto.getValorAbsoluto()))
+            throw new IllegalArgumentException("Valor deve ser diferente de zero");
+
+        Lancamento lancamento = lancamentoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Lançamento não encontrado"));
+
+        if (!lancamento.isEditable()) {
+            throw new IllegalStateException("Lançamento não pode ser editado");
+        }
+
+        var contaPartida = contaRepository.findById(editDto.getContaPartidaId())
+                .orElseThrow(() -> new IllegalArgumentException("Conta partida não encontrada"));
+        var contaContrapartida = contaRepository.findById(editDto.getContaContrapartidaId())
+                .orElseThrow(() -> new IllegalArgumentException("Conta contrapartida não encontrada"));
+        if (contaPartida.getTipo() != ANALITICA || contaContrapartida.getTipo() != ANALITICA) {
+            throw new IllegalArgumentException("Apenas contas analíticas podem receber lançamentos");
+        }
+
+        if (!contaPartida.isAtiva() || !contaContrapartida.isAtiva()) {
+            throw new IllegalArgumentException("Contas inativas não podem receber lançamentos");
+        }
+
+        // Determinar sentido contábil a partir do sentido natural informado em relação
+        // à conta partida
+        // Regra inversa da usada no mapper: se conta partida é credora, entrada =
+        // crédito; se devedora, entrada = débito.
+        boolean partidaEhCredora = contaPartida.getNatureza() == Natureza.CREDORA;
+        boolean entrada = editDto.getSentidoNatural() == SentidoNatural.ENTRADA
+                ? true
+                : false;
+        boolean usaCreditoComoPartida = partidaEhCredora ? entrada : !entrada; // true => partida é crédito; false =>
+                                                                               // partida é débito
+        SentidoContabil sentidoPartida = usaCreditoComoPartida ? CREDITO : DEBITO;
+        SentidoContabil sentidoContrapartida = usaCreditoComoPartida ? DEBITO : CREDITO;
+        if (!contaPartida.isAceitaSentido(sentidoPartida)) {
+            throw new IllegalArgumentException("Conta partida não aceita lançamentos neste sentido");
+        }
+        if (!contaContrapartida.isAceitaSentido(sentidoContrapartida)) {
+            throw new IllegalArgumentException("Conta contrapartida não aceita lançamentos neste sentido");
+        }
+        lancamento.setDescricao(editDto.getDescricao());
+        lancamento.setDataCompetencia(editDto.getDataCompetencia());
+        lancamento.setValor(BigDecimal.valueOf(editDto.getValorAbsoluto()));
+        if (usaCreditoComoPartida) {
+            lancamento.setContaCredito(contaPartida);
+            lancamento.setContaDebito(contaContrapartida);
+        } else {
+            lancamento.setContaDebito(contaPartida);
+            lancamento.setContaCredito(contaContrapartida);
+        }
+        lancamentoRepository.save(lancamento);
+    }
 }

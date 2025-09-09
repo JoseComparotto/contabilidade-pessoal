@@ -6,7 +6,10 @@
 <body>
     <div th:replace="~{fragments/toast :: toasts}"></div>
     <main class="container">
-        <h1>Detalhes da Conta</h1>
+
+        <div class="page-header">
+            <h1>Detalhes da Conta</h1>
+        </div>
 
         <div class="controls" style="margin-bottom:1rem">
             <a href="/contas">← Voltar</a>
@@ -51,7 +54,8 @@
                         <a class="cover" th:href="@{/contas}">
                             <span class="sr-only">Abrir o plano de contas</span>
                         </a>
-                    </div>                </div>
+                    </div>
+                </div>
                 <div class="field">
                     <label>Saldo Atual</label>
                     <input type="text" th:value="${conta.saldoAtualFormatado}" disabled />
@@ -62,7 +66,7 @@
                     <h2>Contas inferiores</h2>
                     <div class="actions">
                         <a class="btn details icon" th:href="@{/contas/new(superiorId=${conta.id})}"
-                           aria-label="Criar nova conta inferior" title="Criar nova conta inferior">
+                            aria-label="Criar nova conta inferior" title="Criar nova conta inferior">
                             <i class="fa-solid fa-plus" aria-hidden="true"></i>
                             <span class="sr-only">Criar nova conta inferior</span>
                         </a>
@@ -75,7 +79,7 @@
                     <h2>Lançamentos</h2>
                     <div class="actions">
                         <a class="btn details icon" th:href="@{/lancamentos/new(contaPartidaId=${conta.id})}"
-                           aria-label="Novo lançamento" title="Novo lançamento">
+                            aria-label="Novo lançamento" title="Novo lançamento">
                             <i class="fa-solid fa-plus" aria-hidden="true"></i>
                             <span class="sr-only">Novo lançamento</span>
                         </a>

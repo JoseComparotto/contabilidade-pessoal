@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaEditDto;
+
 import static me.josecomparotto.contabilidade_pessoal.model.enums.Natureza.*;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 import static me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil.*;
@@ -23,10 +25,11 @@ public class LancamentoMapper {
         LancamentoDto dto = new LancamentoDto();
         dto.setId(lancamento.getId());
         dto.setDescricao(lancamento.getDescricao());
-        dto.setValor(lancamento.getValor());
+        dto.setValor(lancamento.getValor().doubleValue());
         dto.setDataCompetencia(lancamento.getDataCompetencia());
         dto.setContaCredito(ContaMapper.toViewDto(lancamento.getContaCredito()));
         dto.setContaDebito(ContaMapper.toViewDto(lancamento.getContaDebito()));
+        dto.setEditable(lancamento.isEditable());
         dto.setDeletable(lancamento.isDeletable());
         dto.setDisplayText(lancamento.getDisplayText());
 
@@ -79,12 +82,16 @@ public class LancamentoMapper {
         dto.setId(l.getId());
         dto.setDescricao(l.getDescricao());
         dto.setDataCompetencia(l.getDataCompetencia());
+        dto.setContaPartidaId(contaPartida.getId());
+        dto.setContaContrapartidaId(contaContrapartida.getId());
         dto.setContaPartida(ContaMapper.toViewDto(contaPartida));
         dto.setContaContrapartida(ContaMapper.toViewDto(contaContrapartida));
         dto.setSentidoContabil(sentidoContabil);
         dto.setSentidoNatural(sentidoNatural);
-        dto.setValorContabil(valorContabil);
-        dto.setValorNatural(valorNatural);
+        dto.setValorContabil(valorContabil.doubleValue());
+        dto.setValorNatural(valorNatural.doubleValue());
+        dto.setValorAbsoluto(valorAbsoluto.doubleValue());
+        dto.setEditable(l.isEditable());
         dto.setDeletable(l.isDeletable());
         dto.setDisplayText(l.getDisplayText());
         return dto;
