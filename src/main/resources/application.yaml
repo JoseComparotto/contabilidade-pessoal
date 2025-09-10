@@ -36,6 +36,11 @@ spring:
       app-user: "${APP_DB_USER:app}"
       app-user-password: "${APP_DB_PASSWORD:app}"
 
+  # Workaround: exclude SpringDoc HATEOAS auto-configuration (incompatible with Spring Boot 3.5.x)
+  autoconfigure:
+    exclude:
+      - org.springdoc.core.configuration.SpringDocHateoasConfiguration
+
 springdoc:
   swagger-ui:
     # Path where Swagger UI will be served

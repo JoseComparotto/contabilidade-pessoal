@@ -1,26 +1,27 @@
 package me.josecomparotto.contabilidade_pessoal.model.dto.lancamento;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.hateoas.server.core.Relation;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 
+@Relation(collectionRelation = "lancamentos", itemRelation = "lancamento")
 public class LancamentoDto implements IDto<Lancamento> {
 
     private Long id;
     private String descricao;
-    private BigDecimal valor;
+    private Double valor;
     private LocalDate dataCompetencia;
-
-    @JsonIgnoreProperties({"superior", "inferiores", "lancamentos"})
     private ContaViewDto contaDebito;
-
-    @JsonIgnoreProperties({"superior", "inferiores", "lancamentos"})
     private ContaViewDto contaCredito;
+
+    private boolean editable;
+    private boolean deletable;
+
+    private String displayText;
 
     public Long getId() {
         return id;
@@ -38,11 +39,11 @@ public class LancamentoDto implements IDto<Lancamento> {
         this.descricao = descricao;
     }
 
-    public BigDecimal getValor() {
+    public Double getValor() {
         return valor;
     }
 
-    public void setValor(BigDecimal valor) {
+    public void setValor(Double valor) {
         this.valor = valor;
     }
 
@@ -68,5 +69,34 @@ public class LancamentoDto implements IDto<Lancamento> {
 
     public void setContaCredito(ContaViewDto contaCredito) {
         this.contaCredito = contaCredito;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
+
+    public boolean isDeletable() {
+        return deletable;
+    }
+
+    public void setDeletable(boolean deletable) {
+        this.deletable = deletable;
+    }
+
+    public String getDisplayText() {
+        return displayText;
+    }
+
+    public void setDisplayText(String displayText) {
+        this.displayText = displayText;
+    }
+
+    @Override
+    public String toString() {
+        return getDisplayText();
     }
 }

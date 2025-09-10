@@ -1,13 +1,12 @@
 package me.josecomparotto.contabilidade_pessoal.model.dto.lancamento;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.time.format.DateTimeFormatter;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.hateoas.server.core.Relation;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
@@ -15,23 +14,30 @@ import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoNatural;
 
+@Relation(collectionRelation = "lancamentos", itemRelation = "lancamento")
 public class LancamentoPartidaDto implements IDto<Lancamento> {
 
     private Long id;
     private String descricao;
     private LocalDate dataCompetencia;
 
-    @JsonIgnoreProperties({ "superior", "inferiores", "lancamentos" })
-    private ContaViewDto contaPartida;
+    private int contaPartidaId;
+    private int contaContrapartidaId;
 
-    @JsonIgnoreProperties({ "superior", "inferiores", "lancamentos" })
+    private ContaViewDto contaPartida;
     private ContaViewDto contaContrapartida;
 
     private SentidoContabil sentidoContabil;
     private SentidoNatural sentidoNatural;
-    
-    private BigDecimal valorContabil; // negativo quando sentidoContabil = DEBITO
-    private BigDecimal valorNatural; // negativo quando o sentidoContabil for contra a natureza da conta de partida
+
+    private Double valorContabil; // negativo quando sentidoContabil = DEBITO
+    private Double valorNatural; // negativo quando o sentidoContabil for contra a natureza da conta de partida
+    private Double valorAbsoluto; // sempre positivo
+
+    private boolean editable;
+    private boolean deletable;
+
+    private String displayText;
 
     public Long getId() {
         return id;
@@ -55,6 +61,22 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
 
     public void setDataCompetencia(LocalDate dataCompetencia) {
         this.dataCompetencia = dataCompetencia;
+    }
+
+    public int getContaPartidaId() {
+        return contaPartidaId;
+    }
+
+    public void setContaPartidaId(int contaPartidaId) {
+        this.contaPartidaId = contaPartidaId;
+    }
+
+    public int getContaContrapartidaId() {
+        return contaContrapartidaId;
+    }
+
+    public void setContaContrapartidaId(int contaContrapartidaId) {
+        this.contaContrapartidaId = contaContrapartidaId;
     }
 
     public ContaViewDto getContaPartida() {
@@ -89,25 +111,33 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
         this.sentidoNatural = sentidoNatural;
     }
 
-    public BigDecimal getValorContabil() {
+    public Double getValorContabil() {
         return valorContabil;
     }
 
-    public void setValorContabil(BigDecimal valorContabil) {
+    public void setValorContabil(Double valorContabil) {
         this.valorContabil = valorContabil;
     }
 
-    public BigDecimal getValorNatural() {
+    public Double getValorNatural() {
         return valorNatural;
     }
 
-    public void setValorNatural(BigDecimal valorNatural) {
+    public void setValorNatural(Double valorNatural) {
         this.valorNatural = valorNatural;
+    }
+
+    public Double getValorAbsoluto() {
+        return valorAbsoluto;
+    }
+
+    public void setValorAbsoluto(Double valor) {
+        this.valorAbsoluto = valor;
     }
 
     @JsonIgnore
     public String getValorNaturalFormatado() {
-        if (valorNatural == null || BigDecimal.ZERO.compareTo(valorNatural) == 0) {
+        if (valorNatural == null || Double.compare(valorNatural, 0.0) == 0) {
             return "R$ 0,00";
         }
         NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
@@ -116,9 +146,38 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
 
     @JsonIgnore
     public String getDataCompetenciaFormatada() {
-        if (dataCompetencia == null) return "—";
+        if (dataCompetencia == null)
+            return "—";
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return dataCompetencia.format(fmt);
     }
 
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
+
+    public boolean isDeletable() {
+        return deletable;
+    }
+
+    public void setDeletable(boolean deletable) {
+        this.deletable = deletable;
+    }
+
+    public String getDisplayText() {
+        return displayText;
+    }
+
+    public void setDisplayText(String displayText) {
+        this.displayText = displayText;
+    }
+
+    @Override
+    public String toString() {
+        return getDisplayText();
+    }
 }

@@ -38,7 +38,7 @@
 
                     <!-- Conta superior -->
                     <div th:replace="~{fragments/form-controls :: selectField(
-                        'superiorId', 'superiorId', 'Conta superior', ${contas}, ${mode == 'edit' ? conta.superior.id : conta.superiorId},
+                        'superiorId', 'superiorId', 'Conta superior', ${contas}, ${mode == 'edit' ? superior.id : conta.superiorId},
                         true, ${isSelectDisabled}, 'Selecione…', 'A nova conta será criada como filha da conta selecionada.', true)
                     }"></div>
 
@@ -60,8 +60,6 @@
             </form>
         </div>
     </main>
-
-    <script src="/js/toast.js"></script>
 </body>
 
 </html>

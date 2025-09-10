@@ -1,5 +1,7 @@
 package me.josecomparotto.contabilidade_pessoal.controller.web;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,15 +14,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import me.josecomparotto.contabilidade_pessoal.application.mapper.ContaMapper;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 import me.josecomparotto.contabilidade_pessoal.service.ContaService;
+import me.josecomparotto.contabilidade_pessoal.service.LancamentoService;
 
 @Controller
 public class ContaWebController {
 
     @Autowired
     private ContaService contasService;
+
+    @Autowired
+    private LancamentoService lancamentoService;
 
     // GET /contas
     @GetMapping("/contas")
@@ -32,12 +39,19 @@ public class ContaWebController {
     // GET /contas/{id}
     @GetMapping("/contas/{id}")
     public String detalhesConta(@PathVariable Integer id, Model model, RedirectAttributes redirectAttrs) {
-        ContaViewDto dto = contasService.obterContaPorId(id);
-        if (dto == null) {
+        ContaViewDto conta = contasService.obterContaPorId(id);
+        if (conta == null) {
             redirectAttrs.addFlashAttribute("error", "Conta não encontrada.");
             return "redirect:/contas";
         }
-        model.addAttribute("conta", dto);
+        ContaViewDto superior = contasService.obterSuperiorPorConta(id);
+        List<ContaViewDto> inferiores = contasService.listarInferioresPorConta(id);
+        List<LancamentoPartidaDto> lancamentos = lancamentoService.listarLancamentosPorConta(id);
+
+        model.addAttribute("conta", conta);
+        model.addAttribute("superior", superior);
+        model.addAttribute("inferiores", inferiores);
+        model.addAttribute("lancamentos", lancamentos);
         return "contas/detail";
     }
 
@@ -59,7 +73,7 @@ public class ContaWebController {
     // POST /contas[?redirect={redirectUrl}] (create)
     @PostMapping("/contas")
     public String criarConta(ContaNewDto contaDto, RedirectAttributes redirectAttrs,
-                              @RequestParam(name = "redirect", required = false) String redirectUrl) {
+            @RequestParam(name = "redirect", required = false, defaultValue = "/contas") String redirectUrl) {
         try {
             ContaViewDto criada = contasService.criarConta(contaDto);
             redirectAttrs.addFlashAttribute("success", "Conta criada com sucesso: " + criada.getCodigo());
@@ -71,7 +85,8 @@ public class ContaWebController {
     }
 
     private String sanitizeRedirect(String redirectUrl) {
-        if (redirectUrl == null || redirectUrl.isBlank()) return "/contas";
+        if (redirectUrl == null || redirectUrl.isBlank())
+            return "/contas";
         // Only allow relative paths within the app to avoid open redirects
         if (redirectUrl.startsWith("/") && !redirectUrl.startsWith("//")) {
             return redirectUrl;
@@ -82,13 +97,15 @@ public class ContaWebController {
     // GET /contas/{id}/edit
     @GetMapping("/contas/{id}/edit")
     public String editarConta(@PathVariable Integer id, Model model, RedirectAttributes redirectAttrs) {
-        ContaViewDto dto = contasService.obterContaPorId(id);
-        if (dto == null) {
+        ContaViewDto conta = contasService.obterContaPorId(id);
+        ContaViewDto superior = contasService.obterSuperiorPorConta(id);
+        if (conta == null) {
             redirectAttrs.addFlashAttribute("error", "Conta não encontrada.");
             return "redirect:/contas";
         }
         model.addAttribute("mode", "edit");
-        model.addAttribute("conta", dto);
+        model.addAttribute("conta", conta);
+        model.addAttribute("superior", superior);
         model.addAttribute("tipos", TipoConta.values());
         model.addAttribute("contas", contasService.listarContasSinteticas());
         return "contas/form";

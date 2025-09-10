@@ -6,7 +6,10 @@
 <body>
     <div th:replace="~{fragments/toast :: toasts}"></div>
     <main class="container">
-        <h1>Detalhes da Conta</h1>
+
+        <div class="page-header">
+            <h1>Detalhes da Conta</h1>
+        </div>
 
         <div class="controls" style="margin-bottom:1rem">
             <a href="/contas">← Voltar</a>
@@ -40,18 +43,19 @@
             <div class="form-grid">
                 <div class="field">
                     <label>Conta superior</label>
-                    <div class="input-link" th:if="${conta.superior != null}">
-                        <input type="text" disabled th:value="${conta.superior.displayText}" />
-                        <a class="cover" th:href="@{/contas/{id}(id=${conta.superior.id})}">
+                    <div class="input-link" th:if="${superior != null}">
+                        <input type="text" disabled th:value="${superior.displayText}" />
+                        <a class="cover" th:href="@{/contas/{id}(id=${superior.id})}">
                             <span class="sr-only">Abrir detalhes da conta superior</span>
                         </a>
                     </div>
-                    <div class="input-link" th:if="${conta.superior == null}">
+                    <div class="input-link" th:if="${superior == null}">
                         <input type="text" disabled value="Plano de Contas" />
                         <a class="cover" th:href="@{/contas}">
-                            <span class="sr-only">Abrir o plano de caontas</span>
+                            <span class="sr-only">Abrir o plano de contas</span>
                         </a>
-                    </div>                </div>
+                    </div>
+                </div>
                 <div class="field">
                     <label>Saldo Atual</label>
                     <input type="text" th:value="${conta.saldoAtualFormatado}" disabled />
@@ -62,31 +66,29 @@
                     <h2>Contas inferiores</h2>
                     <div class="actions">
                         <a class="btn details icon" th:href="@{/contas/new(superiorId=${conta.id})}"
-                           aria-label="Criar nova conta inferior" title="Criar nova conta inferior">
+                            aria-label="Criar nova conta inferior" title="Criar nova conta inferior">
                             <i class="fa-solid fa-plus" aria-hidden="true"></i>
                             <span class="sr-only">Criar nova conta inferior</span>
                         </a>
                     </div>
                 </div>
-                <div th:replace="~{fragments/contas/list :: contaTable(${conta.inferiores}, null)}"></div>
+                <div th:replace="~{fragments/contas/list :: contaTable(${inferiores}, null)}"></div>
             </div>
             <div class="card-section" th:if="${conta.tipo.name() == 'ANALITICA'}">
                 <div class="card-header">
                     <h2>Lançamentos</h2>
                     <div class="actions">
-                        <!-- <a class="btn details icon" th:href="@{/lancamentos/new(contaPartidaId=${conta.id})}"
-                           aria-label="Novo lançamento" title="Novo lançamento">
+                        <a class="btn details icon" th:href="@{/lancamentos/new(contaPartidaId=${conta.id})}"
+                            aria-label="Novo lançamento" title="Novo lançamento">
                             <i class="fa-solid fa-plus" aria-hidden="true"></i>
                             <span class="sr-only">Novo lançamento</span>
-                        </a> -->
+                        </a>
                     </div>
                 </div>
-                <div th:replace="~{fragments/lancamentos/list :: lancamentoTable(${conta.lancamentos}, null)}"></div>
+                <div th:replace="~{fragments/lancamentos/list :: lancamentoTable(${lancamentos}, null)}"></div>
             </div>
         </div>
     </main>
-
-    <script src="/js/toast.js"></script>
 </body>
 
 </html>

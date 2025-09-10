@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Contabilidade Pessoal API",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "API para gerenciamento e consulta de contas contábeis."
   },
   "servers": [
@@ -20,13 +20,10 @@
         "operationId": "listarContas",
         "responses": {
           "200": {
-            "description": "Lista de contas",
+            "description": "Lista de contas (HATEOAS)",
             "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/ContaViewDto" }
-                }
+              "application/hal+json": {
+                "schema": { "$ref": "#/components/schemas/CollectionModelContaViewDto" }
               }
             }
           }
@@ -46,10 +43,10 @@
         },
         "responses": {
           "201": {
-            "description": "Conta criada",
+            "description": "Conta criada (HATEOAS)",
             "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ContaViewDto" }
+              "application/hal+json": {
+                "schema": { "$ref": "#/components/schemas/EntityModelContaViewDto" }
               }
             }
           },
@@ -67,10 +64,10 @@
         ],
         "responses": {
           "200": {
-            "description": "Conta encontrada",
+            "description": "Conta encontrada (HATEOAS)",
             "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ContaViewDto" }
+              "application/hal+json": {
+                "schema": { "$ref": "#/components/schemas/EntityModelContaViewDto" }
               }
             }
           },
@@ -94,10 +91,10 @@
         },
         "responses": {
           "200": {
-            "description": "Conta atualizada",
+            "description": "Conta atualizada (HATEOAS)",
             "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ContaViewDto" }
+              "application/hal+json": {
+                "schema": { "$ref": "#/components/schemas/EntityModelContaViewDto" }
               }
             }
           },
@@ -119,6 +116,69 @@
         }
       }
     },
+    "/contas/{id}/superior": {
+      "get": {
+        "tags": ["Contas"],
+        "summary": "Obter superior da conta",
+        "operationId": "obterSuperiorPorConta",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int32" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conta superior encontrada (HATEOAS)",
+            "content": {
+              "application/hal+json": {
+                "schema": { "$ref": "#/components/schemas/EntityModelContaViewDto" }
+              }
+            }
+          },
+          "404": { "description": "Conta ou superior não encontrada" }
+        }
+      }
+    },
+    "/contas/{id}/inferiores": {
+      "get": {
+        "tags": ["Contas"],
+        "summary": "Listar contas inferiores da conta",
+        "operationId": "listarInferioresPorConta",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int32" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contas inferiores encontradas (HATEOAS)",
+            "content": {
+              "application/hal+json": {
+                "schema": { "$ref": "#/components/schemas/CollectionModelContaViewDto" }
+              }
+            }
+          },
+          "404": { "description": "Conta não encontrada ou sem inferiores" }
+        }
+      }
+    },
+    "/contas/{id}/lancamentos": {
+      "get": {
+        "tags": ["Contas"],
+        "summary": "Listar lançamentos da conta",
+        "operationId": "listarLancamentosPorConta",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int32" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lançamentos encontrados (HATEOAS)",
+            "content": {
+              "application/hal+json": {
+                "schema": { "$ref": "#/components/schemas/CollectionModelLancamentoPartidaDto" }
+              }
+            }
+          },
+          "404": { "description": "Conta não encontrada ou sem lançamentos" }
+        }
+      }
+    },
     "/lancamentos": {
       "get": {
         "tags": ["Lançamentos"],
@@ -126,13 +186,10 @@
         "operationId": "listarLancamentos",
         "responses": {
           "200": {
-            "description": "Lista de lançamentos",
+            "description": "Lista de lançamentos (HATEOAS)",
             "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/LancamentoDto" }
-                }
+              "application/hal+json": {
+                "schema": { "$ref": "#/components/schemas/CollectionModelLancamentoDto" }
               }
             }
           }
@@ -149,10 +206,10 @@
         ],
         "responses": {
           "200": {
-            "description": "Lançamento encontrado",
+            "description": "Lançamento encontrado (HATEOAS)",
             "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/LancamentoDto" }
+              "application/hal+json": {
+                "schema": { "$ref": "#/components/schemas/EntityModelLancamentoDto" }
               }
             }
           },
@@ -163,6 +220,21 @@
   },
   "components": {
     "schemas": {
+      "Link": {
+        "type": "object",
+        "properties": {
+          "href": { "type": "string", "format": "uri" },
+          "templated": { "type": "boolean" },
+          "type": { "type": "string" },
+          "title": { "type": "string" }
+        },
+        "required": ["href"]
+      },
+      "Links": {
+        "type": "object",
+        "additionalProperties": { "$ref": "#/components/schemas/Link" }
+      },
+
       "TipoConta": {
         "type": "string",
         "description": "Tipo da conta",
@@ -183,6 +255,7 @@
         "description": "Sentido natural considerando a natureza da conta",
         "enum": ["ENTRADA", "SAIDA"]
       },
+
       "ContaNewDto": {
         "type": "object",
         "description": "DTO para criação de nova conta",
@@ -225,6 +298,34 @@
           "lancamentos": { "type": "array", "items": { "$ref": "#/components/schemas/LancamentoPartidaDto" } }
         }
       },
+
+      "EntityModelContaViewDto": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ContaViewDto" },
+          {
+            "type": "object",
+            "properties": { "_links": { "$ref": "#/components/schemas/Links" } },
+            "required": ["_links"]
+          }
+        ]
+      },
+      "CollectionModelContaViewDto": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "contas": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/EntityModelContaViewDto" }
+              }
+            }
+          },
+          "_links": { "$ref": "#/components/schemas/Links" }
+        },
+        "required": ["_links"]
+      },
+
       "LancamentoDto": {
         "type": "object",
         "description": "Representação de um lançamento contábil",
@@ -237,6 +338,32 @@
           "contaCredito": { "$ref": "#/components/schemas/ContaViewDto" }
         },
         "required": ["id", "descricao", "valor", "dataCompetencia", "contaDebito", "contaCredito"]
+      },
+      "EntityModelLancamentoDto": {
+        "allOf": [
+          { "$ref": "#/components/schemas/LancamentoDto" },
+          {
+            "type": "object",
+            "properties": { "_links": { "$ref": "#/components/schemas/Links" } },
+            "required": ["_links"]
+          }
+        ]
+      },
+      "CollectionModelLancamentoDto": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "lancamentos": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/EntityModelLancamentoDto" }
+              }
+            }
+          },
+          "_links": { "$ref": "#/components/schemas/Links" }
+        },
+        "required": ["_links"]
       },
       "LancamentoPartidaDto": {
         "type": "object",
@@ -253,6 +380,22 @@
           "valorNatural": { "type": "number", "format": "double", "description": "Negativo quando contra a natureza da conta de partida" }
         },
         "required": ["id", "descricao", "dataCompetencia", "contaPartida", "contaContrapartida", "sentidoContabil", "sentidoNatural", "valorContabil", "valorNatural"]
+      },
+      "CollectionModelLancamentoPartidaDto": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "lancamentos": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/LancamentoPartidaDto" }
+              }
+            }
+          },
+          "_links": { "$ref": "#/components/schemas/Links" }
+        },
+        "required": ["_links"]
       }
     }
   }
