@@ -55,3 +55,7 @@ springdoc:
     enabled: true
     path: /v3/api-docs
 
+server:
+  port: "${APP_PORT:8080}"
+  servlet:
+    context-path: "/"
