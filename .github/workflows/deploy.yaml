@@ -40,7 +40,7 @@ jobs:
           # Cria o app 
           az container create \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --location eastus \
+            --location mexicocentral \
             --name java-app \
             --os-type Linux \
             --dns-name-label contabilidade-pessoal \
