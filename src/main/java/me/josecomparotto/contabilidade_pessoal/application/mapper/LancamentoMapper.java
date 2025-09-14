@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaEditDto;
 
 import static me.josecomparotto.contabilidade_pessoal.model.enums.Natureza.*;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
