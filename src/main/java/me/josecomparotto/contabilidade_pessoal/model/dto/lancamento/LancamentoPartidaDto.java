@@ -6,7 +6,6 @@ import java.util.Locale;
 import java.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.hateoas.server.core.Relation;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
@@ -14,7 +13,6 @@ import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoNatural;
 
-@Relation(collectionRelation = "lancamentos", itemRelation = "lancamento")
 public class LancamentoPartidaDto implements IDto<Lancamento> {
 
     private Long id;

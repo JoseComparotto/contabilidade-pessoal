@@ -2,13 +2,11 @@ package me.josecomparotto.contabilidade_pessoal.model.dto.lancamento;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import org.springframework.hateoas.server.core.Relation;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoNatural;
 
-@Relation(collectionRelation = "lancamentos", itemRelation = "lancamento")
 public class LancamentoPartidaNewDto implements IDto<Lancamento> {
 
     private String descricao;
