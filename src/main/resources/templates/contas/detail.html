@@ -76,7 +76,7 @@
             </div>
             <div class="card-section" th:if="${conta.tipo.name() == 'ANALITICA'}">
                 <div class="card-header">
-                    <h2>Lançamentos</h2>
+                    <h2>Movimentos</h2>
                     <div class="actions">
                         <a class="btn details icon" th:href="@{/lancamentos/new(contaPartidaId=${conta.id})}"
                             aria-label="Novo lançamento" title="Novo lançamento">
@@ -85,7 +85,7 @@
                         </a>
                     </div>
                 </div>
-                <div th:replace="~{fragments/lancamentos/list :: lancamentoTable(${lancamentos}, null)}"></div>
+                <div th:replace="~{fragments/lancamentos/list :: lancamentoTable(${movimentos}, null)}"></div>
             </div>
         </div>
     </main>

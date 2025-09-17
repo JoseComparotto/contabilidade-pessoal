@@ -90,6 +90,7 @@ public class LancamentoMapper {
         dto.setValorContabil(valorContabil.doubleValue());
         dto.setValorNatural(valorNatural.doubleValue());
         dto.setValorAbsoluto(valorAbsoluto.doubleValue());
+        dto.setStatus(l.getStatus());
         dto.setEditable(l.isEditable());
         dto.setDeletable(l.isDeletable());
         dto.setDisplayText(l.getDisplayText());

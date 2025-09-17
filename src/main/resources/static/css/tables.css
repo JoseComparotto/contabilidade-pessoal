@@ -7,6 +7,9 @@ tbody td { padding: .6rem .8rem; border-bottom: 1px solid #f1f3f7 }
 /* Row semantic states */
 .sintetica td { font-weight: 700 }
 .redutora td { font-style: italic; }
+.agregado td { background: #f3f4f6; font-weight: 700; }
+.entrada td { color: #166534; } /* green-800 */
+.saida td { color: #9a3412; } /* red-700 */
 
 /* Clickable row pattern */
 .clickable-rows tbody tr { cursor: pointer; }

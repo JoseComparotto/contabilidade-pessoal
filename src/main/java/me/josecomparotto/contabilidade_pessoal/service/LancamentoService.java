@@ -1,9 +1,13 @@
 package me.josecomparotto.contabilidade_pessoal.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,7 @@ import me.josecomparotto.contabilidade_pessoal.repository.LancamentoRepository;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaNewDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.MovimentoDto;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoNatural;
@@ -53,7 +58,7 @@ public class LancamentoService {
                 .orElseThrow(() -> new IllegalArgumentException("Lançamento não encontrado"));
     }
 
-    public List<LancamentoPartidaDto> listarLancamentosPorConta(Integer id) {
+    private List<LancamentoPartidaDto> listarLancamentosPorConta(Integer id) {
 
         List<Lancamento> lancamentosCredito = lancamentoRepository.findByContaCreditoId(id);
         List<Lancamento> lancamentosDebito = lancamentoRepository.findByContaDebitoId(id);
@@ -72,6 +77,67 @@ public class LancamentoService {
 
         return partidas;
 
+    }
+
+    public List<MovimentoDto> listarMovimentosPorConta(Integer idConta) {
+
+        Map<LocalDate, List<LancamentoPartidaDto>> dataLancamentosMap = new HashMap<>();
+        List<LancamentoPartidaDto> lancamentosPartidas = listarLancamentosPorConta(idConta);
+
+        lancamentosPartidas.sort(Comparator
+                .comparing(LancamentoPartidaDto::getDataCompetencia)
+                .thenComparing(LancamentoPartidaDto::getValorNatural, Comparator.reverseOrder()));
+
+        for (LancamentoPartidaDto l : lancamentosPartidas) {
+            LocalDate data = l.getDataCompetencia();
+            dataLancamentosMap.computeIfAbsent(data, k -> new ArrayList<>()).add(l);
+        }
+
+        List<MovimentoDto> movimentos = new ArrayList<>();
+
+        List<LocalDate> datasOrdenadas = new ArrayList<>(dataLancamentosMap.keySet());
+        datasOrdenadas.sort(Comparator.naturalOrder());
+
+        BigDecimal saldoAcumulado = BigDecimal.ZERO;
+        for (var data : datasOrdenadas) {
+            var lancamentos = dataLancamentosMap.get(data);
+
+            BigDecimal saldoAnterior = saldoAcumulado;
+
+            for (var lancamento : lancamentos) {
+                saldoAcumulado = saldoAcumulado.add(BigDecimal.valueOf(lancamento.getValorNatural()));
+
+                MovimentoDto m = new MovimentoDto();
+                m.setAgregado(false);
+                m.setStatus(lancamento.getStatus());
+                m.setData(data);
+                m.setValor(lancamento.getValorNatural());
+                m.setSaldo(saldoAcumulado.doubleValue());
+                m.setIdLancamento(lancamento.getId());
+                m.setDescricao(lancamento.getDescricao());
+                m.setSentidoContabil(lancamento.getSentidoContabil());
+                m.setSentidoNatural(lancamento.getSentidoNatural());
+                m.setContaPartida(lancamento.getContaPartida());
+                m.setContaContrapartida(lancamento.getContaContrapartida());
+
+                movimentos.add(m);
+            }
+
+            MovimentoDto mAgregado = new MovimentoDto();
+            mAgregado.setAgregado(true);
+            mAgregado.setData(data);
+            mAgregado.setValor(saldoAcumulado.subtract(saldoAnterior).doubleValue());
+            mAgregado.setSaldo(saldoAcumulado.doubleValue());
+            mAgregado.setSentidoNatural(mAgregado.getValor() >= 0 ? SentidoNatural.ENTRADA : SentidoNatural.SAIDA);
+            movimentos.add(mAgregado);
+        }
+
+        movimentos.sort(Comparator
+                .comparing(MovimentoDto::getData, Comparator.reverseOrder())
+                .thenComparing(MovimentoDto::isAgregado, Comparator.reverseOrder())
+                .thenComparing(MovimentoDto::getValor));
+
+        return movimentos;
     }
 
     public boolean deletarLancamento(Long id) {
@@ -168,7 +234,7 @@ public class LancamentoService {
             throw new IllegalArgumentException("Conta contrapartida obrigatória");
         if (editDto.getContaPartidaId().equals(editDto.getContaContrapartidaId()))
             throw new IllegalArgumentException("Conta partida e contrapartida devem ser diferentes");
-        if (editDto.getValorAbsoluto() == null || BigDecimal.ZERO.equals(editDto.getValorAbsoluto()))
+        if (editDto.getValorAbsoluto() == null || editDto.getValorAbsoluto() == 0)
             throw new IllegalArgumentException("Valor deve ser diferente de zero");
 
         Lancamento lancamento = lancamentoRepository.findById(id)

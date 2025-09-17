@@ -12,6 +12,7 @@ import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoNatural;
+import me.josecomparotto.contabilidade_pessoal.model.enums.StatusLancamento;
 
 public class LancamentoPartidaDto implements IDto<Lancamento> {
 
@@ -31,6 +32,8 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
     private Double valorContabil; // negativo quando sentidoContabil = DEBITO
     private Double valorNatural; // negativo quando o sentidoContabil for contra a natureza da conta de partida
     private Double valorAbsoluto; // sempre positivo
+
+    private StatusLancamento status;
 
     private boolean editable;
     private boolean deletable;
@@ -131,6 +134,14 @@ public class LancamentoPartidaDto implements IDto<Lancamento> {
 
     public void setValorAbsoluto(Double valor) {
         this.valorAbsoluto = valor;
+    }
+
+    public StatusLancamento getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusLancamento status) {
+        this.status = status;
     }
 
     @JsonIgnore

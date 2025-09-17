@@ -7,23 +7,44 @@
                     <th>Data</th>
                     <th>Descrição</th>
                     <th>Valor</th>
+                    <th>Saldo</th>
                     <th>Contrapartida</th>
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="l : ${items}" th:object="${l}">
-                    <td>
-                        <a th:href="@{/lancamentos/{id}(id=*{id},sentidoContabil=*{sentidoContabil})}" th:text="*{dataCompetenciaFormatada}">01/01/2024</a>
-                    </td>
-                    <td>
-                        <a th:href="@{/lancamentos/{id}(id=*{id},sentidoContabil=*{sentidoContabil})}" th:text="*{descricao}">Descrição</a>
-                    </td>
-                    <td>
-                        <a th:href="@{/lancamentos/{id}(id=*{id},sentidoContabil=*{sentidoContabil})}" th:text="*{valorNaturalFormatado}">R$ 0,00</a>
-                    </td>
-                    <td>
-                        <a th:href="@{/contas/{id}(id=*{contaContrapartida.id})}" th:text="*{contaContrapartida.displayText}">Contrapartida</a>
-                    </td>
+                <tr th:each="l : ${items}" th:object="${l}" th:classappend="(${l.agregado} ? 'agregado' : '') + ' ' + (${l.sentidoNatural.name()=='ENTRADA'} ? 'entrada' : 'saida')">
+                    <div th:if="${l.agregado}">
+                        <td>
+                            <span th:text="*{dataFormatada}">01/01/2024</span>
+                        </td>
+                        <td>
+                            <span th:text="*{descricao}">Descrição</span>
+                        </td>
+                        <td>
+                            <span th:text="*{valorFormatado}">R$ 0,00</span>
+                        </td>
+                        <td>
+                            <span th:text="*{saldoFormatado}">R$ 0,00</span>
+                        </td>
+                        <td></td>
+                    </div>
+                    <div th:if="${not l.agregado}">
+                        <td>
+                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento},sentidoContabil=*{sentidoContabil})}" th:text="*{dataFormatada}">01/01/2024</a>
+                        </td>
+                        <td>
+                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento},sentidoContabil=*{sentidoContabil})}" th:text="*{descricao}">Descrição</a>
+                        </td>
+                        <td>
+                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento},sentidoContabil=*{sentidoContabil})}" th:text="*{valorFormatado}">R$ 0,00</a>
+                        </td>
+                        <td>
+                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento},sentidoContabil=*{sentidoContabil})}" th:text="*{saldoFormatado}">R$ 0,00</a>
+                        </td>
+                        <td>
+                            <a th:href="@{/contas/{id}(id=*{contaContrapartida.id})}" th:text="*{contaContrapartida.displayText}">Contrapartida</a>
+                        </td>
+                    </div>
                 </tr>
             </tbody>
         </table>
