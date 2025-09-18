@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
+import me.josecomparotto.contabilidade_pessoal.model.enums.StatusLancamento;
 
 public class LancamentoDto implements IDto<Lancamento> {
 
@@ -14,6 +15,7 @@ public class LancamentoDto implements IDto<Lancamento> {
     private LocalDate dataCompetencia;
     private ContaViewDto contaDebito;
     private ContaViewDto contaCredito;
+    private StatusLancamento status;
 
     private boolean editable;
     private boolean deletable;
@@ -66,6 +68,13 @@ public class LancamentoDto implements IDto<Lancamento> {
 
     public void setContaCredito(ContaViewDto contaCredito) {
         this.contaCredito = contaCredito;
+    }
+
+    public StatusLancamento getStatus() {
+        return status;
+    }
+    public void setStatus(StatusLancamento status) {
+        this.status = status;
     }
 
     public boolean isEditable() {

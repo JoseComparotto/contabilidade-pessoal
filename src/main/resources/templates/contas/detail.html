@@ -82,14 +82,14 @@
                             <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                             <span>Recolher</span>
                         </button>
-                        <a class="btn details icon" th:href="@{/lancamentos/new(contaPartidaId=${conta.id})}"
-                            aria-label="Novo lançamento" title="Novo lançamento">
+                        <a class="btn details icon" th:href="${conta.natureza.name() == 'CREDORA'} ? @{/lancamentos/new(statusName=EFETIVO,contaCreditoId=${conta.id})} : @{/lancamentos/new(statusName=EFETIVO,contaDebitoId=${conta.id})}"
+                            aria-label="Nova entrada" title="Nova entrada">
                             <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                            <span class="sr-only">Novo lançamento</span>
+                            <span class="sr-only">Nova entrada</span>
                         </a>
                     </div>
                 </div>
-                <div class="collapse-content" th:insert="~{fragments/lancamentos/list :: lancamentoTable(${movimentosEfetivos}, null)}"></div>
+                <div class="collapse-content" th:insert="~{fragments/movimentos/list :: movimentoTable(${movimentosEfetivos}, null)}"></div>
             </div>
             <div class="card-section collapsible collapsed" th:if="${conta.tipo.name() == 'ANALITICA'}">
                 <div class="card-header">
@@ -99,14 +99,14 @@
                             <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                             <span>Expandir</span>
                         </button>
-                        <a class="btn details icon" th:href="@{/lancamentos/new(contaPartidaId=${conta.id})}"
-                            aria-label="Novo lançamento" title="Novo lançamento">
+                        <a class="btn details icon" th:href="${conta.natureza.name() == 'CREDORA'} ? @{/lancamentos/new(statusName=PREVISTO,contaCreditoId=${conta.id})} : @{/lancamentos/new(statusName=PREVISTO,contaDebitoId=${conta.id})}"
+                            aria-label="Nova entrada prevista" title="Nova entrada prevista">
                             <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                            <span class="sr-only">Novo lançamento</span>
+                            <span class="sr-only">Nova entrada prevista</span>
                         </a>
                     </div>
                 </div>
-                <div class="collapse-content" th:insert="~{fragments/lancamentos/list :: lancamentoTable(${movimentosPrevistos}, null)}"></div>
+                <div class="collapse-content" th:insert="~{fragments/movimentos/list :: movimentoTable(${movimentosPrevistos}, null)}"></div>
             </div>
         </div>
     </main>
