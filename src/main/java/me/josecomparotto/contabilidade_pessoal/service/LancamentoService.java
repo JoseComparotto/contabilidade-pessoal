@@ -25,6 +25,8 @@ import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.MovimentoDto
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoNatural;
+import me.josecomparotto.contabilidade_pessoal.model.enums.StatusLancamento;
+
 import static me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta.*;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 import static me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil.*;
@@ -79,10 +81,18 @@ public class LancamentoService {
 
     }
 
-    public List<MovimentoDto> listarMovimentosPorConta(Integer idConta) {
+    public List<MovimentoDto> listarMovimentosPorConta(Integer idConta, boolean efetivo) {
+        ContaViewDto conta = contaService.obterContaPorId(idConta);
+        if (conta == null) {
+            throw new IllegalArgumentException("Conta não encontrada");
+        }
 
         Map<LocalDate, List<LancamentoPartidaDto>> dataLancamentosMap = new HashMap<>();
-        List<LancamentoPartidaDto> lancamentosPartidas = listarLancamentosPorConta(idConta);
+        List<LancamentoPartidaDto> lancamentosPartidas = listarLancamentosPorConta(idConta)
+                .stream()
+                .filter(l -> efetivo ? StatusLancamento.EFETIVO.equals(l.getStatus())
+                        : StatusLancamento.PREVISTO.equals(l.getStatus()))
+                .collect(Collectors.toList());
 
         lancamentosPartidas.sort(Comparator
                 .comparing(LancamentoPartidaDto::getDataCompetencia)
@@ -98,7 +108,7 @@ public class LancamentoService {
         List<LocalDate> datasOrdenadas = new ArrayList<>(dataLancamentosMap.keySet());
         datasOrdenadas.sort(Comparator.naturalOrder());
 
-        BigDecimal saldoAcumulado = BigDecimal.ZERO;
+        BigDecimal saldoAcumulado = efetivo ? BigDecimal.ZERO : conta.getSaldoAtual();
         for (var data : datasOrdenadas) {
             var lancamentos = dataLancamentosMap.get(data);
 
@@ -132,11 +142,17 @@ public class LancamentoService {
             movimentos.add(mAgregado);
         }
 
-        movimentos.sort(Comparator
-                .comparing(MovimentoDto::getData, Comparator.reverseOrder())
-                .thenComparing(MovimentoDto::isAgregado, Comparator.reverseOrder())
-                .thenComparing(MovimentoDto::getValor));
-
+        if (efetivo) {
+            movimentos.sort(Comparator
+                    .comparing(MovimentoDto::getData, Comparator.reverseOrder())
+                    .thenComparing(MovimentoDto::isAgregado, Comparator.reverseOrder())
+                    .thenComparing(MovimentoDto::getValor));
+        } else {
+            movimentos.sort(Comparator
+                    .comparing(MovimentoDto::getData)
+                    .thenComparing(MovimentoDto::isAgregado, Comparator.reverseOrder())
+                    .thenComparing(MovimentoDto::getValor, Comparator.reverseOrder()));
+        }
         return movimentos;
     }
 

@@ -46,12 +46,14 @@ public class ContaWebController {
         }
         ContaViewDto superior = contasService.obterSuperiorPorConta(id);
         List<ContaViewDto> inferiores = contasService.listarInferioresPorConta(id);
-        List<MovimentoDto> movimentos = lancamentoService.listarMovimentosPorConta(id);
+        List<MovimentoDto> movimentosEfetivos = lancamentoService.listarMovimentosPorConta(id, true);
+        List<MovimentoDto> movimentosPrevistos = lancamentoService.listarMovimentosPorConta(id, false);
 
         model.addAttribute("conta", conta);
         model.addAttribute("superior", superior);
         model.addAttribute("inferiores", inferiores);
-        model.addAttribute("movimentos", movimentos);
+        model.addAttribute("movimentosEfetivos", movimentosEfetivos);
+        model.addAttribute("movimentosPrevistos", movimentosPrevistos);
         return "contas/detail";
     }
 
