@@ -2,7 +2,8 @@ package me.josecomparotto.contabilidade_pessoal.model.dto.lancamento;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.text.NumberFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -127,18 +128,20 @@ public class MovimentoDto {
     @JsonIgnore
     public String getValorFormatado() {
         if (valor == null || Double.compare(valor, 0.0) == 0) {
-            return "R$ 0,00";
+            return "-";
         }
-        NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
-        return nf.format(valor);
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.forLanguageTag("pt-BR"));
+        DecimalFormat df = new DecimalFormat("#,##0.00;(#,##0.00)", symbols);
+        return df.format(valor);
     }
 
     @JsonIgnore
     public String getSaldoFormatado() {
         if (saldo == null || Double.compare(saldo, 0.0) == 0) {
-            return "R$ 0,00";
+            return "-";
         }
-        NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
-        return nf.format(saldo);
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.forLanguageTag("pt-BR"));
+        DecimalFormat df = new DecimalFormat("#,##0.00;(#,##0.00)", symbols);
+        return df.format(saldo);
     }
 }

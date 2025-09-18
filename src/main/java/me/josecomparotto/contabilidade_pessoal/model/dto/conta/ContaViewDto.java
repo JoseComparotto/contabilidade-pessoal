@@ -1,7 +1,8 @@
 package me.josecomparotto.contabilidade_pessoal.model.dto.conta;
 
 import java.math.BigDecimal;
-import java.text.NumberFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.Set;
 
@@ -66,10 +67,11 @@ public class ContaViewDto implements IDto<Conta> {
     @JsonIgnore
     public String getSaldoAtualFormatado() {
         if (saldoAtual == null || BigDecimal.ZERO.compareTo(saldoAtual) == 0) {
-            return "R$ 0,00";
+            return "-";
         }
-        NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
-        return nf.format(saldoAtual);
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.forLanguageTag("pt-BR"));
+        DecimalFormat df = new DecimalFormat("#,##0.00;(#,##0.00)", symbols);
+        return df.format(saldoAtual);
     }
 
     public void setSaldoAtual(BigDecimal saldoAtual) {
