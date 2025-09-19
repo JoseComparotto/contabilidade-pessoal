@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import me.josecomparotto.contabilidade_pessoal.application.mapper.LancamentoMapper;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.enums.StatusLancamento;
 import me.josecomparotto.contabilidade_pessoal.service.ContaService;
@@ -19,6 +21,7 @@ import me.josecomparotto.contabilidade_pessoal.service.LancamentoService;
 import static me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil.*;
 import static me.josecomparotto.contabilidade_pessoal.model.enums.StatusLancamento.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -95,6 +98,45 @@ public class LancamentoWebController {
         } catch (Exception e) {
             redirectAttrs.addFlashAttribute("error", e.getMessage());
             return "redirect:/lancamentos/new";
+        }
+    }
+
+    // GET /lancamentos/{id}/edit
+    @GetMapping("/lancamentos/{id}/edit")
+    public String editarLancamento(@PathVariable Long id, Model model, RedirectAttributes redirectAttrs) {
+        try {
+            LancamentoEditDto lancamento = LancamentoMapper.toEditDto(lancamentoService.obterLancamentoPorId(id));
+            if (lancamento == null) {
+                redirectAttrs.addFlashAttribute("error", "Lançamento não encontrado.");
+                return "redirect:/contas";
+            }
+
+            List<ContaViewDto> contasCredito = contaService.listarContasAnaliticasPorSentidoAceito(CREDITO);
+            List<ContaViewDto> contasDebito = contaService.listarContasAnaliticasPorSentidoAceito(DEBITO);
+            List<StatusLancamento> statusList = Arrays.asList(StatusLancamento.values());
+
+            model.addAttribute("mode", "edit");
+            model.addAttribute("lancamento", lancamento);
+            model.addAttribute("contasDebito", contasDebito);
+            model.addAttribute("contasCredito", contasCredito);
+            model.addAttribute("statusList", statusList);
+            return "lancamentos/form";
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("error", e.getMessage());
+            return "redirect:/lancamentos/" + id;
+        }
+    }
+
+    // POST /lancamentos/{id}/edit
+    @PostMapping("/lancamentos/{id}/edit")
+    public String salvarEdicao(@PathVariable Long id, LancamentoEditDto lancamentoDto, RedirectAttributes redirectAttrs) {
+        try {
+            lancamentoService.atualizarLancamento(id, lancamentoDto);
+            redirectAttrs.addFlashAttribute("success", "Lançamento atualizado com sucesso.");
+            return "redirect:/lancamentos/" + id;
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("error", e.getMessage());
+            return "redirect:/lancamentos/" + id + "/edit";
         }
     }
 

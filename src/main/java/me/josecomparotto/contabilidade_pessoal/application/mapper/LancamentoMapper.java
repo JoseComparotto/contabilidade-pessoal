@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
@@ -106,5 +107,29 @@ public class LancamentoMapper {
         lancamento.setStatus(dto.getStatus());
 
         return lancamento;
+    }
+
+    public static LancamentoEditDto toEditDto(LancamentoDto viewDto) {
+
+        if (viewDto == null) {
+            return null;
+        }
+
+        LancamentoEditDto dto = new LancamentoEditDto();
+        dto.setId(viewDto.getId());
+        dto.setDescricao(viewDto.getDescricao());
+        dto.setValor(viewDto.getValor());
+        dto.setDataCompetencia(viewDto.getDataCompetencia());
+        if (viewDto.getContaCredito() != null) {
+            dto.setContaCreditoId(viewDto.getContaCredito().getId());
+        }
+        if (viewDto.getContaDebito() != null) {
+            dto.setContaDebitoId(viewDto.getContaDebito().getId());
+        }
+        dto.setStatus(viewDto.getStatus());
+        dto.setEditable(viewDto.isEditable());
+        dto.setDeletable(viewDto.isDeletable());
+
+        return dto;
     }
 }
