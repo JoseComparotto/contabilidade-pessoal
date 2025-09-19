@@ -1,0 +1,93 @@
+package me.josecomparotto.contabilidade_pessoal.controller.web;
+
+import org.springframework.ui.Model;
+import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoNewDto;
+import me.josecomparotto.contabilidade_pessoal.model.enums.StatusLancamento;
+import me.josecomparotto.contabilidade_pessoal.service.ContaService;
+import me.josecomparotto.contabilidade_pessoal.service.LancamentoService;
+
+import static me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil.*;
+import static me.josecomparotto.contabilidade_pessoal.model.enums.StatusLancamento.*;
+
+import java.util.List;
+
+@Controller
+public class LancamentoWebController {
+
+    @Autowired
+    private ContaService contaService;
+
+    @Autowired
+    private LancamentoService lancamentoService;
+
+    // GET
+    // /lancamentos/new[?status={EFETIVO|PREVISTO}&contaDebitoId={contaId}&contaCreditoId={contaId}]
+    @GetMapping("/lancamentos/new")
+    public String novoLancamento(Model model, @RequestParam(required = false) String status,
+            @RequestParam(required = false) Integer contaDebitoId,
+            @RequestParam(required = false) Integer contaCreditoId) {
+        LancamentoNewDto novo = new LancamentoNewDto();
+
+        List<ContaViewDto> contasCredito = contaService.listarContasAnaliticasPorSentidoAceito(CREDITO);
+        List<ContaViewDto> contasDebito = contaService.listarContasAnaliticasPorSentidoAceito(DEBITO);
+        List<StatusLancamento> statusList = List.of(EFETIVO, PREVISTO);
+
+        String redirectUrl = "/contas";
+
+        if (contaDebitoId != null) {
+            novo.setContaDebitoId(contaDebitoId);
+            redirectUrl = "/contas/" + contaDebitoId;
+        }
+        if (contaCreditoId != null) {
+            novo.setContaCreditoId(contaCreditoId);
+            redirectUrl = "/contas/" + contaCreditoId;
+        }
+
+        if ("PREVISTO".equalsIgnoreCase(status)) {
+            novo.setStatus(PREVISTO);
+        } else if ("EFETIVO".equalsIgnoreCase(status)) {
+            novo.setStatus(EFETIVO);
+        }
+
+        model.addAttribute("mode", "create");
+        model.addAttribute("redirectUrl", redirectUrl);
+        model.addAttribute("lancamento", novo);
+        model.addAttribute("contasDebito", contasDebito);
+        model.addAttribute("contasCredito", contasCredito);
+        model.addAttribute("statusList", statusList);
+        return "lancamentos/form";
+    }
+
+    // POST /lancamentos[?redirect={redirectUrl}] (create)
+    @PostMapping("lancamentos")
+    public String create(LancamentoNewDto dto,
+            @RequestParam(name = "redirect", required = false) String redirectUrl,
+            RedirectAttributes redirectAttrs) {
+        try {
+            LancamentoDto created = lancamentoService.criarLancamento(dto);
+            return "redirect:" + sanitizeRedirect(redirectUrl, "/lancamentos/" + created.getId());
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("error", e.getMessage());
+            return "redirect:/lancamentos/new";
+        }
+    }
+
+    private String sanitizeRedirect(String redirectUrl, String defaultUrl) {
+        if (redirectUrl == null || redirectUrl.isBlank())
+            return defaultUrl;
+        // Only allow relative paths within the app to avoid open redirects
+        if (redirectUrl.startsWith("/") && !redirectUrl.startsWith("//")) {
+            return redirectUrl;
+        }
+        return defaultUrl;
+    }
+}

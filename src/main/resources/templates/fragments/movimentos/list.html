@@ -27,19 +27,19 @@
                     </div>
                     <div th:if="${not l.agregado}">
                         <td>
-                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento},sentidoContabil=*{sentidoContabil})}"
+                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento})}"
                                 th:text="*{dataFormatada}">01/01/2024</a>
                         </td>
                         <td>
-                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento},sentidoContabil=*{sentidoContabil})}"
+                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento})}"
                                 th:text="*{descricao}">Descrição</a>
                         </td>
                         <td>
-                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento},sentidoContabil=*{sentidoContabil})}"
+                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento})}"
                                 th:text="*{valorFormatado}" class="accounting-column">R$ 0,00</a>
                         </td>
                         <td>
-                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento},sentidoContabil=*{sentidoContabil})}"
+                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento})}"
                                 th:text="*{saldoFormatado}" class="accounting-column">R$ 0,00</a>
                         </td>
                         <td>

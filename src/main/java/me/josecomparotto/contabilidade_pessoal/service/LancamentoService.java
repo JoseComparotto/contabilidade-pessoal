@@ -16,17 +16,27 @@ import org.springframework.stereotype.Service;
 import me.josecomparotto.contabilidade_pessoal.application.mapper.LancamentoMapper;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoNewDto;
+import me.josecomparotto.contabilidade_pessoal.repository.ContaRepository;
 import me.josecomparotto.contabilidade_pessoal.repository.LancamentoRepository;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.MovimentoDto;
+import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoNatural;
 import me.josecomparotto.contabilidade_pessoal.model.enums.StatusLancamento;
+
+import static me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil.CREDITO;
+import static me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil.DEBITO;
+import static me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta.*;
 
 @Service
 public class LancamentoService {
 
     @Autowired
     private LancamentoRepository lancamentoRepository;
+
+    @Autowired
+    private ContaRepository contaRepository;
 
     @Autowired
     private ContaService contaService;
@@ -132,68 +142,51 @@ public class LancamentoService {
                 .collect(Collectors.toList());
     }
 
-    // public Long criarLancamento(LancamentoPartidaNewDto dto) {
-    //     if (dto == null)
-    //         throw new IllegalArgumentException("DTO não pode ser nulo");
-    //     if (dto.getDataCompetencia() == null)
-    //         throw new IllegalArgumentException("Data de competência obrigatória");
-    //     if (dto.getContaPartidaId() == null)
-    //         throw new IllegalArgumentException("Conta partida obrigatória");
-    //     if (dto.getContaContrapartidaId() == null)
-    //         throw new IllegalArgumentException("Conta contrapartida obrigatória");
-    //     if (dto.getContaPartidaId().equals(dto.getContaContrapartidaId()))
-    //         throw new IllegalArgumentException("Conta partida e contrapartida devem ser diferentes");
-    //     if (dto.getValorAbsoluto() == null || BigDecimal.ZERO.equals(dto.getValorAbsoluto()))
-    //         throw new IllegalArgumentException("Valor deve ser diferente de zero");
+    public LancamentoDto criarLancamento(LancamentoNewDto dto) {
 
-    //     var contaPartida = contaRepository.findById(dto.getContaPartidaId())
-    //             .orElseThrow(() -> new IllegalArgumentException("Conta partida não encontrada"));
-    //     var contaContrapartida = contaRepository.findById(dto.getContaContrapartidaId())
-    //             .orElseThrow(() -> new IllegalArgumentException("Conta contrapartida não encontrada"));
+        // Validações iniciais
+        if (dto == null)
+            throw new IllegalArgumentException("DTO não pode ser nulo");
+        if (dto.getDataCompetencia() == null)
+            throw new IllegalArgumentException("Data de competência obrigatória");
+        if (dto.getContaCreditoId() == null)
+            throw new IllegalArgumentException("Conta de origem (crédito) obrigatória");
+        if (dto.getContaDebitoId() == null)
+            throw new IllegalArgumentException("Conta de destino (débito) obrigatória");
+        if (dto.getContaDebitoId().equals(dto.getContaCreditoId()))
+            throw new IllegalArgumentException("Conta de origem (crédito) e de destino (débito) devem ser diferentes");
+        if (dto.getValor() == null || dto.getValor() <= 0.0)
+            throw new IllegalArgumentException("Valor deve ser positivo e diferente de zero"); 
 
-    //     if (contaPartida.getTipo() != ANALITICA || contaContrapartida.getTipo() != ANALITICA) {
-    //         throw new IllegalArgumentException("Apenas contas analíticas podem receber lançamentos");
-    //     }
-    //     if (!contaPartida.isAtiva() || !contaContrapartida.isAtiva()) {
-    //         throw new IllegalArgumentException("Contas inativas não podem receber lançamentos");
-    //     }
+        Conta contaCredito = contaRepository.findById(dto.getContaCreditoId())
+                .orElse(null);
+        Conta contaDebito = contaRepository.findById(dto.getContaDebitoId())
+                .orElse(null);
 
-    //     // Determinar sentido contábil a partir do sentido natural informado em relação
-    //     // à conta partida
-    //     // Regra inversa da usada no mapper: se conta partida é credora, entrada =
-    //     // crédito; se devedora, entrada = débito.
-    //     boolean partidaEhCredora = contaPartida.getNatureza() == Natureza.CREDORA;
-    //     boolean entrada = dto.getSentidoNatural() == SentidoNatural.ENTRADA;
+        // Validações das contas
+        if (contaCredito == null)
+            throw new IllegalArgumentException("Conta de origem (crédito) não encontrada");
+        if (contaDebito == null)
+            throw new IllegalArgumentException("Conta de destino (débito) não encontrada");
+        if (!contaCredito.isAtiva() || !contaDebito.isAtiva())
+            throw new IllegalArgumentException("Contas inativas não podem receber lançamentos");
+        if (contaCredito.getTipo() != ANALITICA || contaDebito.getTipo() != ANALITICA) 
+            throw new IllegalArgumentException("Apenas contas analíticas podem receber lançamentos");
+        if(!contaCredito.getAceitaSentido(CREDITO))
+            throw new IllegalArgumentException("Conta de origem (crédito) não aceita lançamentos neste sentido");
+        if(!contaDebito.getAceitaSentido(DEBITO))
+            throw new IllegalArgumentException("Conta de destino (débito) não aceita lançamentos neste sentido");
+        
+        // Mapear DTO para entidade
+        Lancamento lancamento = LancamentoMapper.fromNewDto(dto, contaCredito, contaDebito);
+        if (lancamento == null) {
+            throw new IllegalArgumentException("Erro ao mapear DTO para entidade");
+        }
 
-    //     boolean usaCreditoComoPartida = partidaEhCredora ? entrada : !entrada; // true => partida é crédito; false =>
-    //                                                                            // partida é débito
-
-    //     SentidoContabil sentidoPartida = usaCreditoComoPartida ? CREDITO : DEBITO;
-    //     SentidoContabil sentidoContrapartida = usaCreditoComoPartida ? DEBITO : CREDITO;
-
-    //     if (!contaPartida.isAceitaSentido(sentidoPartida)) {
-    //         throw new IllegalArgumentException("Conta partida não aceita lançamentos neste sentido");
-    //     }
-    //     if (!contaContrapartida.isAceitaSentido(sentidoContrapartida)) {
-    //         throw new IllegalArgumentException("Conta contrapartida não aceita lançamentos neste sentido");
-    //     }
-
-    //     var lanc = new Lancamento();
-    //     lanc.setDescricao(dto.getDescricao());
-    //     lanc.setDataCompetencia(dto.getDataCompetencia());
-    //     lanc.setValor(dto.getValorAbsoluto());
-
-    //     if (usaCreditoComoPartida) {
-    //         lanc.setContaCredito(contaPartida);
-    //         lanc.setContaDebito(contaContrapartida);
-    //     } else {
-    //         lanc.setContaDebito(contaPartida);
-    //         lanc.setContaCredito(contaContrapartida);
-    //     }
-
-    //     var saved = lancamentoRepository.save(lanc);
-    //     return saved.getId();
-    // }
+        // Salvar entidade
+        lancamentoRepository.save(lancamento);
+        return LancamentoMapper.toDto(lancamento);
+    }
 
     // public void atualizarLancamento(Long id, LancamentoPartidaEditDto editDto) {
     //     if (editDto == null)

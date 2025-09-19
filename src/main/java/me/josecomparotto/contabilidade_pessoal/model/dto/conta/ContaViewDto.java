@@ -11,8 +11,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
+import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 
+import static me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil.*;
+import static me.josecomparotto.contabilidade_pessoal.model.enums.Natureza.*;
 public class ContaViewDto implements IDto<Conta> {
     private Integer id;
     private String codigo;
@@ -108,6 +111,11 @@ public class ContaViewDto implements IDto<Conta> {
 
     public void setAceitaMovimentoOposto(boolean aceitaMovimentoOposto) {
         this.aceitaMovimentoOposto = aceitaMovimentoOposto;
+    }
+
+    public boolean getAceitaSentido(SentidoContabil sentido) {
+        Natureza natureza = sentido == CREDITO ? CREDORA : DEVEDORA;
+        return natureza.equals(getNatureza()) || Boolean.TRUE.equals(isAceitaMovimentoOposto());
     }
 
     public boolean isAtiva() {

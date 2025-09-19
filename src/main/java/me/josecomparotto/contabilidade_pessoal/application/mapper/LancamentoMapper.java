@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoNewDto;
+import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.MovimentoDto;
 
@@ -87,5 +89,22 @@ public class LancamentoMapper {
         dto.setValor(valorNatural.doubleValue());
         dto.setStatus(l.getStatus());
         return dto;
+    }
+
+    public static Lancamento fromNewDto(LancamentoNewDto dto, Conta contaCredito, Conta contaDebito) {
+        if (dto == null) {
+            return null;
+        }
+
+        Lancamento lancamento = new Lancamento();
+        lancamento.setId(dto.getId());
+        lancamento.setDescricao(dto.getDescricao());
+        lancamento.setValor(dto.getValor() != null ? BigDecimal.valueOf(dto.getValor()) : null);
+        lancamento.setDataCompetencia(dto.getDataCompetencia());
+        lancamento.setContaCredito(contaCredito);
+        lancamento.setContaDebito(contaDebito);
+        lancamento.setStatus(dto.getStatus());
+
+        return lancamento;
     }
 }

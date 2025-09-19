@@ -25,6 +25,9 @@ import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 import me.josecomparotto.contabilidade_pessoal.model.enums.StatusLancamento;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 
+import static me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil.*;
+import static me.josecomparotto.contabilidade_pessoal.model.enums.Natureza.*;
+
 @Entity
 @Table(name = "tb_contas", schema = "public")
 public class Conta {
@@ -369,6 +372,11 @@ public class Conta {
     @Override
     public String toString() {
         return getDisplayText();
+    }
+
+    public boolean getAceitaSentido(SentidoContabil sentido) {
+        Natureza natureza = sentido == CREDITO ? CREDORA : DEVEDORA;
+        return natureza.equals(getNatureza()) || Boolean.TRUE.equals(getAceitaMovimentoOposto());
     }
 
 }
