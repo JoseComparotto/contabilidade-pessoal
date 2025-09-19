@@ -14,6 +14,10 @@
 .btn.cancel:hover { background: #feecec }
 .btn.edit { background: #fff; color: #0a66c2; border-color: #cfe4fb }
 .btn.edit:hover { background: #eef6ff }
+.btn.add-positive { background: #fff; color: #4caf50; border-color: #c8e6c9 } /* green-600 */
+.btn.add-positive:hover { background: #eff6ff }
+.btn.add-negative { background: #fff; color: #dc2626; border-color: #fecaca } /* red-600 */
+.btn.add-negative:hover { background: #fef2f2 }
 
 /* Icon buttons */
 .btn.icon { padding: .35rem; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; box-sizing: border-box }

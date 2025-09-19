@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import me.josecomparotto.contabilidade_pessoal.application.mapper.ContaMapper;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaEditDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.MovimentoDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 import me.josecomparotto.contabilidade_pessoal.service.ContaService;
@@ -46,12 +46,14 @@ public class ContaWebController {
         }
         ContaViewDto superior = contasService.obterSuperiorPorConta(id);
         List<ContaViewDto> inferiores = contasService.listarInferioresPorConta(id);
-        List<LancamentoPartidaDto> lancamentos = lancamentoService.listarLancamentosPorConta(id);
+        List<MovimentoDto> movimentosEfetivos = lancamentoService.listarMovimentosPorConta(id, true);
+        List<MovimentoDto> movimentosPrevistos = lancamentoService.listarMovimentosPorConta(id, false);
 
         model.addAttribute("conta", conta);
         model.addAttribute("superior", superior);
         model.addAttribute("inferiores", inferiores);
-        model.addAttribute("lancamentos", lancamentos);
+        model.addAttribute("movimentosEfetivos", movimentosEfetivos);
+        model.addAttribute("movimentosPrevistos", movimentosPrevistos);
         return "contas/detail";
     }
 

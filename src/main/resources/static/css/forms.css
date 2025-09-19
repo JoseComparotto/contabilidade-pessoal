@@ -58,6 +58,14 @@ input[type="text"], select, input[type="number"], input[type="checkbox"], input[
 .switch input[type="checkbox"][disabled] + .slider { opacity: .6; cursor: not-allowed }
 .switch input[type="checkbox"][disabled] ~ .switch-text { opacity: .7 }
 
+/* Collapsible sections */
+.collapsible .collapse-toggle { background: transparent; border: 1px solid #d9dce4; border-radius: 6px; padding: .35rem .6rem; display: inline-flex; align-items: center; gap: .4rem; cursor: pointer }
+.collapsible .collapse-toggle:hover { background: #f6faff }
+.collapsible .collapse-toggle i { transition: transform .2s ease }
+.collapsible.collapsed .collapse-toggle i { transform: rotate(-90deg) }
+.collapsible .collapse-content { margin-top: .5rem }
+.collapsible.collapsed .collapse-content { display: none }
+
 /* Responsive */
 @media (max-width: 640px) {
 	.form-grid { grid-template-columns: 1fr; gap: .6rem }

@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoEditDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoNewDto;
+import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
-import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaDto;
-import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.LancamentoPartidaEditDto;
+import me.josecomparotto.contabilidade_pessoal.model.dto.lancamento.MovimentoDto;
 
 import static me.josecomparotto.contabilidade_pessoal.model.enums.Natureza.*;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
@@ -29,6 +31,7 @@ public class LancamentoMapper {
         dto.setDataCompetencia(lancamento.getDataCompetencia());
         dto.setContaCredito(ContaMapper.toViewDto(lancamento.getContaCredito()));
         dto.setContaDebito(ContaMapper.toViewDto(lancamento.getContaDebito()));
+        dto.setStatus(lancamento.getStatus());
         dto.setEditable(lancamento.isEditable());
         dto.setDeletable(lancamento.isDeletable());
         dto.setDisplayText(lancamento.getDisplayText());
@@ -46,15 +49,15 @@ public class LancamentoMapper {
                 .collect(Collectors.toList());
     }
 
-    public static LancamentoPartidaDto toPartidaDebito(Lancamento l) {
-        return toPartida(l, DEBITO);
+    public static MovimentoDto toMovimentoDebito(Lancamento l) {
+        return toMovimento(l, DEBITO);
     }
 
-    public static LancamentoPartidaDto toPartidaCredito(Lancamento l) {
-        return toPartida(l, CREDITO);
+    public static MovimentoDto toMovimentoCredito(Lancamento l) {
+        return toMovimento(l, CREDITO);
     }
 
-    public static LancamentoPartidaDto toPartida(Lancamento l, SentidoContabil sentidoContabil) {
+    public static MovimentoDto toMovimento(Lancamento l, SentidoContabil sentidoContabil) {
         if (l == null)
             return null;
 
@@ -75,25 +78,58 @@ public class LancamentoMapper {
 
         SentidoNatural sentidoNatural = ehEntrada ? ENTRADA : SAIDA;
 
-        BigDecimal valorContabil = valorAbsoluto;
         BigDecimal valorNatural = ehEntrada ? valorAbsoluto : valorAbsoluto.negate();
 
-        LancamentoPartidaDto dto = new LancamentoPartidaDto();
-        dto.setId(l.getId());
+        MovimentoDto dto = new MovimentoDto();
+        dto.setIdLancamento(l.getId());
         dto.setDescricao(l.getDescricao());
-        dto.setDataCompetencia(l.getDataCompetencia());
-        dto.setContaPartidaId(contaPartida.getId());
-        dto.setContaContrapartidaId(contaContrapartida.getId());
+        dto.setData(l.getDataCompetencia());
         dto.setContaPartida(ContaMapper.toViewDto(contaPartida));
         dto.setContaContrapartida(ContaMapper.toViewDto(contaContrapartida));
-        dto.setSentidoContabil(sentidoContabil);
         dto.setSentidoNatural(sentidoNatural);
-        dto.setValorContabil(valorContabil.doubleValue());
-        dto.setValorNatural(valorNatural.doubleValue());
-        dto.setValorAbsoluto(valorAbsoluto.doubleValue());
-        dto.setEditable(l.isEditable());
-        dto.setDeletable(l.isDeletable());
-        dto.setDisplayText(l.getDisplayText());
+        dto.setValor(valorNatural.doubleValue());
+        dto.setStatus(l.getStatus());
+        return dto;
+    }
+
+    public static Lancamento fromNewDto(LancamentoNewDto dto, Conta contaCredito, Conta contaDebito) {
+        if (dto == null) {
+            return null;
+        }
+
+        Lancamento lancamento = new Lancamento();
+        lancamento.setId(dto.getId());
+        lancamento.setDescricao(dto.getDescricao());
+        lancamento.setValor(dto.getValor() != null ? BigDecimal.valueOf(dto.getValor()) : null);
+        lancamento.setDataCompetencia(dto.getDataCompetencia());
+        lancamento.setContaCredito(contaCredito);
+        lancamento.setContaDebito(contaDebito);
+        lancamento.setStatus(dto.getStatus());
+
+        return lancamento;
+    }
+
+    public static LancamentoEditDto toEditDto(LancamentoDto viewDto) {
+
+        if (viewDto == null) {
+            return null;
+        }
+
+        LancamentoEditDto dto = new LancamentoEditDto();
+        dto.setId(viewDto.getId());
+        dto.setDescricao(viewDto.getDescricao());
+        dto.setValor(viewDto.getValor());
+        dto.setDataCompetencia(viewDto.getDataCompetencia());
+        if (viewDto.getContaCredito() != null) {
+            dto.setContaCreditoId(viewDto.getContaCredito().getId());
+        }
+        if (viewDto.getContaDebito() != null) {
+            dto.setContaDebitoId(viewDto.getContaDebito().getId());
+        }
+        dto.setStatus(viewDto.getStatus());
+        dto.setEditable(viewDto.isEditable());
+        dto.setDeletable(viewDto.isDeletable());
+
         return dto;
     }
 }

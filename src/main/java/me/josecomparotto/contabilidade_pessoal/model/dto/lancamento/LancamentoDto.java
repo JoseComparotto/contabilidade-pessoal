@@ -1,14 +1,18 @@
 package me.josecomparotto.contabilidade_pessoal.model.dto.lancamento;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
-import org.springframework.hateoas.server.core.Relation;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Lancamento;
+import me.josecomparotto.contabilidade_pessoal.model.enums.StatusLancamento;
 
-@Relation(collectionRelation = "lancamentos", itemRelation = "lancamento")
 public class LancamentoDto implements IDto<Lancamento> {
 
     private Long id;
@@ -17,6 +21,7 @@ public class LancamentoDto implements IDto<Lancamento> {
     private LocalDate dataCompetencia;
     private ContaViewDto contaDebito;
     private ContaViewDto contaCredito;
+    private StatusLancamento status;
 
     private boolean editable;
     private boolean deletable;
@@ -71,6 +76,13 @@ public class LancamentoDto implements IDto<Lancamento> {
         this.contaCredito = contaCredito;
     }
 
+    public StatusLancamento getStatus() {
+        return status;
+    }
+    public void setStatus(StatusLancamento status) {
+        this.status = status;
+    }
+
     public boolean isEditable() {
         return editable;
     }
@@ -93,6 +105,21 @@ public class LancamentoDto implements IDto<Lancamento> {
 
     public void setDisplayText(String displayText) {
         this.displayText = displayText;
+    }
+
+    @JsonIgnore
+    public String getDataCompetenciaFormatada() {
+        return dataCompetencia != null ? dataCompetencia.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "";
+    }
+
+    @JsonIgnore
+    public String getValorFormatado() {
+        if (valor == null || Double.compare(valor, 0.0) == 0) {
+            return "-";
+        }
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.forLanguageTag("pt-BR"));
+        DecimalFormat df = new DecimalFormat("#,##0.00;(#,##0.00)", symbols);
+        return df.format(valor);
     }
 
     @Override

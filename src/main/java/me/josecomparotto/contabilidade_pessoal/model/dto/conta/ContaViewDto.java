@@ -1,19 +1,21 @@
 package me.josecomparotto.contabilidade_pessoal.model.dto.conta;
 
 import java.math.BigDecimal;
-import java.text.NumberFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.hateoas.server.core.Relation;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
+import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 
-@Relation(collectionRelation = "contas", itemRelation = "conta")
+import static me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil.*;
+import static me.josecomparotto.contabilidade_pessoal.model.enums.Natureza.*;
 public class ContaViewDto implements IDto<Conta> {
     private Integer id;
     private String codigo;
@@ -68,10 +70,11 @@ public class ContaViewDto implements IDto<Conta> {
     @JsonIgnore
     public String getSaldoAtualFormatado() {
         if (saldoAtual == null || BigDecimal.ZERO.compareTo(saldoAtual) == 0) {
-            return "R$ 0,00";
+            return "-";
         }
-        NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
-        return nf.format(saldoAtual);
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.forLanguageTag("pt-BR"));
+        DecimalFormat df = new DecimalFormat("#,##0.00;(#,##0.00)", symbols);
+        return df.format(saldoAtual);
     }
 
     public void setSaldoAtual(BigDecimal saldoAtual) {
@@ -108,6 +111,11 @@ public class ContaViewDto implements IDto<Conta> {
 
     public void setAceitaMovimentoOposto(boolean aceitaMovimentoOposto) {
         this.aceitaMovimentoOposto = aceitaMovimentoOposto;
+    }
+
+    public boolean getAceitaSentido(SentidoContabil sentido) {
+        Natureza natureza = sentido == CREDITO ? CREDORA : DEVEDORA;
+        return natureza.equals(getNatureza()) || Boolean.TRUE.equals(isAceitaMovimentoOposto());
     }
 
     public boolean isAtiva() {

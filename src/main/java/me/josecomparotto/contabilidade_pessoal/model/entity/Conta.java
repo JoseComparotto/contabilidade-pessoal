@@ -22,7 +22,11 @@ import me.josecomparotto.contabilidade_pessoal.application.converter.NaturezaCon
 import me.josecomparotto.contabilidade_pessoal.application.converter.TipoContaConverter;
 import me.josecomparotto.contabilidade_pessoal.model.enums.Natureza;
 import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
+import me.josecomparotto.contabilidade_pessoal.model.enums.StatusLancamento;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
+
+import static me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil.*;
+import static me.josecomparotto.contabilidade_pessoal.model.enums.Natureza.*;
 
 @Entity
 @Table(name = "tb_contas", schema = "public")
@@ -224,12 +228,14 @@ public class Conta {
     public BigDecimal getSaldoContabil() {
 
         switch (getTipo()) {
-            // Se for analítica, o saldo é o somatório líquido dos lançamentos
+            // Se for analítica, o saldo é o somatório líquido dos lançamentos efetivos
             case ANALITICA:
                 BigDecimal saldoDebito = lancamentosDebito.stream()
+                        .filter(l -> StatusLancamento.EFETIVO.equals(l.getStatus()))
                         .map(Lancamento::getValor)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
                 BigDecimal saldoCredito = lancamentosCredito.stream()
+                        .filter(l -> StatusLancamento.EFETIVO.equals(l.getStatus()))
                         .map(Lancamento::getValor)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
                 return saldoCredito.subtract(saldoDebito);
@@ -279,8 +285,10 @@ public class Conta {
      * Define a conta superior.
      * <p>
      * Atenção: Este método propaga automaticamente o valor da propriedade
-     * aceitaMovimentoOposto da conta superior para esta conta, caso a conta superior não seja nula.
-     * Esse efeito colateral pode impactar regras de negócio e deve ser considerado ao utilizar este setter.
+     * aceitaMovimentoOposto da conta superior para esta conta, caso a conta
+     * superior não seja nula.
+     * Esse efeito colateral pode impactar regras de negócio e deve ser considerado
+     * ao utilizar este setter.
      *
      * @param superior a conta superior a ser definida
      */
@@ -288,7 +296,7 @@ public class Conta {
         this.superior = superior;
 
         // Propagar aceitação de movimento oposto
-        if(superior != null){
+        if (superior != null) {
             this.aceitaMovimentoOposto = superior.getAceitaMovimentoOposto();
         }
     }
@@ -364,6 +372,11 @@ public class Conta {
     @Override
     public String toString() {
         return getDisplayText();
+    }
+
+    public boolean getAceitaSentido(SentidoContabil sentido) {
+        Natureza natureza = sentido == CREDITO ? CREDORA : DEVEDORA;
+        return natureza.equals(getNatureza()) || Boolean.TRUE.equals(getAceitaMovimentoOposto());
     }
 
 }

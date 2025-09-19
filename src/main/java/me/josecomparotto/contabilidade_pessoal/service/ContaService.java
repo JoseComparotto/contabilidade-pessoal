@@ -21,6 +21,7 @@ import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaNewDto;
 import me.josecomparotto.contabilidade_pessoal.model.entity.Conta;
 import me.josecomparotto.contabilidade_pessoal.model.enums.TipoConta;
 import me.josecomparotto.contabilidade_pessoal.repository.ContaRepository;
+import me.josecomparotto.contabilidade_pessoal.model.enums.SentidoContabil;
 
 @Service
 public class ContaService {
@@ -61,6 +62,14 @@ public class ContaService {
     public List<ContaViewDto> listarContasAnaliticas() {
         return listarContas().stream()
                 .filter(c -> c.getTipo() == TipoConta.ANALITICA)
+                .toList();
+    }
+
+    public List<ContaViewDto> listarContasAnaliticasPorSentidoAceito(SentidoContabil aceitaSentido) {
+
+        return listarContas().stream()
+                .filter(c -> c.getTipo() == TipoConta.ANALITICA)
+                .filter(c -> c.getAceitaSentido(aceitaSentido))
                 .toList();
     }
 

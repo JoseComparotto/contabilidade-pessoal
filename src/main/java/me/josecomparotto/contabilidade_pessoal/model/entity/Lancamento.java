@@ -6,12 +6,15 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import me.josecomparotto.contabilidade_pessoal.model.enums.StatusLancamento;
 
 @Entity
 @Table(name = "tb_lancamentos", schema = "public")
@@ -37,6 +40,10 @@ public class Lancamento {
     @ManyToOne
     @JoinColumn(name = "id_conta_debito")
     private Conta contaDebito;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private StatusLancamento status;
 
     public Long getId() {
         return id;
@@ -84,6 +91,14 @@ public class Lancamento {
 
     public void setContaDebito(Conta contaDebito) {
         this.contaDebito = contaDebito;
+    }
+
+    public StatusLancamento getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusLancamento status) {
+        this.status = status;
     }
 
     @Transient

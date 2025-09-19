@@ -9,7 +9,8 @@
         <h1 th:text="${mode} == 'edit' ? 'Editar Lancamento' : 'Novo Lancamento'"></h1>
 
         <div class="controls" style="margin-bottom:1rem">
-            <a th:href="@{/contas/{id}(id=${lancamento.contaPartidaId})}">← Voltar</a>
+            <a th:href="${mode == 'create'} ? @{${redirectUrl}} : @{/lancamentos/{id}(id=${lancamento.id})}">←
+                Voltar</a>
         </div>
 
         <div class="form-card">
@@ -18,25 +19,25 @@
                 method="post" th:with="
                     canEditDescricao=${mode == 'edit' ? lancamento.editable : true},
                     canEditDataCompetencia=${mode == 'edit' ? lancamento.editable : true},
-                    canEditSentidoNatural=${mode == 'edit' ? lancamento.editable : true},
-                    canEditValorAbsoluto=${mode == 'edit' ? lancamento.editable : true},
-                    canEditContaPartida=${mode == 'edit' ? lancamento.editable : true},
-                    canEditContaContraPartida=${mode == 'edit' ? lancamento.editable : true}
+                    canEditValor=${mode == 'edit' ? lancamento.editable : true},
+                    canEditContaDebito=${mode == 'edit' ? lancamento.editable : true},
+                    canEditContaCredito=${mode == 'edit' ? lancamento.editable : true},
+                    canEditStatus=${mode == 'edit' ? lancamento.editable : true}
                 ">
                 <input type="hidden" name="redirect"
-                    th:value="${mode == 'create' ? '/contas/' + lancamento.contaPartidaId : '/lancamentos/' + lancamento.id}" />
+                    th:value="${mode == 'create'} ? @{${redirectUrl}} : @{/lancamentos/{id}(id=${lancamento.id})}" />
                 <div class="form-grid">
 
-                    <!-- Conta de Partida -->
+                    <!-- Conta de Crédito (de) -->
                     <div th:replace="~{fragments/form-controls :: selectField(
-                        'contaPartidaId', 'contaPartidaId', 'Conta (partida)', ${contas}, ${lancamento.contaPartidaId},
-                        true, ${not canEditContaPartida}, 'Selecione…', null, true)
+                        'contaCreditoId', 'contaCreditoId', 'De: (Conta de Origem)', ${contasCredito}, ${lancamento.contaCreditoId},
+                        true, ${not canEditContaCredito}, 'Selecione…', null, true)
                     }"></div>
 
-                    <!-- Sentido Natural (Segmentado) -->
-                    <div th:replace="~{fragments/form-controls :: segmentedEnum(
-                        'sentidoNatural', 'Sentido', ${sentidosNaturais}, ${lancamento.sentidoNatural != null ? lancamento.sentidoNatural.name() : null}, 'SentidoNatural.',
-                        true, ${not canEditSentidoNatural}, null, true)
+                    <!-- Conta de Débito (para) -->
+                    <div th:replace="~{fragments/form-controls :: selectField(
+                        'contaDebitoId', 'contaDebitoId', 'Para: (Conta de Destino)', ${contasDebito}, ${lancamento.contaDebitoId},
+                        true, ${not canEditContaDebito}, 'Selecione…', null, true)
                     }"></div>
 
                     <!-- Descrição -->
@@ -45,28 +46,29 @@
                         true, ${not canEditDescricao}, null, true)
                     }"></div>
 
+                    <!-- Valor -->
+                    <div th:replace="~{fragments/form-controls :: moneyField(
+                        'valor', 'valor', 'Valor', ${lancamento.valor}, 'R$',
+                        true, ${not canEditValor}, null, true, 2)
+                    }"></div>
+
                     <!-- Data de Competência -->
                     <div th:replace="~{fragments/form-controls :: dateField(
                         'dataCompetencia', 'dataCompetencia', 'Data', ${lancamento.dataCompetencia},
                         true, ${not canEditDataCompetencia}, null, true)
                     }"></div>
 
-                    <!-- Conta de Contrapartida -->
-                    <div th:replace="~{fragments/form-controls :: selectField(
-                        'contaContrapartidaId', 'contaContrapartidaId', 'Conta (contrapartida)', ${contas}, ${lancamento.contaContrapartidaId},
-                        true, ${not canEditContaContraPartida}, 'Selecione…', null, true)
+                    <!-- Status -->
+                    <div th:replace="~{fragments/form-controls :: segmentedEnum(
+                        'status', 'Status', ${statusList}, ${lancamento.status != null ? lancamento.status.name() : null}, 'StatusLancamento.',
+                        true, ${not canEditStatus}, null, true)
                     }"></div>
 
-                    <!-- Valor -->
-                    <div th:replace="~{fragments/form-controls :: moneyField(
-                        'valorAbsoluto', 'valorAbsoluto', 'Valor', ${lancamento.valorAbsoluto}, 'R$',
-                        true, ${not canEditValorAbsoluto}, null, true, 2)
-                    }"></div>
 
                 </div>
 
                 <div
-                    th:replace="~{fragments/form-controls :: formActions(${mode} == 'edit' ? 'Salvar' : 'Criar', ${mode} == 'edit' ? '/lancamentos/' + ${lancamento.id} : '/contas/' + ${lancamento.contaPartidaId})}">
+                    th:replace="~{fragments/form-controls :: formActions(${mode} == 'edit' ? 'Salvar' : 'Criar', ${mode == 'create'} ? @{${redirectUrl}} : @{/lancamentos/{id}(id=${lancamento.id})})}">
                 </div>
             </form>
         </div>

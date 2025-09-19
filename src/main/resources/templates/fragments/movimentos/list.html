@@ -1,0 +1,52 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="movimentoTable(items, redirectUrl)">
+    <div class="table-wrap" th:if="${items != null}">
+        <table class="clickable-rows">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Descrição</th>
+                    <th>Valor</th>
+                    <th>Saldo</th>
+                    <th>Contrapartida</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="l : ${items}" th:object="${l}"
+                    th:classappend="(${l.agregado} ? 'agregado' : '') + ' ' + (${l.sentidoNatural.name()=='ENTRADA'} ? 'positive' : 'negative')">
+                    <div th:if="${l.agregado}">
+                        <td>
+                            <span th:text="*{dataFormatada}">01/01/2024</span>
+                        </td>
+                        <td>
+                            <span th:text="*{descricao}">Descrição</span>
+                        </td>
+                        <td th:text="*{valorFormatado}" class="accounting-column">R$ 0,00</td>
+                        <td th:text="*{saldoFormatado}" class="accounting-column">R$ 0,00</td>
+                        <td></td>
+                    </div>
+                    <div th:if="${not l.agregado}">
+                        <td>
+                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento}, redirect=${redirectUrl})}"
+                                th:text="*{dataFormatada}">01/01/2024</a>
+                        </td>
+                        <td>
+                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento}, redirect=${redirectUrl})}" th:text="*{descricao}">Descrição</a>
+                        </td>
+                        <td>
+                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento}, redirect=${redirectUrl})}" th:text="*{valorFormatado}"
+                                class="accounting-column">R$ 0,00</a>
+                        </td>
+                        <td>
+                            <a th:href="@{/lancamentos/{id}(id=*{idLancamento}, redirect=${redirectUrl})}" th:text="*{saldoFormatado}"
+                                class="accounting-column">R$ 0,00</a>
+                        </td>
+                        <td>
+                            <a th:href="@{/contas/{id}(id=*{contaContrapartida.id})}"
+                                th:text="*{contaContrapartida.displayText}">Contrapartida</a>
+                        </td>
+                    </div>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

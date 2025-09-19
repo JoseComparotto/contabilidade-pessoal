@@ -11,14 +11,14 @@
         </div>
 
         <div class="controls" style="margin-bottom:1rem">
-            <a th:href="@{/contas/{id}(id=${lancamento.contaPartida.id})}">← Voltar</a>
+            <a th:href="@{${redirectUrl}}">← Voltar</a>
         </div>
 
         <div class="form-card">
             <div class="card-header">
                 <h2 th:text="${lancamento.displayText}"></h2>
                 <div class="actions">
-                    <a class="btn edit icon" th:href="${lancamento.editable} ? @{'/lancamentos/' + ${lancamento.id} + '/edit?sentidoContabil=' + ${lancamento.sentidoContabil.name()} } : ''"
+                    <a class="btn edit icon" th:href="${lancamento.editable} ? @{/lancamentos/{id}/edit(id=${lancamento.id})} : '#'"
                         th:classappend="${lancamento.editable} ? '' : ' disabled'"
                         th:attr="aria-disabled=${!lancamento.editable}, tabindex=${lancamento.editable} ? 0 : -1"
                         aria-label="Editar lançamento" title="Editar lançamento">
@@ -30,7 +30,7 @@
                         th:onsubmit="${lancamento.deletable} ? 'return confirm(\'Deseja excluir essa lancamento?\')' : 'return false;'"
                         style="display:inline">
                         <input type="hidden" name="_method" value="delete" />
-                        <input type="hidden" name="redirect" th:value="@{/contas/{id}(id=${lancamento.contaPartida.id})}" />
+                        <input type="hidden" name="redirect" th:value="@{${redirectUrl}}" />
                         <button type="submit" class="btn delete icon"
                             th:classappend="${lancamento.deletable} ? '' : ' disabled'" th:disabled="${!lancamento.deletable}"
                             aria-label="Excluir lancamento" title="Excluir lancamento">
@@ -42,26 +42,18 @@
             </div>
             <div class="form-grid">
                 <div class="field">
-                    <label>Conta (partida)</label>
+                    <label>De: (Conta de Origem)</label>
                     <div class="input-link">
-                        <input type="text" th:value="${lancamento.contaPartida.displayText}" disabled />
-                        <a class="cover" th:href="@{/contas/{id}(id=${lancamento.contaPartida.id})}"><span class="sr-only">Abrir conta</span></a>
+                        <input type="text" th:value="${lancamento.contaCredito.displayText}" disabled />
+                        <a class="cover" th:href="@{/contas/{id}(id=${lancamento.contaCredito.id})}"><span class="sr-only">Abrir conta</span></a>
                     </div>
                 </div>
                 <div class="field">
-                    <label>Conta (contrapartida)</label>
+                    <label>Para: (Conta de Destino)</label>
                     <div class="input-link">
-                        <input type="text" th:value="${lancamento.contaContrapartida.displayText}" disabled />
-                        <a class="cover" th:href="@{/contas/{id}(id=${lancamento.contaContrapartida.id})}"><span class="sr-only">Abrir conta</span></a>
+                        <input type="text" th:value="${lancamento.contaDebito.displayText}" disabled />
+                        <a class="cover" th:href="@{/contas/{id}(id=${lancamento.contaDebito.id})}"><span class="sr-only">Abrir conta</span></a>
                     </div>
-                </div>
-                <div class="field">
-                    <label>Sentido</label>
-                    <input type="text" th:value="#{'SentidoNatural.' + ${lancamento.sentidoNatural.name()}}" disabled />
-                </div>
-                <div class="field">
-                    <label>Data</label>
-                    <input type="text" th:value="${lancamento.dataCompetenciaFormatada}" disabled />
                 </div>
                 <div class="field">
                     <label>Descrição</label>
@@ -69,7 +61,15 @@
                 </div>
                 <div class="field">
                     <label>Valor</label>
-                    <input type="text" th:value="${lancamento.valorNaturalFormatado}" disabled />
+                    <input type="text" th:value="${lancamento.valorFormatado}" disabled />
+                </div>
+                <div class="field">
+                    <label>Data</label>
+                    <input type="text" th:value="${lancamento.dataCompetenciaFormatada}" disabled />
+                </div>
+                <div class="field">
+                    <label>Status</label>
+                    <input type="text" th:value="#{'StatusLancamento.' + ${lancamento.status}}" disabled />
                 </div>
             </div>
         </div>

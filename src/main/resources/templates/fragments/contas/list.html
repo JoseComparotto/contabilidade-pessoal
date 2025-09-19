@@ -21,7 +21,7 @@
                             <span th:text="*{descricao}">Descrição</span>
                         </a>
                     </td>
-                    <td>
+                    <td class="accounting-column" th:classappend="*{saldoAtual != null} ? (*{saldoAtual} &lt; 0 ? ' negative' : ' positive') : ''">
                         <a th:href="@{/contas/{id}(id=*{id})}" th:text="*{saldoAtualFormatado}">R$ 0,00</a>
                     </td>
                 </tr>
