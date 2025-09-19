@@ -1,6 +1,12 @@
 package me.josecomparotto.contabilidade_pessoal.model.dto.lancamento;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import me.josecomparotto.contabilidade_pessoal.model.dto.IDto;
 import me.josecomparotto.contabilidade_pessoal.model.dto.conta.ContaViewDto;
@@ -99,6 +105,21 @@ public class LancamentoDto implements IDto<Lancamento> {
 
     public void setDisplayText(String displayText) {
         this.displayText = displayText;
+    }
+
+    @JsonIgnore
+    public String getDataCompetenciaFormatada() {
+        return dataCompetencia != null ? dataCompetencia.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "";
+    }
+
+    @JsonIgnore
+    public String getValorFormatado() {
+        if (valor == null || Double.compare(valor, 0.0) == 0) {
+            return "-";
+        }
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.forLanguageTag("pt-BR"));
+        DecimalFormat df = new DecimalFormat("#,##0.00;(#,##0.00)", symbols);
+        return df.format(valor);
     }
 
     @Override

@@ -94,7 +94,7 @@
                         </a>
                     </div>
                 </div>
-                <div class="collapse-content" th:insert="~{fragments/movimentos/list :: movimentoTable(${movimentosEfetivos}, null)}"></div>
+                <div class="collapse-content" th:insert="~{fragments/movimentos/list :: movimentoTable(${movimentosEfetivos}, @{/contas/{id}(id=${conta.id})})}"></div>
             </div>
             <div class="card-section collapsible collapsed" th:if="${conta.tipo.name() == 'ANALITICA'}">
                 <div class="card-header">
@@ -116,7 +116,7 @@
                         </a>
                     </div>
                 </div>
-                <div class="collapse-content" th:insert="~{fragments/movimentos/list :: movimentoTable(${movimentosPrevistos}, null)}"></div>
+                <div class="collapse-content" th:insert="~{fragments/movimentos/list :: movimentoTable(${movimentosPrevistos}, @{/contas/{id}(id=${conta.id})})}"></div>
             </div>
         </div>
     </main>

@@ -30,13 +30,13 @@
 
                     <!-- Conta de Crédito (de) -->
                     <div th:replace="~{fragments/form-controls :: selectField(
-                        'contaCreditoId', 'contaCreditoId', 'De', ${contasCredito}, ${lancamento.contaCreditoId},
+                        'contaCreditoId', 'contaCreditoId', 'De: (Conta de Origem)', ${contasCredito}, ${lancamento.contaCreditoId},
                         true, ${not canEditContaCredito}, 'Selecione…', null, true)
                     }"></div>
 
                     <!-- Conta de Débito (para) -->
                     <div th:replace="~{fragments/form-controls :: selectField(
-                        'contaDebitoId', 'contaDebitoId', 'Para', ${contasDebito}, ${lancamento.contaDebitoId},
+                        'contaDebitoId', 'contaDebitoId', 'Para: (Conta de Destino)', ${contasDebito}, ${lancamento.contaDebitoId},
                         true, ${not canEditContaDebito}, 'Selecione…', null, true)
                     }"></div>
 

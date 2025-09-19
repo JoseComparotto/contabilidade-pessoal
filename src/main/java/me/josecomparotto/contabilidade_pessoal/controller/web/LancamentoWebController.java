@@ -4,6 +4,7 @@ import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -28,6 +29,22 @@ public class LancamentoWebController {
 
     @Autowired
     private LancamentoService lancamentoService;
+
+    // GET /lancamentos/{id}[?redirect={redirectUrl}]
+    @GetMapping("/lancamentos/{id}")
+    public String detalhesLancamento(
+            @PathVariable Long id,
+            @RequestParam(name = "redirect", required = false) String redirectUrl,
+            Model model, RedirectAttributes redirectAttrs) {
+        LancamentoDto lancamento = lancamentoService.obterLancamentoPorId(id);
+        if (lancamento == null) {
+            redirectAttrs.addFlashAttribute("error", "Lançamento não encontrado.");
+            return "redirect:" + sanitizeRedirect(redirectUrl, "/lancamentos");
+        }
+        model.addAttribute("lancamento", lancamento);
+        model.addAttribute("redirectUrl", sanitizeRedirect(redirectUrl, "/lancamentos"));
+        return "lancamentos/detail";
+    }
 
     // GET
     // /lancamentos/new[?status={EFETIVO|PREVISTO}&contaDebitoId={contaId}&contaCreditoId={contaId}]
