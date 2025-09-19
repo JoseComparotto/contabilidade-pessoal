@@ -11,23 +11,25 @@
 	</parent>
 	<groupId>me.josecomparotto</groupId>
 	<artifactId>contabilidade-pessoal</artifactId>
-	<version>0.3.0-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>contabilidade-pessoal</name>
 	<description>Sistema de Contabilidade Pessoal</description>
-	<url />
+	<url>https://github.com/JoseComparotto/contabilidade-pessoal</url>
 	<licenses>
 		<license />
 	</licenses>
 	<developers>
 		<developer>
+			<id>josecomparotto</id>
 			<name>José Comparotto</name>
 			<email>jose.comparotto@gmail.com</email>
+			<url>https://github.com/JoseComparotto</url>
 		</developer>
 	</developers>
 	<scm>
-		<connection />
-		<developerConnection />
-		<tag />
+		<connection>scm:git:git://github.com/JoseComparotto/contabilidade-pessoal.git</connection>
+		<developerConnection>scm:git:ssh://github.com/JoseComparotto/contabilidade-pessoal.git</developerConnection>
+		<tag>v1.0.0-SNAPSHOT</tag>
 		<url>https://github.com/JoseComparotto/contabilidade-pessoal</url>
 	</scm>
 	<properties>
