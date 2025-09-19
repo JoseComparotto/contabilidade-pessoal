@@ -39,10 +39,10 @@ public class LancamentoWebController {
         LancamentoDto lancamento = lancamentoService.obterLancamentoPorId(id);
         if (lancamento == null) {
             redirectAttrs.addFlashAttribute("error", "Lançamento não encontrado.");
-            return "redirect:" + sanitizeRedirect(redirectUrl, "/lancamentos");
+            return "redirect:" + sanitizeRedirect(redirectUrl, "/contas");
         }
         model.addAttribute("lancamento", lancamento);
-        model.addAttribute("redirectUrl", sanitizeRedirect(redirectUrl, "/lancamentos"));
+        model.addAttribute("redirectUrl", sanitizeRedirect(redirectUrl, "/contas"));
         return "lancamentos/detail";
     }
 
@@ -96,6 +96,26 @@ public class LancamentoWebController {
             redirectAttrs.addFlashAttribute("error", e.getMessage());
             return "redirect:/lancamentos/new";
         }
+    }
+
+    // POST /lancamentos/{id}/delete[?redirect={redirectUrl}] (delete)
+    @PostMapping("/lancamentos/{id}/delete")
+    public String deletarLancamento(@PathVariable Long id, RedirectAttributes redirectAttrs,
+            @RequestParam(name = "redirect", required = false) String redirectUrl) {
+        try {
+            boolean removido = lancamentoService.deletarLancamentoPorId(id);
+            if (!removido) {
+                redirectAttrs.addFlashAttribute("error", "Lançamento não encontrado.");
+            } else {
+                redirectAttrs.addFlashAttribute("success", "Lançamento excluído com sucesso.");
+            }
+        } catch (IllegalStateException e) {
+            redirectAttrs.addFlashAttribute("error", e.getMessage());
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("error", "Erro ao excluir lançamento: " + e.getMessage());
+            return "redirect:/lancamentos/" + id;
+        }
+        return "redirect:" + sanitizeRedirect(redirectUrl, "/contas");
     }
 
     private String sanitizeRedirect(String redirectUrl, String defaultUrl) {

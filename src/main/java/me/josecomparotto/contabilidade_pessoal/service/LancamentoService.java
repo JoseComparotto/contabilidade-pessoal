@@ -122,7 +122,7 @@ public class LancamentoService {
         return movimentos;
     }
 
-    public boolean deletarLancamento(Long id) {
+    public boolean deletarLancamentoPorId(Long id) {
         Optional<Lancamento> opt = lancamentoRepository.findById(id);
         if (opt.isEmpty())
             return false;
