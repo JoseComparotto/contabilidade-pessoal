@@ -28,7 +28,31 @@
                     aria-label="Buscar contas"
                 >
             </div>
-            <div id="searchResults" style="margin-top: 0.5rem; font-size: 0.9rem; color: #6c757d;"></div>
+            
+            <!-- Filtros por grupo -->
+            <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+                <span style="font-size: 0.9rem; color: #6c757d; font-weight: 500;">Filtrar por grupo:</span>
+                <button class="filter-chip" data-filter="all" data-active="true" style="padding: 0.4rem 0.9rem; border: 2px solid #0066cc; background: #0066cc; color: white; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                    Todos
+                </button>
+                <button class="filter-chip" data-filter="1" style="padding: 0.4rem 0.9rem; border: 2px solid #28a745; background: white; color: #28a745; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                    <i class="fa-solid fa-circle-plus" style="font-size: 0.75rem;"></i> Ativo
+                </button>
+                <button class="filter-chip" data-filter="2" style="padding: 0.4rem 0.9rem; border: 2px solid #dc3545; background: white; color: #dc3545; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                    <i class="fa-solid fa-circle-minus" style="font-size: 0.75rem;"></i> Passivo
+                </button>
+                <button class="filter-chip" data-filter="3" style="padding: 0.4rem 0.9rem; border: 2px solid #6f42c1; background: white; color: #6f42c1; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                    <i class="fa-solid fa-balance-scale" style="font-size: 0.75rem;"></i> PL
+                </button>
+                <button class="filter-chip" data-filter="4" style="padding: 0.4rem 0.9rem; border: 2px solid #17a2b8; background: white; color: #17a2b8; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                    <i class="fa-solid fa-arrow-trend-up" style="font-size: 0.75rem;"></i> Receitas
+                </button>
+                <button class="filter-chip" data-filter="5" style="padding: 0.4rem 0.9rem; border: 2px solid #fd7e14; background: white; color: #fd7e14; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                    <i class="fa-solid fa-arrow-trend-down" style="font-size: 0.75rem;"></i> Despesas
+                </button>
+            </div>
+            
+            <div id="searchResults" style="margin-top: 0.75rem; font-size: 0.9rem; color: #6c757d;"></div>
         </div>
 
         <div th:replace="~{fragments/contas/list :: contaTable(${contas}, null)}"></div>
@@ -40,6 +64,8 @@
             const searchInput = document.getElementById('searchInput');
             const searchResults = document.getElementById('searchResults');
             const tableRows = document.querySelectorAll('.clickable-rows tbody tr');
+            const filterChips = document.querySelectorAll('.filter-chip');
+            let activeFilter = 'all';
             
             // Função para remover acentos
             function removeAccents(str) {
@@ -53,8 +79,16 @@
                 tableRows.forEach(row => {
                     const codigo = removeAccents(row.querySelector('td:first-child a').textContent.toLowerCase());
                     const descricao = removeAccents(row.querySelector('td:nth-child(2) a').textContent.toLowerCase());
+                    const codigoCompleto = row.querySelector('td:first-child a').textContent.trim();
                     
-                    if (searchTerm === '' || codigo.includes(searchTerm) || descricao.includes(searchTerm)) {
+                    // Verificar filtro de texto
+                    const matchesSearch = searchTerm === '' || codigo.includes(searchTerm) || descricao.includes(searchTerm);
+                    
+                    // Verificar filtro de grupo (primeiro dígito do código)
+                    const primeiroDigito = codigoCompleto.charAt(0);
+                    const matchesGroup = activeFilter === 'all' || primeiroDigito === activeFilter;
+                    
+                    if (matchesSearch && matchesGroup) {
                         row.style.display = '';
                         visibleCount++;
                     } else {
@@ -63,7 +97,7 @@
                 });
                 
                 // Atualizar contador de resultados
-                if (searchTerm === '') {
+                if (searchTerm === '' && activeFilter === 'all') {
                     searchResults.textContent = '';
                 } else {
                     searchResults.textContent = visibleCount === 1 
@@ -71,6 +105,44 @@
                         : visibleCount + ' contas encontradas';
                 }
             }
+            
+            // Manipular cliques nos chips de filtro
+            filterChips.forEach(chip => {
+                chip.addEventListener('click', function() {
+                    // Remover estado ativo de todos os chips
+                    filterChips.forEach(c => {
+                        c.dataset.active = 'false';
+                        const color = c === chip ? c.style.borderColor : c.style.color;
+                        c.style.background = 'white';
+                        c.style.color = c.style.borderColor;
+                    });
+                    
+                    // Ativar chip clicado
+                    this.dataset.active = 'true';
+                    const chipColor = this.style.borderColor;
+                    this.style.background = chipColor;
+                    this.style.color = 'white';
+                    
+                    // Atualizar filtro ativo
+                    activeFilter = this.dataset.filter;
+                    
+                    // Aplicar filtros
+                    filterTable();
+                });
+                
+                // Efeito hover
+                chip.addEventListener('mouseenter', function() {
+                    if (this.dataset.active !== 'true') {
+                        this.style.background = this.style.borderColor + '15';
+                    }
+                });
+                
+                chip.addEventListener('mouseleave', function() {
+                    if (this.dataset.active !== 'true') {
+                        this.style.background = 'white';
+                    }
+                });
+            });
             
             // Filtrar enquanto o usuário digita
             searchInput.addEventListener('input', filterTable);
