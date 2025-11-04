@@ -16,9 +16,74 @@
             </div>
         </div>
 
+        <!-- Barra de busca -->
+        <div class="search-container" style="margin-bottom: 1.5rem;">
+            <div style="position: relative; max-width: 500px;">
+                <i class="fa-solid fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Buscar por código ou descrição..." 
+                    style="width: 100%; padding: 0.5rem 0.75rem 0.5rem 2.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95rem;"
+                    aria-label="Buscar contas"
+                >
+            </div>
+            <div id="searchResults" style="margin-top: 0.5rem; font-size: 0.9rem; color: #6c757d;"></div>
+        </div>
+
         <div th:replace="~{fragments/contas/list :: contaTable(${contas}, null)}"></div>
 
     </main>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            const tableRows = document.querySelectorAll('.clickable-rows tbody tr');
+            
+            // Função para remover acentos
+            function removeAccents(str) {
+                return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            }
+            
+            function filterTable() {
+                const searchTerm = removeAccents(searchInput.value.toLowerCase().trim());
+                let visibleCount = 0;
+                
+                tableRows.forEach(row => {
+                    const codigo = removeAccents(row.querySelector('td:first-child a').textContent.toLowerCase());
+                    const descricao = removeAccents(row.querySelector('td:nth-child(2) a').textContent.toLowerCase());
+                    
+                    if (searchTerm === '' || codigo.includes(searchTerm) || descricao.includes(searchTerm)) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                // Atualizar contador de resultados
+                if (searchTerm === '') {
+                    searchResults.textContent = '';
+                } else {
+                    searchResults.textContent = visibleCount === 1 
+                        ? '1 conta encontrada' 
+                        : visibleCount + ' contas encontradas';
+                }
+            }
+            
+            // Filtrar enquanto o usuário digita
+            searchInput.addEventListener('input', filterTable);
+            
+            // Limpar busca com ESC
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    searchInput.value = '';
+                    filterTable();
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
