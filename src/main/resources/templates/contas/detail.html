@@ -74,6 +74,36 @@
                 </div>
                 <div th:replace="~{fragments/contas/list :: contaTable(${inferiores}, null)}"></div>
             </div>
+            <!-- Barra de busca única para lançamentos -->
+            <div class="search-container" th:if="${conta.tipo.name() == 'ANALITICA'}" style="margin: 1.5rem 0; padding: 0 0.5rem;">
+                <div style="position: relative; max-width: 500px;">
+                    <i class="fa-solid fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+                    <input 
+                        type="text" 
+                        id="searchInputLancamentos" 
+                        placeholder="Buscar por data, descrição, valor ou contrapartida..." 
+                        style="width: 100%; padding: 0.5rem 0.75rem 0.5rem 2.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95rem;"
+                        aria-label="Buscar lançamentos"
+                    >
+                </div>
+                
+                <!-- Filtros por tipo de lançamento -->
+                <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+                    <span style="font-size: 0.9rem; color: #6c757d; font-weight: 500;">Filtrar por tipo:</span>
+                    <button class="filter-chip-lancamento" data-filter="all" data-active="true" style="padding: 0.4rem 0.9rem; border: 2px solid #0066cc; background: #0066cc; color: white; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                        Todos
+                    </button>
+                    <button class="filter-chip-lancamento" data-filter="efetivos" style="padding: 0.4rem 0.9rem; border: 2px solid #28a745; background: white; color: #28a745; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                        <i class="fa-solid fa-check-circle" style="font-size: 0.75rem;"></i> Efetivos
+                    </button>
+                    <button class="filter-chip-lancamento" data-filter="previstos" style="padding: 0.4rem 0.9rem; border: 2px solid #ffc107; background: white; color: #ffc107; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                        <i class="fa-solid fa-clock" style="font-size: 0.75rem;"></i> Previstos
+                    </button>
+                </div>
+                
+                <div id="searchResultsLancamentos" style="margin-top: 0.75rem; font-size: 0.9rem; color: #6c757d;"></div>
+            </div>
+
             <div class="card-section collapsible" th:if="${conta.tipo.name() == 'ANALITICA'}">
                 <div class="card-header">
                     <h2>Extrato da Conta</h2>
@@ -100,11 +130,11 @@
                 <div class="card-header">
                     <h2>Lançamentos futuros</h2>
                     <div class="actions">
-                        <button type="button" class="collapse-toggle" aria-expanded="false">
+                        <button type="button" class="collapse-toggle" aria-expanded="true">
                             <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-                            <span>Expandir</span>
+                            <span>Recolher</span>
                         </button>
-                        <a class="btn add-negative icon" th:if="${conta.aceitaMovimentoOposto}" th:href="${conta.natureza.name() == 'CREDORA'} ? @{/lancamentos/new(status=EFETIVO,contaDebitoId=${conta.id})} : @{/lancamentos/new(status=EFETIVO,contaCreditoId=${conta.id})}"
+                        <a class="btn add-negative icon" th:if="${conta.aceitaMovimentoOposto}" th:href="${conta.natureza.name() == 'CREDORA'} ? @{/lancamentos/new(status=PREVISTO,contaDebitoId=${conta.id})} : @{/lancamentos/new(status=PREVISTO,contaCreditoId=${conta.id})}"
                             aria-label="Nova saída prevista" title="Nova saída prevista">
                             <i class="fa-solid fa-minus" aria-hidden="true"></i>
                             <span class="sr-only">Nova saída prevista</span>
@@ -120,6 +150,148 @@
             </div>
         </div>
     </main>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInputLancamentos');
+            const searchResults = document.getElementById('searchResultsLancamentos');
+            const filterChips = document.querySelectorAll('.filter-chip-lancamento');
+            
+            if (!searchInput) return;
+            
+            const cardSections = document.querySelectorAll('.card-section.collapsible');
+            const efetivosSection = cardSections[0];
+            const previstosSection = cardSections[1];
+            
+            let activeFilter = 'all';
+            
+            // Função para remover acentos
+            function removeAccents(str) {
+                return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            }
+            
+            function filterTable() {
+                const searchTerm = removeAccents(searchInput.value.toLowerCase().trim());
+                let visibleCount = 0;
+                
+                // Filtrar lançamentos efetivos
+                if (efetivosSection && (activeFilter === 'all' || activeFilter === 'efetivos')) {
+                    const efetivoRows = efetivosSection.querySelectorAll('.clickable-rows tbody tr');
+                    efetivoRows.forEach(row => {
+                        const matchesSearch = checkRowMatch(row, searchTerm);
+                        
+                        if (matchesSearch) {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                }
+                
+                // Filtrar lançamentos previstos
+                if (previstosSection && (activeFilter === 'all' || activeFilter === 'previstos')) {
+                    const previstoRows = previstosSection.querySelectorAll('.clickable-rows tbody tr');
+                    previstoRows.forEach(row => {
+                        const matchesSearch = checkRowMatch(row, searchTerm);
+                        
+                        if (matchesSearch) {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                }
+                
+                // Ocultar/mostrar seções completas baseado no filtro
+                if (efetivosSection) {
+                    efetivosSection.style.display = (activeFilter === 'all' || activeFilter === 'efetivos') ? '' : 'none';
+                }
+                if (previstosSection) {
+                    previstosSection.style.display = (activeFilter === 'all' || activeFilter === 'previstos') ? '' : 'none';
+                }
+                
+                // Atualizar contador de resultados
+                if (searchTerm === '' && activeFilter === 'all') {
+                    searchResults.textContent = '';
+                } else {
+                    searchResults.textContent = visibleCount === 1 
+                        ? '1 lançamento encontrado' 
+                        : visibleCount + ' lançamentos encontrados';
+                }
+            }
+            
+            function checkRowMatch(row, searchTerm) {
+                if (searchTerm === '') return true;
+                
+                const data = row.querySelector('td:nth-child(1)') ? 
+                    removeAccents(row.querySelector('td:nth-child(1)').textContent.toLowerCase()) : '';
+                const descricao = row.querySelector('td:nth-child(2)') ? 
+                    removeAccents(row.querySelector('td:nth-child(2)').textContent.toLowerCase()) : '';
+                const valor = row.querySelector('td:nth-child(3)') ? 
+                    removeAccents(row.querySelector('td:nth-child(3)').textContent.toLowerCase()) : '';
+                const saldo = row.querySelector('td:nth-child(4)') ? 
+                    removeAccents(row.querySelector('td:nth-child(4)').textContent.toLowerCase()) : '';
+                const contrapartida = row.querySelector('td:nth-child(5)') ? 
+                    removeAccents(row.querySelector('td:nth-child(5)').textContent.toLowerCase()) : '';
+                
+                return data.includes(searchTerm) || 
+                       descricao.includes(searchTerm) ||
+                       valor.includes(searchTerm) ||
+                       saldo.includes(searchTerm) ||
+                       contrapartida.includes(searchTerm);
+            }
+            
+            // Manipular cliques nos chips de filtro
+            filterChips.forEach(chip => {
+                chip.addEventListener('click', function() {
+                    // Remover estado ativo de todos os chips
+                    filterChips.forEach(c => {
+                        c.dataset.active = 'false';
+                        c.style.background = 'white';
+                        c.style.color = c.style.borderColor;
+                    });
+                    
+                    // Ativar chip clicado
+                    this.dataset.active = 'true';
+                    const chipColor = this.style.borderColor;
+                    this.style.background = chipColor;
+                    this.style.color = 'white';
+                    
+                    // Atualizar filtro ativo
+                    activeFilter = this.dataset.filter;
+                    
+                    // Aplicar filtros
+                    filterTable();
+                });
+                
+                // Efeito hover
+                chip.addEventListener('mouseenter', function() {
+                    if (this.dataset.active !== 'true') {
+                        this.style.background = this.style.borderColor + '15';
+                    }
+                });
+                
+                chip.addEventListener('mouseleave', function() {
+                    if (this.dataset.active !== 'true') {
+                        this.style.background = 'white';
+                    }
+                });
+            });
+            
+            // Filtrar enquanto o usuário digita
+            searchInput.addEventListener('input', filterTable);
+            
+            // Limpar busca com ESC
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    searchInput.value = '';
+                    filterTable();
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
