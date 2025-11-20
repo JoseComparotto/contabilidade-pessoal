@@ -22,6 +22,7 @@ public class ContaViewDto implements IDto<Conta> {
     private String descricao;
     private String displayText;
     private BigDecimal saldoAtual;
+    private BigDecimal saldoProjetado;
     private Natureza natureza;
     private TipoConta tipo;
     private boolean ativa;
@@ -79,6 +80,23 @@ public class ContaViewDto implements IDto<Conta> {
 
     public void setSaldoAtual(BigDecimal saldoAtual) {
         this.saldoAtual = saldoAtual;
+    }
+    
+    public BigDecimal getSaldoProjetado() {
+        return saldoProjetado;
+    }
+    public void setSaldoProjetado(BigDecimal saldoProjetado) {
+        this.saldoProjetado = saldoProjetado;
+    }
+
+    @JsonIgnore
+    public String getSaldoProjetadoFormatado() {
+        if (saldoProjetado == null || BigDecimal.ZERO.compareTo(saldoProjetado) == 0) {
+            return "-";
+        }
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.forLanguageTag("pt-BR"));
+        DecimalFormat df = new DecimalFormat("#,##0.00;(#,##0.00)", symbols);
+        return df.format(saldoProjetado);
     }
 
     public Natureza getNatureza() {

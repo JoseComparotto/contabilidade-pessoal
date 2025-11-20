@@ -23,7 +23,8 @@ public final class ContaMapper {
         dto.setDisplayText(conta.getDisplayText());
         dto.setNatureza(conta.getNatureza());
         dto.setTipo(conta.getTipo());
-        dto.setSaldoAtual(conta.getSaldoNatural());
+        dto.setSaldoAtual(conta.getSaldoNaturalEfetivo());
+        dto.setSaldoProjetado(conta.getSaldoNaturalPrevisto());
         dto.setRedutora(conta.isRedutora());
         dto.setAceitaMovimentoOposto(conta.getAceitaMovimentoOposto());
         dto.setAtiva(conta.isAtiva());

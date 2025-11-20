@@ -60,6 +60,10 @@
                     <label>Saldo Atual</label>
                     <input type="text" th:value="${conta.saldoAtualFormatado}" disabled />
                 </div>
+                <div class="field">
+                    <label>Saldo Projetado</label>
+                    <input type="text" th:value="${conta.saldoProjetadoFormatado}" disabled />
+                </div>
             </div>
             <div class="card-section" th:if="${conta.tipo.name() == 'SINTETICA'}">
                 <div class="card-header">
@@ -89,7 +93,6 @@
                 
                 <!-- Filtros por tipo de lançamento -->
                 <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
-                    <span style="font-size: 0.9rem; color: #6c757d; font-weight: 500;">Filtrar por tipo:</span>
                     <button class="filter-chip-lancamento" data-filter="all" data-active="true" style="padding: 0.4rem 0.9rem; border: 2px solid #0066cc; background: #0066cc; color: white; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">
                         Todos
                     </button>
@@ -126,7 +129,7 @@
                 </div>
                 <div class="collapse-content" th:insert="~{fragments/movimentos/list :: movimentoTable(${movimentosEfetivos}, @{/contas/{id}(id=${conta.id})})}"></div>
             </div>
-            <div class="card-section collapsible collapsed" th:if="${conta.tipo.name() == 'ANALITICA'}">
+            <div class="card-section collapsible" th:if="${conta.tipo.name() == 'ANALITICA'}">
                 <div class="card-header">
                     <h2>Lançamentos futuros</h2>
                     <div class="actions">

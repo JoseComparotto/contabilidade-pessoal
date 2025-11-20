@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -132,8 +133,8 @@ public class Conta {
         return inferiores.isEmpty() && lancamentosDebito.isEmpty() && lancamentosCredito.isEmpty();
     }
 
-    private boolean canEditRedutora(){
-        if(isRedutora()){
+    private boolean canEditRedutora() {
+        if (isRedutora()) {
             // Pode deixar de ser redutora se a superior não for redutora
             return superior == null || !superior.isRedutora();
         } else {
@@ -209,33 +210,56 @@ public class Conta {
     }
 
     @Transient
-    public BigDecimal getSaldoNatural() {
+    public BigDecimal getSaldoNaturalEfetivo() {
+        return getSaldoNatural(l -> StatusLancamento.EFETIVO.equals(l.getStatus()));
+    }
+
+    @Transient
+    public BigDecimal getSaldoNaturalPrevisto() {
+        return getSaldoNatural(l -> StatusLancamento.EFETIVO.equals(l.getStatus())
+                || StatusLancamento.PREVISTO.equals(l.getStatus()));
+    }
+
+    @Transient
+    public BigDecimal getSaldoNatural(Function<Lancamento, Boolean> isConsidered) {
         Natureza n = getNatureza();
         if (n == null) {
             return BigDecimal.ZERO;
         }
         switch (n) {
             case CREDORA:
-                return getSaldoContabil();
+                return getSaldoContabil(isConsidered);
             case DEVEDORA:
-                return getSaldoContabil().multiply(BigDecimal.valueOf(-1));
+                return getSaldoContabil(isConsidered)
+                        .multiply(BigDecimal.valueOf(-1));
             default:
                 return BigDecimal.ZERO;
         }
     }
 
     @Transient
-    public BigDecimal getSaldoContabil() {
+    public BigDecimal getSaldoContabilEfetivo() {
+        return getSaldoContabil(l -> StatusLancamento.EFETIVO.equals(l.getStatus()));
+    }
+
+    @Transient
+    public BigDecimal getSaldoContabilPrevisto() {
+        return getSaldoContabil(l -> StatusLancamento.EFETIVO.equals(l.getStatus())
+                || StatusLancamento.PREVISTO.equals(l.getStatus()));
+    }
+
+    @Transient
+    public BigDecimal getSaldoContabil(Function<Lancamento, Boolean> isConsidered) {
 
         switch (getTipo()) {
             // Se for analítica, o saldo é o somatório líquido dos lançamentos efetivos
             case ANALITICA:
                 BigDecimal saldoDebito = lancamentosDebito.stream()
-                        .filter(l -> StatusLancamento.EFETIVO.equals(l.getStatus()))
+                        .filter(isConsidered::apply)
                         .map(Lancamento::getValor)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
                 BigDecimal saldoCredito = lancamentosCredito.stream()
-                        .filter(l -> StatusLancamento.EFETIVO.equals(l.getStatus()))
+                        .filter(isConsidered::apply)
                         .map(Lancamento::getValor)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
                 return saldoCredito.subtract(saldoDebito);
@@ -245,7 +269,7 @@ public class Conta {
             case SINTETICA:
                 return getTodasInferiores().stream()
                         .filter(c -> TipoConta.ANALITICA.equals(c.getTipo()))
-                        .map(Conta::getSaldoContabil)
+                        .map(c -> c.getSaldoContabil(isConsidered))
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
             default:
                 break;
