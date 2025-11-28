@@ -7,6 +7,7 @@
                     <th>Código</th>
                     <th>Descrição</th>
                     <th>Saldo Atual</th>
+                    <th>Saldo Projetado</th>
                 </tr>
             </thead>
             <tbody>
@@ -24,6 +25,8 @@
                     <td class="accounting-column" th:classappend="*{saldoAtual != null} ? (*{saldoAtual} &lt; 0 ? ' negative' : ' positive') : ''">
                         <a th:href="@{/contas/{id}(id=*{id})}" th:text="*{saldoAtualFormatado}">R$ 0,00</a>
                     </td>
+                    <td class="accounting-column" th:classappend="*{saldoProjetado != null} ? (*{saldoProjetado} &lt; 0 ? ' negative' : ' positive') : ''">
+                        <a th:href="@{/contas/{id}(id=*{id})}" th:text="*{saldoProjetadoFormatado}">R$ 0,00</a>
                 </tr>
             </tbody>
         </table>
