@@ -1,6 +1,7 @@
 package me.josecomparotto.contabilidade_pessoal.service;
 
 import java.beans.PropertyDescriptor;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -237,6 +238,7 @@ public class ContaService {
         }
 
         return conta.getInferiores().stream()
+                .sorted(Comparator.comparing(Conta::getSequencia))
                 .map(ContaMapper::toViewDto)
                 .collect(Collectors.toList());
     }
