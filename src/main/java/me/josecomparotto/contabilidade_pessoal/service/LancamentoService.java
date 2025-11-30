@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,70 +58,106 @@ public class LancamentoService {
             throw new IllegalArgumentException("Conta não encontrada");
         }
 
-        Map<LocalDate, List<MovimentoDto>> dataLancamentosMap = new HashMap<>();
-        List<MovimentoDto> movimentos = new ArrayList<>();
+        List<MovimentoDto> movimentos = coletarMovimentosDaConta(idConta, efetivo);
+        Map<LocalDate, List<MovimentoDto>> movimentosPorData = agruparPorData(movimentos);
+        
+        return calcularSaldosAcumuladosEAgrupar(movimentosPorData, conta, efetivo);
+    }
 
+    private List<MovimentoDto> coletarMovimentosDaConta(Integer idConta, boolean efetivo) {
         List<Lancamento> lancamentosCredito = lancamentoRepository.findByContaCreditoId(idConta);
         List<Lancamento> lancamentosDebito = lancamentoRepository.findByContaDebitoId(idConta);
 
-        movimentos.addAll(lancamentosCredito.stream()
-                .map(LancamentoMapper::toMovimentoCredito)
-                .collect(Collectors.toList()));
-        movimentos.addAll(lancamentosDebito.stream()
-                .map(LancamentoMapper::toMovimentoDebito)
-                .collect(Collectors.toList()));
+        return Stream.concat(
+                lancamentosCredito.stream().map(LancamentoMapper::toMovimentoCredito),
+                lancamentosDebito.stream().map(LancamentoMapper::toMovimentoDebito)
+        )
+        .filter(m -> efetivo ? StatusLancamento.EFETIVO.equals(m.getStatus())
+                : StatusLancamento.PREVISTO.equals(m.getStatus()))
+        .sorted(Comparator
+                .comparing(MovimentoDto::getData)
+                .thenComparing(this::compararPorNaturaEId))
+        .collect(Collectors.toList());
+    }
 
-        movimentos = movimentos.stream()
-                .filter(m -> efetivo ? StatusLancamento.EFETIVO.equals(m.getStatus())
-                        : StatusLancamento.PREVISTO.equals(m.getStatus()))
-                .sorted(Comparator
-                        .comparing(MovimentoDto::getData)
-                        .thenComparing(MovimentoDto::getValor, Comparator.reverseOrder()))
+    private Map<LocalDate, List<MovimentoDto>> agruparPorData(List<MovimentoDto> movimentos) {
+        return movimentos.stream()
+                .collect(Collectors.groupingBy(MovimentoDto::getData, HashMap::new, Collectors.toList()));
+    }
+
+    private List<MovimentoDto> calcularSaldosAcumuladosEAgrupar(
+            Map<LocalDate, List<MovimentoDto>> movimentosPorData,
+            ContaViewDto conta,
+            boolean efetivo) {
+        
+        List<MovimentoDto> resultado = new ArrayList<>();
+        BigDecimal saldoAcumulado = efetivo ? BigDecimal.ZERO : conta.getSaldoAtual();
+
+        List<LocalDate> datasOrdenadas = movimentosPorData.keySet().stream()
+                .sorted(Comparator.naturalOrder())
                 .collect(Collectors.toList());
 
-        for (MovimentoDto m : movimentos) {
-            LocalDate data = m.getData();
-            dataLancamentosMap.computeIfAbsent(data, k -> new ArrayList<>()).add(m);
-        }
-
-        movimentos.clear();
-
-        List<LocalDate> datasOrdenadas = new ArrayList<>(dataLancamentosMap.keySet());
-        datasOrdenadas.sort(Comparator.naturalOrder());
-
-        BigDecimal saldoAcumulado = efetivo ? BigDecimal.ZERO : conta.getSaldoAtual();
-        for (var data : datasOrdenadas) {
-            var mLancamentos = dataLancamentosMap.get(data);
-
+        for (LocalDate data : datasOrdenadas) {
             BigDecimal saldoAnterior = saldoAcumulado;
-
-            for (var m : mLancamentos) {
-                saldoAcumulado = saldoAcumulado.add(BigDecimal.valueOf(m.getValor()));
-                m.setSaldo(saldoAcumulado.doubleValue());
-                movimentos.add(m);
+            
+            for (MovimentoDto movimento : movimentosPorData.get(data)) {
+                saldoAcumulado = saldoAcumulado.add(BigDecimal.valueOf(movimento.getValor()));
+                movimento.setSaldo(saldoAcumulado.doubleValue());
+                resultado.add(movimento);
             }
 
-            MovimentoDto mAgregado = new MovimentoDto();
-            mAgregado.setAgregado(true);
-            mAgregado.setData(data);
-            mAgregado.setValor(saldoAcumulado.subtract(saldoAnterior).doubleValue());
-            mAgregado.setSaldo(saldoAcumulado.doubleValue());
-            mAgregado.setSentidoNatural(mAgregado.getValor() >= 0 ? SentidoNatural.ENTRADA : SentidoNatural.SAIDA);
-            movimentos.add(mAgregado);
+            resultado.add(criarMovimentoAgregado(data, saldoAnterior, saldoAcumulado));
         }
 
-        if (efetivo) {
-            movimentos.sort(Comparator
-                    .comparing(MovimentoDto::getData, Comparator.reverseOrder())
-                    .thenComparing(MovimentoDto::isAgregado, Comparator.reverseOrder())
-                    .thenComparing(MovimentoDto::getValor));
-        } else {
-            movimentos.sort(Comparator
-                    .comparing(MovimentoDto::getData)
-                    .thenComparing(MovimentoDto::isAgregado, Comparator.reverseOrder())
-                    .thenComparing(MovimentoDto::getValor, Comparator.reverseOrder()));
+        ordenarResultadoFinal(resultado, efetivo);
+        return resultado;
+    }
+
+    private MovimentoDto criarMovimentoAgregado(LocalDate data, BigDecimal saldoAnterior, BigDecimal saldoAcumulado) {
+        MovimentoDto agregado = new MovimentoDto();
+        BigDecimal totalDia = saldoAcumulado.subtract(saldoAnterior);
+        
+        agregado.setAgregado(true);
+        agregado.setData(data);
+        agregado.setValor(totalDia.doubleValue());
+        agregado.setSaldo(saldoAcumulado.doubleValue());
+        agregado.setSentidoNatural(totalDia.signum() >= 0 ? SentidoNatural.ENTRADA : SentidoNatural.SAIDA);
+        
+        return agregado;
+    }
+
+    private void ordenarResultadoFinal(List<MovimentoDto> movimentos, boolean efetivo) {
+        Comparator<MovimentoDto> comparador = Comparator
+                .comparing(MovimentoDto::getData, efetivo ? Comparator.reverseOrder() : Comparator.naturalOrder())
+                .thenComparing(MovimentoDto::isAgregado, Comparator.reverseOrder())
+                .thenComparing(efetivo ? this::compararPorNaturaEIdReversed : this::compararPorNaturaEId);
+        
+        movimentos.sort(comparador);
+    }
+
+    private int compararPorNaturaEId(MovimentoDto m1, MovimentoDto m2) {
+        // Lançamentos com valor positivo (ENTRADA) vêm antes dos negativos (SAIDA)
+        boolean isPositive1 = m1.getValor() >= 0;
+        boolean isPositive2 = m2.getValor() >= 0;
+        
+        if (isPositive1 != isPositive2) {
+            return Boolean.compare(isPositive2, isPositive1); // positivos primeiro
         }
-        return movimentos;
+        
+        // Se mesma natureza, ordenar por ID do lançamento
+        return m1.getIdLancamento().compareTo(m2.getIdLancamento());
+    }
+    private int compararPorNaturaEIdReversed(MovimentoDto m1, MovimentoDto m2) {
+        // Lançamentos com valor positivo (ENTRADA) vêm antes dos negativos (SAIDA)
+        boolean isPositive1 = m1.getValor() >= 0;
+        boolean isPositive2 = m2.getValor() >= 0;
+        
+        if (isPositive1 != isPositive2) {
+            return Boolean.compare(isPositive1, isPositive2); // negativos primeiro
+        }
+        
+        // Se mesma natureza, ordenar por ID do lançamento
+        return m2.getIdLancamento().compareTo(m1.getIdLancamento());
     }
 
     public boolean deletarLancamentoPorId(Long id) {
